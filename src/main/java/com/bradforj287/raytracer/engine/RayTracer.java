@@ -1,0 +1,310 @@
+package com.bradforj287.raytracer.engine;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Random;
+
+import com.bradforj287.raytracer.ProgramArguments;
+import com.bradforj287.raytracer.model.SceneModel3D;
+import com.bradforj287.raytracer.shapes.Matrix3D;
+import com.bradforj287.raytracer.shapes.RayCastArguments;
+import com.bradforj287.raytracer.shapes.Triangle3D;
+import com.bradforj287.raytracer.shapes.Vector3D;
+import com.bradforj287.raytracer.utils.VideoDataPointBuffer;
+
+public class RayTracer {
+	private SceneModel3D scene = null;
+	private Dimension sceneResolution = null;
+	private VideoDataPointBuffer fpsBuffer = new VideoDataPointBuffer();
+
+	public RayTracer(SceneModel3D model, Dimension sceneResolution) {
+		this.sceneResolution = sceneResolution;
+		this.scene = model;
+	}
+
+	public BufferedImage traceScene(final double thetax, final double thetay, final double thetaz)
+			throws InterruptedException {
+
+		final BufferedImage image = new BufferedImage(sceneResolution.width,
+				sceneResolution.height, BufferedImage.TYPE_INT_RGB);
+
+		// first clear the screen to the background color
+		clearImage(image);
+
+		final int numCores = Runtime.getRuntime().availableProcessors();
+
+		// create some arguments for the trace call
+		final double xIncrement = ProgramArguments.SCREEN_WIDTH / sceneResolution.getWidth();
+		final double yIncrement = ProgramArguments.SCREEN_HEIGHT / sceneResolution.getHeight();
+		final double xstart = -1 * ProgramArguments.SCREEN_WIDTH / 2;
+		final double ystart = -1 * ProgramArguments.SCREEN_HEIGHT / 2;
+		final int threadWidth = sceneResolution.width / numCores;
+
+		ArrayList<Thread> tracePool = new ArrayList<Thread>();
+
+		// create the threads
+		for (int i = 0; i < numCores; i++) {
+			// calculate width and height for this thread
+			int width = threadWidth;
+			int height = sceneResolution.height;
+
+			if (i == numCores - 1) {
+				width += sceneResolution.width % numCores;
+			}
+
+			// pass this to thread
+			final Rectangle threadRect = new Rectangle(i * threadWidth, 0,
+					width, height);
+
+			// create the worker thread
+			Thread traceThread = new Thread(new Runnable() {
+				@Override
+					public void run() {
+	
+						iterateOverScreenRegion(image, threadRect, xIncrement,
+								yIncrement, xstart, ystart, thetax, thetay, thetaz);
+					}
+				}
+			);
+
+			tracePool.add(traceThread);
+
+			// start up the thread we just created
+			traceThread.start();
+		}
+
+		// make sure all threads have finished before we return!
+		for (Thread t : tracePool) {
+			t.join();
+		}
+
+		fpsBuffer.addToBuffer(System.currentTimeMillis());
+
+		printStatsToImage(image,thetax,thetay,thetaz);
+		return image;
+	}
+
+	private void printStatsToImage(BufferedImage image, double thetax, double thetay, double thetaz) {
+		Graphics2D g2d = (Graphics2D) image.getGraphics();
+
+		// print FPS
+		String fpsString = Double.toString(fpsBuffer.getFramesPerSecond());
+		drawString(g2d,"FPS = " + fpsString, 10,10);
+		
+		// print rotation
+		drawString(g2d,"rX= " + Double.toString(thetax), 10,20);
+		drawString(g2d,"rY = " + Double.toString(thetay), 10,30);
+		drawString(g2d,"rZ = " + Double.toString(thetaz), 10,40);
+	
+	}
+
+	private void drawString(Graphics2D g2d, String s, int i, int j) {
+		if (s.length() > 10) {
+			s = s.substring(0, 10);
+		}
+		char[] charA = s.toCharArray();
+
+		g2d.drawChars(charA, 0, charA.length, i, j);
+	}
+
+	/**
+	 * Iterates over a subset of the screen resolution specified by Region. The
+	 * purpose of this is to distribute across threads.
+	 * 
+	 * @param region
+	 * @param xIncrement
+	 * @param yIncrement
+	 * @param xStart
+	 * @param yStart
+	 * @param theta
+	 */
+	private void iterateOverScreenRegion(BufferedImage image, Rectangle region,
+			double xIncrement, double yIncrement, double xStart, double yStart,
+			double thetax, double thetay, double thetaz) {
+		
+		Matrix3D xRot = Matrix3D.getXRotationMatrix(thetax);
+		Matrix3D yRot = Matrix3D.getYRotationMatrix(thetay);
+		Matrix3D zRot = Matrix3D.getZRotationMatrix(thetaz);
+		
+		Random rand = new Random();
+		
+		Matrix3D rot = Matrix3D.matrixMultiply(xRot, yRot);
+		rot = Matrix3D.matrixMultiply(rot, zRot);
+		
+		// iterate over all pixels in resolution
+		for (int i = region.x; i < region.x + region.width; i++) {
+			for (int j = 0; j < region.height; j++) {
+
+				int aveR = 0;
+				int aveG = 0;
+				int aveB = 0;
+				int aveA = 0;
+				for (int a = 0; a < ProgramArguments.ANTIALIASING_SAMPLES; a++)
+				{
+					double xOffset;
+					double yOffset;
+					
+					if (ProgramArguments.ANTIALIASING_SAMPLES > 1)
+					{
+						xOffset = rand.nextDouble()*xIncrement;
+						yOffset = rand.nextDouble()*yIncrement;
+					}
+					else
+					{
+						xOffset = .5*xIncrement;
+						yOffset = .5*yIncrement;
+					}
+		
+					// calculate pointOnScreen and eyePoint
+					Vector3D pointOnScreen = new Vector3D(xStart + i * xIncrement +xOffset ,
+							yStart + j * yIncrement  +yOffset, ProgramArguments.SCREEN_POSITION.z);
+					Vector3D eyePosition = new Vector3D(ProgramArguments.EYE_POSITION);
+	
+					// rotate both points according to theta
+					pointOnScreen.multiplyByMatrix(rot);
+					eyePosition.multiplyByMatrix(rot);
+	
+					// calculate view ray
+					Vector3D eyeDirection = Vector3D.vectorSubtract(pointOnScreen,
+							eyePosition);
+
+					int color = getColorForRay( eyeDirection, eyePosition, i, j);
+
+					Color c = new Color(color);
+					aveR = aveR + c.getRed();
+					aveG = aveG + c.getGreen();
+					aveB = aveB + c.getBlue();
+					aveA = aveA + c.getAlpha();
+				
+				}
+				
+				aveR = aveR / ProgramArguments.ANTIALIASING_SAMPLES;
+				aveG = aveG / ProgramArguments.ANTIALIASING_SAMPLES;
+				aveB = aveB / ProgramArguments.ANTIALIASING_SAMPLES;
+				aveA = aveA / ProgramArguments.ANTIALIASING_SAMPLES;
+				
+				Color c1 = new Color(aveR, aveG, aveB, aveA);
+						
+				image.setRGB(i, j, c1.getRGB());
+			}
+		}
+	}
+
+	/**
+	 * Process the ray specified by eyeDirection and EYE_POSITION
+	 * 
+	 * @param eyeDirection
+	 */
+	private int getColorForRay(final Vector3D eyeDirection,
+			final Vector3D eyePosition, int i, int j) {
+
+		RayCastArguments returnArgs = new RayCastArguments();
+
+		Triangle3D interesectTriangle = doesRayHitAnyShape(eyeDirection,
+				eyePosition, returnArgs);
+		if (interesectTriangle != null) {
+			
+			double t = returnArgs.t;
+
+			Vector3D intersectLoc = new Vector3D(eyePosition.x + t
+					* eyeDirection.x, eyePosition.y + t * eyeDirection.y,
+					eyePosition.z + t * eyeDirection.z);
+			Vector3D normalToShape = interesectTriangle.getNormalVector();
+
+			int color = interesectTriangle.color;
+
+
+			Vector3D lightVector = Vector3D.vectorSubtract(ProgramArguments.LIGHT_LOCATION, intersectLoc);
+
+			lightVector.makeUnitVector();
+
+			double angleBetweenNormalAndLight = Vector3D.dotProduct(
+					normalToShape, lightVector);
+
+			lightVector = Vector3D.vectorSubtract(intersectLoc, ProgramArguments.LIGHT_LOCATION);
+			lightVector.makeUnitVector();
+			if (angleBetweenNormalAndLight < 0) {
+				angleBetweenNormalAndLight = 0;
+			} else if (isInShadow(interesectTriangle, ProgramArguments.LIGHT_LOCATION, lightVector)) {
+				angleBetweenNormalAndLight = 0;
+			}
+
+			/**
+			 * Set the color for the pixel
+			 */
+			double colorscalar = ProgramArguments.AMBIENT_LIGHT + (1 - ProgramArguments.AMBIENT_LIGHT)
+					* angleBetweenNormalAndLight;
+
+			int mask = 0x00FFFFFF;
+			int redChannel = color & mask;
+			redChannel = redChannel >> 16;
+
+			mask = 0x0000FF00;
+			int greenChannel = color & mask;
+
+			greenChannel = greenChannel >> 8;
+
+			mask = 0x000000FF;
+			int blueChannel = color & mask;
+
+			double nRed = colorscalar * ((double) redChannel);
+			double nGreen = colorscalar * ((double) greenChannel);
+			double nBlue = colorscalar * ((double) blueChannel);
+
+			redChannel = (int) nRed;
+			greenChannel = (int) nGreen;
+			blueChannel = (int) nBlue;
+
+			redChannel = redChannel << 16;
+			greenChannel = greenChannel << 8;
+
+			int colorToAssign = redChannel + greenChannel + blueChannel;
+
+			return colorToAssign;
+		} else {
+			return 0;
+		}
+
+	}
+
+	private boolean isInShadow(Triangle3D hitTriangle, Vector3D intersectLoc,
+			Vector3D lightDir) {
+		Triangle3D interesectTriangle = doesRayHitAnyShape(lightDir,
+				intersectLoc, new RayCastArguments());
+
+		if (interesectTriangle == null) {
+			return false;
+		} else if (interesectTriangle != hitTriangle) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private Triangle3D doesRayHitAnyShape(Vector3D direction,
+			final Vector3D eyePosition, RayCastArguments returnArgs) {
+
+		double t0 = .0001;
+		double t1 = Double.MAX_VALUE; // switch this to max float
+
+		Triangle3D visibleTriangle = null;
+		// check triangles
+		for (int i = 0; i < scene.size(); i++) {
+			if (scene.getShape(i).isHitByRay(eyePosition, direction, t0, t1,
+					returnArgs)) {
+				t1 = returnArgs.t;
+				visibleTriangle = scene.getShape(i);
+			}
+		}
+
+		return visibleTriangle;
+	}
+
+	private void clearImage(BufferedImage image) {
+		Graphics2D g = (Graphics2D) image.getGraphics();
+		g.setBackground(Color.red);
+		g.setColor(Color.black);
+		g.fillRect(0, 0, sceneResolution.width, sceneResolution.height);
+	}
+}
