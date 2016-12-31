@@ -1,4 +1,4 @@
-package com.bradforj287.raytracer.shapes;
+package com.bradforj287.raytracer.geometry;
 
 public class Matrix3D {
     public double[][] matrix = new double[4][4];

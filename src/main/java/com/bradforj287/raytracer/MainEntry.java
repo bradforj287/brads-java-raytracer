@@ -6,8 +6,8 @@ import java.io.FileNotFoundException;
 import javax.swing.*;
 import com.bradforj287.raytracer.model.SceneModel3D;
 import com.bradforj287.raytracer.parser.ObjFileParser;
-import com.bradforj287.raytracer.shapes.Triangle3D;
-import com.bradforj287.raytracer.shapes.Vector3D;
+import com.bradforj287.raytracer.geometry.Triangle3D;
+import com.bradforj287.raytracer.geometry.Vector3D;
 import com.bradforj287.raytracer.utils.Utils;
 
 public class MainEntry {

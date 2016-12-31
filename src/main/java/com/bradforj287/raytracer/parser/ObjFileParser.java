@@ -8,8 +8,8 @@ import java.util.Scanner;
 import java.util.StringTokenizer;
 
 import com.bradforj287.raytracer.model.SceneModel3D;
-import com.bradforj287.raytracer.shapes.Triangle3D;
-import com.bradforj287.raytracer.shapes.Vector3D;
+import com.bradforj287.raytracer.geometry.Triangle3D;
+import com.bradforj287.raytracer.geometry.Vector3D;
 
 public class ObjFileParser {
 

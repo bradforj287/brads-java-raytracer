@@ -3,9 +3,9 @@ package com.bradforj287.raytracer.model;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import com.bradforj287.raytracer.shapes.Matrix3D;
-import com.bradforj287.raytracer.shapes.Triangle3D;
-import com.bradforj287.raytracer.shapes.Vector3D;
+import com.bradforj287.raytracer.geometry.Matrix3D;
+import com.bradforj287.raytracer.geometry.Triangle3D;
+import com.bradforj287.raytracer.geometry.Vector3D;
 
 public class SceneModel3D {
     private List<Triangle3D> shapes = new ArrayList<Triangle3D>();

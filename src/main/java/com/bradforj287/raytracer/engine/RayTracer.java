@@ -7,10 +7,10 @@ import java.util.Random;
 
 import com.bradforj287.raytracer.ProgramArguments;
 import com.bradforj287.raytracer.model.SceneModel3D;
-import com.bradforj287.raytracer.shapes.Matrix3D;
-import com.bradforj287.raytracer.shapes.RayCastArguments;
-import com.bradforj287.raytracer.shapes.Triangle3D;
-import com.bradforj287.raytracer.shapes.Vector3D;
+import com.bradforj287.raytracer.geometry.Matrix3D;
+import com.bradforj287.raytracer.geometry.RayCastArguments;
+import com.bradforj287.raytracer.geometry.Triangle3D;
+import com.bradforj287.raytracer.geometry.Vector3D;
 import com.bradforj287.raytracer.utils.VideoDataPointBuffer;
 
 public class RayTracer {

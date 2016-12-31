@@ -1,7 +1,7 @@
 package com.bradforj287.raytracer;
 
 import java.awt.*;
-import com.bradforj287.raytracer.shapes.Vector3D;
+import com.bradforj287.raytracer.geometry.Vector3D;
 
 public class ProgramArguments {
     public static final boolean ROTATION_ON = true;

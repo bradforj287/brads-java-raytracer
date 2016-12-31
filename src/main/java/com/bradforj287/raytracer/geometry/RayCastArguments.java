@@ -1,4 +1,4 @@
-package com.bradforj287.raytracer.shapes;
+package com.bradforj287.raytracer.geometry;
 
 public class RayCastArguments {
 

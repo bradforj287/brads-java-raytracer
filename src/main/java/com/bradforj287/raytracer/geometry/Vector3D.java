@@ -1,4 +1,4 @@
-package com.bradforj287.raytracer.shapes;
+package com.bradforj287.raytracer.geometry;
 
 /**
  * Class for 3d vector

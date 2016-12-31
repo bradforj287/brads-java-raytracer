@@ -3,8 +3,8 @@ package com.bradforj287.raytracer.model;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Iterator;
-import com.bradforj287.raytracer.shapes.Triangle3D;
-import com.bradforj287.raytracer.shapes.Vector3D;
+import com.bradforj287.raytracer.geometry.Triangle3D;
+import com.bradforj287.raytracer.geometry.Vector3D;
 
 public class VertexIterator implements Iterator<Vector3D> {
     private final SceneModel3D scene;
