@@ -84,7 +84,7 @@ public class KDTree implements SpacialStructure {
     }
 
     @Override
-    public void visitPossibleMatches(final Ray3d ray, final ShapeVisitor visitor) {
+    public void visitPossibleIntersections(final Ray3d ray, final ShapeVisitor visitor) {
         visitPossibleMatchesHelper(root, ray, visitor);
     }
 

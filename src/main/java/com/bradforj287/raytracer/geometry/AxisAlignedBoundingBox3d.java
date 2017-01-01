@@ -18,6 +18,6 @@ public class AxisAlignedBoundingBox3d {
     }
 
     public boolean rayItersects(Ray3d ray) {
-        return true;
+        return false;
     }
 }

@@ -9,7 +9,6 @@ import com.bradforj287.raytracer.geometry.Shape3d;
 import com.bradforj287.raytracer.geometry.Triangle3d;
 import com.bradforj287.raytracer.geometry.Vector3d;
 import com.bradforj287.raytracer.model.SceneModel;
-import com.bradforj287.raytracer.model.kdtree.KDTree;
 import com.bradforj287.raytracer.parser.ObjFileParser;
 import com.bradforj287.raytracer.utils.Utils;
 

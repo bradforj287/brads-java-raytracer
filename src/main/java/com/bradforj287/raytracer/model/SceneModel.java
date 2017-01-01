@@ -20,8 +20,8 @@ public class SceneModel implements SpacialStructure {
     }
 
     @Override
-    public void visitPossibleMatches(Ray3d ray, ShapeVisitor visitor) {
-        kdTree.visitPossibleMatches(ray, visitor);
+    public void visitPossibleIntersections(Ray3d ray, ShapeVisitor visitor) {
+        kdTree.visitPossibleIntersections(ray, visitor);
     }
 
     @Override

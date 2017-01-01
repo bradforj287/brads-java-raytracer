@@ -282,7 +282,7 @@ public class RayTracer {
         final double t0 = .0001;
         final VisitingResults results = new VisitingResults();
 
-        scene.visitPossibleMatches(ray, shape -> {
+        scene.visitPossibleIntersections(ray, shape -> {
             if (shape.isHitByRay(ray, t0, results.t1,
                     returnArgs)) {
                 results.t1 = returnArgs.t;
