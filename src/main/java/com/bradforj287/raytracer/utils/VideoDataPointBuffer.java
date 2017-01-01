@@ -8,8 +8,8 @@ import java.util.LinkedList;
  * @author bjones
  */
 public class VideoDataPointBuffer {
-    private static final int BUFFER_MAX_SIZE = 500;
-    private static final long RUNNING_AVERAGE_DURATION = 10000;
+    private static final int BUFFER_MAX_SIZE = 100;
+    private static final long RUNNING_AVERAGE_DURATION = 1000;
 
     private LinkedList<Long> buffer = new LinkedList<Long>();
 

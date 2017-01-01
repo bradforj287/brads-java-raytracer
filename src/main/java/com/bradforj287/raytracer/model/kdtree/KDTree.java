@@ -23,19 +23,6 @@ public class KDTree implements SpacialStructure {
         populateTree(root);
     }
 
-    private String getNextCoordInSequence(String currentCoord) {
-        if (currentCoord.equals("x")) {
-            return "y";
-        }
-        if (currentCoord.equals("y")) {
-            return "z";
-        }
-        if (currentCoord.equals("z")) {
-            return "x";
-        }
-        return null;
-    }
-
     private KDNode buildNode(List<Shape3d> theShapes) {
         if (theShapes.isEmpty()) {
             return null;
@@ -47,39 +34,60 @@ public class KDTree implements SpacialStructure {
         return node;
     }
 
+    private class SplitResult {
+        List<Shape3d> leftShapes = new ArrayList<>();
+        List<Shape3d> rightShapes = new ArrayList<>();
+        public boolean isEmptySplit() {
+            return leftShapes.isEmpty() || rightShapes.isEmpty();
+        }
+
+        // lower value is better
+        public double getSplitScore() {
+            double leftSize = leftShapes.size();
+            double rightSize = rightShapes.size();
+            double totalSize = leftSize + rightSize;
+            double percentLeft = leftSize/totalSize;
+            final double idealSplit = .50;
+            return Math.abs(percentLeft - idealSplit);
+        }
+    }
+
+    private SplitResult splitShapes(final List<Shape3d> shapes, final String coord, final double midpoint) {
+        SplitResult res = new SplitResult();
+        for (Shape3d shape : shapes) {
+            Vector3d shapeMidpoint = shape.getCentroid();
+            double shapeCoord = shapeMidpoint.getCoordiateByName(coord);
+            if (shapeCoord <= midpoint) {
+                res.leftShapes.add(shape);
+            } else {
+                res.rightShapes.add(shape);
+            }
+        }
+        return res;
+    }
+
     private void populateTree(KDNode node) {
         if (node == null || node.getShapes().isEmpty() || node.getShapes().size() <=  1) {
             return; // todo: enhance logic for detecting when to stop
         }
 
-        List<Shape3d> leftShapes = new ArrayList<>();
-        List<Shape3d> rightShapes = new ArrayList<>();
-
         // split shapes
-
-        // final String coord = getNextCoordInSequence();
         final String coord = node.getBoundingBox().getLongestAxis().toString();
-        double midpointCoord =  ShapeUtils.getAverageCenterCoordiate(coord, node.getShapes());
+        double midpointCoord =  ShapeUtils.getMedianCenterCoordiate(coord, node.getShapes());
+        double length = node.getBoundingBox().getMax().getCoordiateByName(coord) - node.getBoundingBox().getMin().getCoordiateByName(coord);
+        final double randomShift = .01 * length;
 
-        for (Shape3d shape : node.getShapes()) {
-            Vector3d shapeMidpoint = shape.getCentroid();
-            double shapeCoord = shapeMidpoint.getCoordiateByName(coord);
-            if (shapeCoord <= midpointCoord) {
-                leftShapes.add(shape);
-            } else {
-                rightShapes.add(shape);
-            }
-        }
+        SplitResult splitResult = splitShapes(node.getShapes(), coord, midpointCoord);
 
-        if (leftShapes.isEmpty() || rightShapes.isEmpty()) {
+        if (splitResult.isEmptySplit()) {
             return;
         }
 
         // left node
-        KDNode leftNode = buildNode(leftShapes);
+        KDNode leftNode = buildNode(splitResult.leftShapes);
 
         // right node
-        KDNode rightNode = buildNode(rightShapes);
+        KDNode rightNode = buildNode(splitResult.rightShapes);
 
         // current node
         node.setShapes(null);
