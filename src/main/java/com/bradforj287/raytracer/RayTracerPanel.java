@@ -10,7 +10,7 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 import com.bradforj287.raytracer.engine.RayTracer;
-import com.bradforj287.raytracer.model.SceneModel3D;
+import com.bradforj287.raytracer.model.SceneModel;
 
 public class RayTracerPanel extends JPanel {
     private RayTracer rayTracer;
@@ -19,7 +19,7 @@ public class RayTracerPanel extends JPanel {
 
     private Object paintLock = new Object();
 
-    public RayTracerPanel(SceneModel3D model, Dimension sceneSize) {
+    public RayTracerPanel(SceneModel model, Dimension sceneSize) {
         this.sceneSize = sceneSize;
         this.setPreferredSize(sceneSize);
         rayTracer = new RayTracer(model, sceneSize);

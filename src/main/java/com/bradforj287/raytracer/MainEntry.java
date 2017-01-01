@@ -3,14 +3,13 @@ package com.bradforj287.raytracer;
 import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import javax.swing.*;
-import com.bradforj287.raytracer.geometry.Shape3D;
+import com.bradforj287.raytracer.geometry.Shape3d;
 import com.bradforj287.raytracer.model.KDTree;
-import com.bradforj287.raytracer.model.SceneModel3D;
+import com.bradforj287.raytracer.model.SceneModel;
 import com.bradforj287.raytracer.parser.ObjFileParser;
-import com.bradforj287.raytracer.geometry.Triangle3D;
+import com.bradforj287.raytracer.geometry.Triangle3d;
 import com.bradforj287.raytracer.geometry.Vector3D;
 import com.bradforj287.raytracer.utils.Utils;
 
@@ -22,12 +21,12 @@ public class MainEntry {
 
         JFrame frame = new JFrame("Brad's Ray Tracer");
 
-        SceneModel3D model = null;
+        SceneModel model = null;
         try {
             model = ObjFileParser.parseObjFile(objFile);
 
             // quick test
-            ArrayList<Shape3D> shapes = new ArrayList<>();
+            ArrayList<Shape3d> shapes = new ArrayList<>();
             model.getShapes().forEach(tri -> shapes.add(tri));
 
             KDTree kdtree = new KDTree(shapes);
@@ -51,9 +50,9 @@ public class MainEntry {
         frame.setVisible(true);
     }
 
-    private static void installBoundingBox(SceneModel3D model) {
+    private static void installBoundingBox(SceneModel model) {
 
-        SceneModel3D scene = new SceneModel3D();
+        SceneModel scene = new SceneModel();
         // create cube vertices
 
         double cubeWidth = 2000;
@@ -73,45 +72,45 @@ public class MainEntry {
         Vector3D bottom4 = new Vector3D(cubeWidth, cubeWidth, 0);
 
         // top triangles
-        scene.addShape(new Triangle3D(top1, top2, top3, boundingColor));
-        scene.addShape(flipNormal(new Triangle3D(top2, top3, top4,
+        scene.addShape(new Triangle3d(top1, top2, top3, boundingColor));
+        scene.addShape(flipNormal(new Triangle3d(top2, top3, top4,
                 boundingColor)));
 
         boundingColor = Color.blue.getRGB();
         // bottom triangles
         scene
-                .addShape(new Triangle3D(bottom1, bottom2, bottom3,
+                .addShape(new Triangle3d(bottom1, bottom2, bottom3,
                         boundingColor));
-        scene.addShape(flipNormal(new Triangle3D(bottom2, bottom3, bottom4,
+        scene.addShape(flipNormal(new Triangle3d(bottom2, bottom3, bottom4,
                 boundingColor)));
 
         boundingColor = Color.gray.getRGB();
         // left triangles
-        scene.addShape(new Triangle3D(top1, top3, bottom1, boundingColor));
-        scene.addShape(flipNormal(new Triangle3D(bottom1, bottom3, top3,
+        scene.addShape(new Triangle3d(top1, top3, bottom1, boundingColor));
+        scene.addShape(flipNormal(new Triangle3d(bottom1, bottom3, top3,
                 boundingColor)));
 
         // right triangles
-        scene.addShape(new Triangle3D(top2, top4, bottom2, boundingColor));
-        scene.addShape(flipNormal(new Triangle3D(bottom2, bottom4, top4,
+        scene.addShape(new Triangle3d(top2, top4, bottom2, boundingColor));
+        scene.addShape(flipNormal(new Triangle3d(bottom2, bottom4, top4,
                 boundingColor)));
 
         boundingColor = Color.green.getRGB();
 
         // back triangles
-        scene.addShape(new Triangle3D(top1, top2, bottom1, boundingColor));
-        scene.addShape(flipNormal(new Triangle3D(bottom1, bottom2, top2,
+        scene.addShape(new Triangle3d(top1, top2, bottom1, boundingColor));
+        scene.addShape(flipNormal(new Triangle3d(bottom1, bottom2, top2,
                 boundingColor)));
 
         // front triangles
-        scene.addShape(new Triangle3D(top3, top4, bottom3, boundingColor));
-        scene.addShape(flipNormal(new Triangle3D(bottom3, bottom4, top4,
+        scene.addShape(new Triangle3d(top3, top4, bottom3, boundingColor));
+        scene.addShape(flipNormal(new Triangle3d(bottom3, bottom4, top4,
                 boundingColor)));
 
         double offset = (cubeWidth / 2);
         Vector3D offsetV = new Vector3D(offset, offset, offset);
         for (int i = 0; i < scene.size(); i++) {
-            Triangle3D t = scene.getShape(i);
+            Triangle3d t = scene.getShape(i);
             t.v1.subtract(offsetV);
             t.v2.subtract(offsetV);
             t.v3.subtract(offsetV);
@@ -127,14 +126,14 @@ public class MainEntry {
 
     }
 
-    private static Triangle3D flipNormal(Triangle3D t) {
+    private static Triangle3d flipNormal(Triangle3d t) {
         t.flipNormal();
         return t;
     }
 
-    private static SceneModel3D createSceneForRayTrace() {
+    private static SceneModel createSceneForRayTrace() {
 
-        SceneModel3D scene = new SceneModel3D();
+        SceneModel scene = new SceneModel();
 
         // define icosahedron
         Vector3D[] figurepoints = new Vector3D[12];
@@ -159,46 +158,46 @@ public class MainEntry {
         }
 
         int tempcolor = 123123;
-        scene.addShape(new Triangle3D(figurepoints[9], figurepoints[2],
+        scene.addShape(new Triangle3d(figurepoints[9], figurepoints[2],
                 figurepoints[6], tempcolor));
-        scene.addShape(new Triangle3D(figurepoints[1], figurepoints[5],
+        scene.addShape(new Triangle3d(figurepoints[1], figurepoints[5],
                 figurepoints[11], tempcolor));
-        scene.addShape(new Triangle3D(figurepoints[11], figurepoints[1],
+        scene.addShape(new Triangle3d(figurepoints[11], figurepoints[1],
                 figurepoints[8], tempcolor));
-        scene.addShape(new Triangle3D(figurepoints[0], figurepoints[11],
+        scene.addShape(new Triangle3d(figurepoints[0], figurepoints[11],
                 figurepoints[4], tempcolor));
-        scene.addShape(new Triangle3D(figurepoints[3], figurepoints[7],
+        scene.addShape(new Triangle3d(figurepoints[3], figurepoints[7],
                 figurepoints[1], tempcolor));
-        scene.addShape(new Triangle3D(figurepoints[3], figurepoints[1],
+        scene.addShape(new Triangle3d(figurepoints[3], figurepoints[1],
                 figurepoints[8], tempcolor));
-        scene.addShape(new Triangle3D(figurepoints[9], figurepoints[3],
+        scene.addShape(new Triangle3d(figurepoints[9], figurepoints[3],
                 figurepoints[7], tempcolor));
-        scene.addShape(new Triangle3D(figurepoints[0], figurepoints[2],
+        scene.addShape(new Triangle3d(figurepoints[0], figurepoints[2],
                 figurepoints[6], tempcolor));
-        scene.addShape(new Triangle3D(figurepoints[4], figurepoints[6],
+        scene.addShape(new Triangle3d(figurepoints[4], figurepoints[6],
                 figurepoints[10], tempcolor));
-        scene.addShape(new Triangle3D(figurepoints[1], figurepoints[7],
+        scene.addShape(new Triangle3d(figurepoints[1], figurepoints[7],
                 figurepoints[5], tempcolor));
-        scene.addShape(new Triangle3D(figurepoints[7], figurepoints[2],
+        scene.addShape(new Triangle3d(figurepoints[7], figurepoints[2],
                 figurepoints[5], tempcolor));
-        scene.addShape(new Triangle3D(figurepoints[8], figurepoints[10],
+        scene.addShape(new Triangle3d(figurepoints[8], figurepoints[10],
                 figurepoints[3], tempcolor));
 
-        scene.addShape(new Triangle3D(figurepoints[4], figurepoints[11],
+        scene.addShape(new Triangle3d(figurepoints[4], figurepoints[11],
                 figurepoints[8], tempcolor));
-        scene.addShape(new Triangle3D(figurepoints[9], figurepoints[2],
+        scene.addShape(new Triangle3d(figurepoints[9], figurepoints[2],
                 figurepoints[7], tempcolor));
-        scene.addShape(new Triangle3D(figurepoints[10], figurepoints[6],
+        scene.addShape(new Triangle3d(figurepoints[10], figurepoints[6],
                 figurepoints[9], tempcolor));
-        scene.addShape(new Triangle3D(figurepoints[0], figurepoints[11],
+        scene.addShape(new Triangle3d(figurepoints[0], figurepoints[11],
                 figurepoints[5], tempcolor));
-        scene.addShape(new Triangle3D(figurepoints[0], figurepoints[2],
+        scene.addShape(new Triangle3d(figurepoints[0], figurepoints[2],
                 figurepoints[5], tempcolor));
-        scene.addShape(new Triangle3D(figurepoints[8], figurepoints[10],
+        scene.addShape(new Triangle3d(figurepoints[8], figurepoints[10],
                 figurepoints[4], tempcolor));
-        scene.addShape(new Triangle3D(figurepoints[3], figurepoints[9],
+        scene.addShape(new Triangle3d(figurepoints[3], figurepoints[9],
                 figurepoints[10], tempcolor));
-        scene.addShape(new Triangle3D(figurepoints[6], figurepoints[4],
+        scene.addShape(new Triangle3d(figurepoints[6], figurepoints[4],
                 figurepoints[0], tempcolor));
 
         getNormalsInCorrectDirection(scene);
@@ -206,13 +205,13 @@ public class MainEntry {
         return scene;
     }
 
-    private static void getNormalsInCorrectDirection(SceneModel3D scene) {
+    private static void getNormalsInCorrectDirection(SceneModel scene) {
 
         // get normals to point in right direction
         for (int i = 0; i < scene.size(); i++) {
             Vector3D fromOriginToTriangle = scene.getShape(i).v1;
             fromOriginToTriangle = fromOriginToTriangle.getUnitVector();
-            Vector3D normal = ((Triangle3D) scene.getShape(i))
+            Vector3D normal = ((Triangle3d) scene.getShape(i))
                     .getNormalVector();
             if (Vector3D.dotProduct(normal, fromOriginToTriangle) < 0) {
                 // flip two verticies;

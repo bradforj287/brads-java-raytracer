@@ -1,13 +1,13 @@
 package com.bradforj287.raytracer.geometry;
 
-public class Triangle3D extends Shape3D {
+public class Triangle3d extends Shape3d {
 
     public Vector3D v1;
     public Vector3D v2;
     public Vector3D v3;
     public int color;
 
-    public Triangle3D() {
+    public Triangle3d() {
         color = 0;
 
         flipNormal();
@@ -24,7 +24,7 @@ public class Triangle3D extends Shape3D {
      * @param c
      * @param color1
      */
-    public Triangle3D(Vector3D a, Vector3D b, Vector3D c, int color1) {
+    public Triangle3d(Vector3D a, Vector3D b, Vector3D c, int color1) {
         v1 = new Vector3D(a);
         v2 = new Vector3D(b);
         v3 = new Vector3D(c);
@@ -100,7 +100,7 @@ public class Triangle3D extends Shape3D {
         gamma = areaY / totalArea;
     }
 
-    public void multiplyByMatrix(Matrix3D mat) {
+    public void multiplyByMatrix(Matrix3d mat) {
         v1.multiplyByMatrix(mat);
         v2.multiplyByMatrix(mat);
         v3.multiplyByMatrix(mat);

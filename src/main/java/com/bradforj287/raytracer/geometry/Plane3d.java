@@ -1,10 +1,10 @@
 package com.bradforj287.raytracer.geometry;
 
-public class Plane3D {
+public class Plane3d {
     private Vector3D normal;
     private Vector3D point;
 
-    public Plane3D(Vector3D normal, Vector3D point) {
+    public Plane3d(Vector3D normal, Vector3D point) {
         this.normal = normal;
         this.point = point;
         normal.makeUnitVector();

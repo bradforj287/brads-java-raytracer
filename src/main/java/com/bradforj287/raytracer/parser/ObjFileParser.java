@@ -7,14 +7,14 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
-import com.bradforj287.raytracer.model.SceneModel3D;
-import com.bradforj287.raytracer.geometry.Triangle3D;
+import com.bradforj287.raytracer.model.SceneModel;
+import com.bradforj287.raytracer.geometry.Triangle3d;
 import com.bradforj287.raytracer.geometry.Vector3D;
 
 public class ObjFileParser {
 
-    public static SceneModel3D parseObjFile(File file) throws FileNotFoundException {
-        SceneModel3D m = new SceneModel3D();
+    public static SceneModel parseObjFile(File file) throws FileNotFoundException {
+        SceneModel m = new SceneModel();
 
         FileInputStream in = new FileInputStream(file);
 
@@ -45,7 +45,7 @@ public class ObjFileParser {
                 Vector3D v2 = new Vector3D(verticies.get(j));
                 Vector3D v3 = new Vector3D(verticies.get(k));
 
-                m.addShape(new Triangle3D(v1, v2, v3, 123123));
+                m.addShape(new Triangle3d(v1, v2, v3, 123123));
             }
         }
         return m;

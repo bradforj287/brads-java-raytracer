@@ -1,18 +1,18 @@
 package com.bradforj287.raytracer.utils;
 
 import java.util.List;
-import com.bradforj287.raytracer.geometry.AxisAlignedBoundingBox3D;
-import com.bradforj287.raytracer.geometry.Shape3D;
+import com.bradforj287.raytracer.geometry.AxisAlignedBoundingBox3d;
+import com.bradforj287.raytracer.geometry.Shape3d;
 import com.bradforj287.raytracer.geometry.Vector3D;
 import com.google.common.base.Preconditions;
 
 public class ShapeUtils {
 
-    public static AxisAlignedBoundingBox3D getBoundsForShapes(List<Shape3D> shapes) {
+    public static AxisAlignedBoundingBox3d getBoundsForShapes(List<Shape3d> shapes) {
         Preconditions.checkNotNull(shapes);
         Preconditions.checkArgument(!shapes.isEmpty());
 
-        Shape3D firstShape = shapes.get(0);
+        Shape3d firstShape = shapes.get(0);
         double minX = firstShape.minX();
         double minY = firstShape.minY();
         double minZ = firstShape.minZ();
@@ -21,7 +21,7 @@ public class ShapeUtils {
         double maxZ = firstShape.maxZ();
 
         for (int i = 1; i < shapes.size(); i++) {
-            Shape3D shape = shapes.get(i);
+            Shape3d shape = shapes.get(i);
             if (shape.minX() < minX) {
                 minX = shape.minX();
             }
@@ -45,15 +45,15 @@ public class ShapeUtils {
         Vector3D minPoint = new Vector3D(minX, minY, minZ);
         Vector3D maxPoint = new Vector3D(maxX, maxY, maxZ);
 
-        return new AxisAlignedBoundingBox3D(minPoint, maxPoint);
+        return new AxisAlignedBoundingBox3d(minPoint, maxPoint);
     }
 
-    public static Vector3D getMidpoint(List<Shape3D> shapes) {
+    public static Vector3D getMidpoint(List<Shape3d> shapes) {
         double x = 0;
         double y = 0;
         double z = 0;
         double numShapes = shapes.size();
-        for (Shape3D s : shapes) {
+        for (Shape3d s : shapes) {
             Vector3D center = s.getCentroid();
             x += center.x;
             y += center.y;

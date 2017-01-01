@@ -1,6 +1,6 @@
 package com.bradforj287.raytracer.geometry;
 
-public abstract class Shape3D {
+public abstract class Shape3d {
     public abstract double minX();
     public abstract double minY();
     public abstract double minZ();

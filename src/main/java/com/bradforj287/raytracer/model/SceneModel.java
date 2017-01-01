@@ -3,16 +3,16 @@ package com.bradforj287.raytracer.model;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import com.bradforj287.raytracer.geometry.Matrix3D;
-import com.bradforj287.raytracer.geometry.Triangle3D;
+import com.bradforj287.raytracer.geometry.Matrix3d;
+import com.bradforj287.raytracer.geometry.Triangle3d;
 import com.bradforj287.raytracer.geometry.Vector3D;
 
-public class SceneModel3D {
-    private List<Triangle3D> shapes = new ArrayList<Triangle3D>();
+public class SceneModel {
+    private List<Triangle3d> shapes = new ArrayList<Triangle3d>();
 
     public void convertAllToUnitVector() {
 
-        for (Triangle3D t : shapes) {
+        for (Triangle3d t : shapes) {
             t.convertVerticiesToUnitVectors();
         }
     }
@@ -30,14 +30,14 @@ public class SceneModel3D {
         double yWidth = getYWidth();
         double zWidth = getZWidth();
 
-        Matrix3D scaleMatrix = new Matrix3D();
+        Matrix3d scaleMatrix = new Matrix3d();
 
         scaleMatrix.matrix[0][0] = scaleFactor * (1 / 1);
         scaleMatrix.matrix[1][1] = scaleFactor * (1 / 1);
         scaleMatrix.matrix[2][2] = scaleFactor * (1 / 1);
         scaleMatrix.matrix[3][3] = 1;
 
-        for (Triangle3D t : shapes) {
+        for (Triangle3d t : shapes) {
             //	t.multiplyByMatrix(scaleMatrix);
 
             t.v1.scaleBy(scaleFactor);
@@ -113,15 +113,15 @@ public class SceneModel3D {
         return xwidth;
     }
 
-    public List<Triangle3D> getShapes() {
+    public List<Triangle3d> getShapes() {
         return shapes;
     }
 
-    public void addShape(Triangle3D triangle3d) {
-        shapes.add(triangle3d);
+    public void addShape(Triangle3d triangle3D) {
+        shapes.add(triangle3D);
     }
 
-    public Triangle3D getShape(int i) {
+    public Triangle3d getShape(int i) {
         return shapes.get(i);
     }
 
@@ -129,7 +129,7 @@ public class SceneModel3D {
         return shapes.size();
     }
 
-    public void addShapes(SceneModel3D s) {
+    public void addShapes(SceneModel s) {
         shapes.addAll(s.getShapes());
     }
 

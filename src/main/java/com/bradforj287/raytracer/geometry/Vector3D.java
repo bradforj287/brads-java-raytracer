@@ -86,7 +86,7 @@ public class Vector3D {
         z = z / m;
     }
 
-    public void multiplyByMatrix(Matrix3D a) {
+    public void multiplyByMatrix(Matrix3d a) {
         double[] result = new double[3];
         double[] h = new double[4];
         h[0] = this.x;

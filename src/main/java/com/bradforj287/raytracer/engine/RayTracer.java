@@ -6,19 +6,19 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import com.bradforj287.raytracer.ProgramArguments;
-import com.bradforj287.raytracer.model.SceneModel3D;
-import com.bradforj287.raytracer.geometry.Matrix3D;
+import com.bradforj287.raytracer.model.SceneModel;
+import com.bradforj287.raytracer.geometry.Matrix3d;
 import com.bradforj287.raytracer.geometry.RayCastArguments;
-import com.bradforj287.raytracer.geometry.Triangle3D;
+import com.bradforj287.raytracer.geometry.Triangle3d;
 import com.bradforj287.raytracer.geometry.Vector3D;
 import com.bradforj287.raytracer.utils.VideoDataPointBuffer;
 
 public class RayTracer {
-	private SceneModel3D scene = null;
+	private SceneModel scene = null;
 	private Dimension sceneResolution = null;
 	private VideoDataPointBuffer fpsBuffer = new VideoDataPointBuffer();
 
-	public RayTracer(SceneModel3D model, Dimension sceneResolution) {
+	public RayTracer(SceneModel model, Dimension sceneResolution) {
 		this.sceneResolution = sceneResolution;
 		this.scene = model;
 	}
@@ -123,14 +123,14 @@ public class RayTracer {
 			double xIncrement, double yIncrement, double xStart, double yStart,
 			double thetax, double thetay, double thetaz) {
 		
-		Matrix3D xRot = Matrix3D.getXRotationMatrix(thetax);
-		Matrix3D yRot = Matrix3D.getYRotationMatrix(thetay);
-		Matrix3D zRot = Matrix3D.getZRotationMatrix(thetaz);
+		Matrix3d xRot = Matrix3d.getXRotationMatrix(thetax);
+		Matrix3d yRot = Matrix3d.getYRotationMatrix(thetay);
+		Matrix3d zRot = Matrix3d.getZRotationMatrix(thetaz);
 		
 		Random rand = new Random();
 		
-		Matrix3D rot = Matrix3D.matrixMultiply(xRot, yRot);
-		rot = Matrix3D.matrixMultiply(rot, zRot);
+		Matrix3d rot = Matrix3d.matrixMultiply(xRot, yRot);
+		rot = Matrix3d.matrixMultiply(rot, zRot);
 		
 		// iterate over all pixels in resolution
 		for (int i = region.x; i < region.x + region.width; i++) {
@@ -201,7 +201,7 @@ public class RayTracer {
 
 		RayCastArguments returnArgs = new RayCastArguments();
 
-		Triangle3D interesectTriangle = doesRayHitAnyShape(eyeDirection,
+		Triangle3d interesectTriangle = doesRayHitAnyShape(eyeDirection,
 				eyePosition, returnArgs);
 		if (interesectTriangle != null) {
 			
@@ -268,9 +268,9 @@ public class RayTracer {
 
 	}
 
-	private boolean isInShadow(Triangle3D hitTriangle, Vector3D intersectLoc,
-			Vector3D lightDir) {
-		Triangle3D interesectTriangle = doesRayHitAnyShape(lightDir,
+	private boolean isInShadow(Triangle3d hitTriangle, Vector3D intersectLoc,
+							   Vector3D lightDir) {
+		Triangle3d interesectTriangle = doesRayHitAnyShape(lightDir,
 				intersectLoc, new RayCastArguments());
 
 		if (interesectTriangle == null) {
@@ -282,13 +282,13 @@ public class RayTracer {
 		}
 	}
 
-	private Triangle3D doesRayHitAnyShape(Vector3D direction,
-			final Vector3D eyePosition, RayCastArguments returnArgs) {
+	private Triangle3d doesRayHitAnyShape(Vector3D direction,
+										  final Vector3D eyePosition, RayCastArguments returnArgs) {
 
 		double t0 = .0001;
 		double t1 = Double.MAX_VALUE; // switch this to max float
 
-		Triangle3D visibleTriangle = null;
+		Triangle3d visibleTriangle = null;
 		// check triangles
 		for (int i = 0; i < scene.size(); i++) {
 			if (scene.getShape(i).isHitByRay(eyePosition, direction, t0, t1,

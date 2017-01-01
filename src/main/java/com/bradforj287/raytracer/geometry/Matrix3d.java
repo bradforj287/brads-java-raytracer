@@ -1,9 +1,9 @@
 package com.bradforj287.raytracer.geometry;
 
-public class Matrix3D {
+public class Matrix3d {
     public double[][] matrix = new double[4][4];
 
-    public Matrix3D() {
+    public Matrix3d() {
         zero();
     }
 
@@ -22,8 +22,8 @@ public class Matrix3D {
         }
     }
 
-    public static Matrix3D matrixMultiply(Matrix3D a, Matrix3D b) {
-        Matrix3D result = new Matrix3D();
+    public static Matrix3d matrixMultiply(Matrix3d a, Matrix3d b) {
+        Matrix3d result = new Matrix3d();
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 double sum = 0;
@@ -36,7 +36,7 @@ public class Matrix3D {
         return result;
     }
 
-    public static Vector3D matrixMultiply(Matrix3D a, Vector3D v) {
+    public static Vector3D matrixMultiply(Matrix3d a, Vector3D v) {
         double[] result = new double[3];
         double[] h = new double[4];
         h[0] = v.x;
@@ -55,8 +55,8 @@ public class Matrix3D {
         return res;
     }
 
-    public static Matrix3D getXRotationMatrix(double theta) {
-        Matrix3D result = new Matrix3D();
+    public static Matrix3d getXRotationMatrix(double theta) {
+        Matrix3d result = new Matrix3d();
         result.identity();
         result.matrix[1][1] = Math.cos(theta);
         result.matrix[1][2] = -Math.sin(theta);
@@ -65,8 +65,8 @@ public class Matrix3D {
         return result;
     }
 
-    public static Matrix3D getYRotationMatrix(double theta) {
-        Matrix3D result = new Matrix3D();
+    public static Matrix3d getYRotationMatrix(double theta) {
+        Matrix3d result = new Matrix3d();
         result.identity();
         result.matrix[0][0] = Math.cos(theta);
         result.matrix[0][2] = Math.sin(theta);
@@ -76,8 +76,8 @@ public class Matrix3D {
 
     }
 
-    public static Matrix3D getZRotationMatrix(double theta) {
-        Matrix3D result = new Matrix3D();
+    public static Matrix3d getZRotationMatrix(double theta) {
+        Matrix3d result = new Matrix3d();
         result.identity();
         result.matrix[0][0] = Math.cos(theta);
         result.matrix[0][1] = -Math.sin(theta);

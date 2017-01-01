@@ -3,15 +3,15 @@ package com.bradforj287.raytracer.model;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Iterator;
-import com.bradforj287.raytracer.geometry.Triangle3D;
+import com.bradforj287.raytracer.geometry.Triangle3d;
 import com.bradforj287.raytracer.geometry.Vector3D;
 
 public class VertexIterator implements Iterator<Vector3D> {
-    private final SceneModel3D scene;
+    private final SceneModel scene;
     private int index = 0;
     private int vIndex = 0;
 
-    VertexIterator(SceneModel3D scene) {
+    VertexIterator(SceneModel scene) {
         this.scene = scene;
     }
 
@@ -23,7 +23,7 @@ public class VertexIterator implements Iterator<Vector3D> {
     @Override
     public Vector3D next() {
 
-        Triangle3D tri = scene.getShape(index);
+        Triangle3d tri = scene.getShape(index);
 
         Vector3D retVal = null;
         if (vIndex == 0) {

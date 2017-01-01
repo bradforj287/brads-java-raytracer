@@ -2,16 +2,16 @@ package com.bradforj287.raytracer.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.bradforj287.raytracer.geometry.AxisAlignedBoundingBox3D;
-import com.bradforj287.raytracer.geometry.Shape3D;
+import com.bradforj287.raytracer.geometry.AxisAlignedBoundingBox3d;
+import com.bradforj287.raytracer.geometry.Shape3d;
 import com.bradforj287.raytracer.geometry.Vector3D;
 import com.bradforj287.raytracer.utils.ShapeUtils;
 
 public class KDTree {
     private KDNode root;
-    private List<Shape3D> shapes;
+    private List<Shape3d> shapes;
 
-    public KDTree(List<Shape3D> shapes) {
+    public KDTree(List<Shape3d> shapes) {
         this.shapes = shapes;
         init();
     }
@@ -34,8 +34,8 @@ public class KDTree {
         return null;
     }
 
-    private KDNode buildNode(List<Shape3D> shapes) {
-        AxisAlignedBoundingBox3D box = ShapeUtils.getBoundsForShapes(shapes);
+    private KDNode buildNode(List<Shape3d> shapes) {
+        AxisAlignedBoundingBox3d box = ShapeUtils.getBoundsForShapes(shapes);
         KDNode node = new KDNode();
         node.setBoundingBox(box);
         node.setShapes(shapes);
@@ -47,14 +47,14 @@ public class KDTree {
             return; // todo: enhance logic for detecting when to stop
         }
 
-        List<Shape3D> leftShapes = new ArrayList<>();
-        List<Shape3D> rightShapes = new ArrayList<>();
+        List<Shape3d> leftShapes = new ArrayList<>();
+        List<Shape3d> rightShapes = new ArrayList<>();
 
         Vector3D midpoint = ShapeUtils.getMidpoint(node.getShapes());
         double midpointCoord = midpoint.getCoordiateByName(coord);
 
         //bucket shapes
-        for (Shape3D shape : node.getShapes()) {
+        for (Shape3d shape : node.getShapes()) {
             Vector3D shapeMidpoint = shape.getCentroid();
             double shapeCoord = shapeMidpoint.getCoordiateByName(coord);
             if (shapeCoord <= midpointCoord) {
