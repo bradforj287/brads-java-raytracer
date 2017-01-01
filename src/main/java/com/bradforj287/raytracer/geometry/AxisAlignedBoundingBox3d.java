@@ -16,4 +16,8 @@ public class AxisAlignedBoundingBox3d {
     public Vector3d getMax() {
         return max;
     }
+
+    public boolean rayItersects(Ray3d ray) {
+        return true;
+    }
 }

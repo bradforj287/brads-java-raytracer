@@ -1,17 +1,18 @@
-package com.bradforj287.raytracer.model;
+package com.bradforj287.raytracer.model.kdtree;
 
 import java.util.ArrayList;
 import java.util.List;
 import com.bradforj287.raytracer.geometry.AxisAlignedBoundingBox3d;
+import com.bradforj287.raytracer.geometry.Ray3d;
 import com.bradforj287.raytracer.geometry.Shape3d;
 import com.bradforj287.raytracer.geometry.Vector3d;
 import com.bradforj287.raytracer.utils.ShapeUtils;
 
-public class KDTree {
+public class KDTreeImpl implements KDTree {
     private KDNode root;
     private List<Shape3d> shapes;
 
-    public KDTree(List<Shape3d> shapes) {
+    public KDTreeImpl(List<Shape3d> shapes) {
         this.shapes = shapes;
         init();
     }
@@ -79,5 +80,25 @@ public class KDTree {
         final String nextCoordToUse = getNextCoordInSequence(coord);
         populateTree(leftNode, nextCoordToUse);
         populateTree(rightNode, nextCoordToUse);
+    }
+
+    @Override
+    public void visitPossibleMatches(final Ray3d ray, final ShapeVisitor visitor) {
+        visitPossibleMatchesHelper(root, ray, visitor);
+    }
+
+    private void visitPossibleMatchesHelper(KDNode node, final Ray3d ray, final ShapeVisitor visitor) {
+        if (node.isLeaf()) {
+            node.getShapes().forEach(s -> visitor.visit(s));
+            return;
+        }
+
+        if (node.hasLeft() && node.intersectsBoundingBox(ray)) {
+            visitPossibleMatchesHelper(node.getLeft(), ray, visitor);
+        }
+
+        if (node.hasRight() && node.intersectsBoundingBox(ray)) {
+            visitPossibleMatchesHelper(node.getRight(), ray, visitor);
+        }
     }
 }

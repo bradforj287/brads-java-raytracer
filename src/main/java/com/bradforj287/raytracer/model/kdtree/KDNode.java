@@ -1,7 +1,8 @@
-package com.bradforj287.raytracer.model;
+package com.bradforj287.raytracer.model.kdtree;
 
 import java.util.List;
 import com.bradforj287.raytracer.geometry.AxisAlignedBoundingBox3d;
+import com.bradforj287.raytracer.geometry.Ray3d;
 import com.bradforj287.raytracer.geometry.Shape3d;
 
 public class KDNode {
@@ -13,6 +14,19 @@ public class KDNode {
     public boolean isLeaf() {
         return left == null && right == null;
     }
+
+    public boolean hasLeft() {
+        return left != null;
+    }
+
+    public boolean hasRight() {
+        return right != null;
+    }
+
+    public boolean intersectsBoundingBox(Ray3d ray) {
+        return boundingBox.rayItersects(ray);
+    }
+
     public AxisAlignedBoundingBox3d getBoundingBox() {
         return boundingBox;
     }

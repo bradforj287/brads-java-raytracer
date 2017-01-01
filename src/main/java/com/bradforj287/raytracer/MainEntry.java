@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import javax.swing.*;
 import com.bradforj287.raytracer.geometry.Shape3d;
 import com.bradforj287.raytracer.geometry.Vector3d;
-import com.bradforj287.raytracer.model.KDTree;
+import com.bradforj287.raytracer.model.kdtree.KDTreeImpl;
 import com.bradforj287.raytracer.model.SceneModel;
 import com.bradforj287.raytracer.parser.ObjFileParser;
 import com.bradforj287.raytracer.geometry.Triangle3d;
@@ -29,7 +29,7 @@ public class MainEntry {
             ArrayList<Shape3d> shapes = new ArrayList<>();
             model.getShapes().forEach(tri -> shapes.add(tri));
 
-            KDTree kdtree = new KDTree(shapes);
+            KDTreeImpl kdtree = new KDTreeImpl(shapes);
             System.out.println("done test");
 
 
