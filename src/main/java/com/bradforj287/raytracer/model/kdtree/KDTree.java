@@ -37,6 +37,9 @@ public class KDTree implements SpacialStructure {
     }
 
     private KDNode buildNode(List<Shape3d> shapes) {
+        if (shapes.isEmpty()) {
+            return null;
+        }
         AxisAlignedBoundingBox3d box = ShapeUtils.getBoundsForShapes(shapes);
         KDNode node = new KDNode();
         node.setBoundingBox(box);
@@ -45,15 +48,14 @@ public class KDTree implements SpacialStructure {
     }
 
     private void populateTree(KDNode node, final String coord) {
-        if (node.getShapes().isEmpty() || node.getShapes().size() <=  10) {
+        if (node == null || node.getShapes().isEmpty() || node.getShapes().size() <=  1) {
             return; // todo: enhance logic for detecting when to stop
         }
 
         List<Shape3d> leftShapes = new ArrayList<>();
         List<Shape3d> rightShapes = new ArrayList<>();
 
-        Vector3d midpoint = ShapeUtils.getMidpoint(node.getShapes());
-        double midpointCoord = midpoint.getCoordiateByName(coord);
+        double midpointCoord =  ShapeUtils.getAverageCenterCoordiate(coord, node.getShapes());
 
         //bucket shapes
         for (Shape3d shape : node.getShapes()) {

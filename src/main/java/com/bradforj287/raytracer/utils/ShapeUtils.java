@@ -1,6 +1,7 @@
 package com.bradforj287.raytracer.utils;
 
 import java.util.List;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import com.bradforj287.raytracer.geometry.AxisAlignedBoundingBox3d;
 import com.bradforj287.raytracer.geometry.Shape3d;
 import com.bradforj287.raytracer.geometry.Vector3d;
@@ -48,7 +49,20 @@ public class ShapeUtils {
         return new AxisAlignedBoundingBox3d(minPoint, maxPoint);
     }
 
-    public static Vector3d getMidpoint(List<Shape3d> shapes) {
+    public static double getAverageCenterCoordiate(final String coord, final List<Shape3d> shapes) {
+        Vector3d vec = getAveragePoint(shapes);
+        return vec.getCoordiateByName(coord);
+    }
+
+    public static double getMedianCenterCoordiate(final String coord, final List<Shape3d> shapes) {
+        DescriptiveStatistics stats = new DescriptiveStatistics();
+        for (Shape3d shape3d : shapes) {
+            stats.addValue(shape3d.getCentroid().getCoordiateByName(coord));
+        }
+        return stats.getPercentile(50);
+    }
+
+    public static Vector3d getAveragePoint(List<Shape3d> shapes) {
         double x = 0;
         double y = 0;
         double z = 0;
