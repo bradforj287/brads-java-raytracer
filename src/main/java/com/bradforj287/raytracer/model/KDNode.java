@@ -1,11 +1,11 @@
 package com.bradforj287.raytracer.model;
 
 import java.util.List;
-import com.bradforj287.raytracer.geometry.BoundingBox3D;
+import com.bradforj287.raytracer.geometry.AxisAlignedBoundingBox3D;
 import com.bradforj287.raytracer.geometry.Shape3D;
 
 public class KDNode {
-    private BoundingBox3D boundingBox;
+    private AxisAlignedBoundingBox3D boundingBox;
     private KDNode left;
     private KDNode right;
     private List<Shape3D> shapes;
@@ -13,11 +13,11 @@ public class KDNode {
     public boolean isLeaf() {
         return left == null && right == null;
     }
-    public BoundingBox3D getBoundingBox() {
+    public AxisAlignedBoundingBox3D getBoundingBox() {
         return boundingBox;
     }
 
-    public void setBoundingBox(BoundingBox3D boundingBox) {
+    public void setBoundingBox(AxisAlignedBoundingBox3D boundingBox) {
         this.boundingBox = boundingBox;
     }
 

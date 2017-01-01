@@ -2,9 +2,10 @@ package com.bradforj287.raytracer.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.bradforj287.raytracer.geometry.*;
+import com.bradforj287.raytracer.geometry.AxisAlignedBoundingBox3D;
+import com.bradforj287.raytracer.geometry.Shape3D;
+import com.bradforj287.raytracer.geometry.Vector3D;
 import com.bradforj287.raytracer.utils.ShapeUtils;
-import com.google.common.base.Preconditions;
 
 public class KDTree {
     private KDNode root;
@@ -16,8 +17,6 @@ public class KDTree {
     }
 
     private void init() {
-        // create root
-        BoundingBox3D box = calculateBoundingBox(this.shapes);
         root = buildNode(shapes);
         populateTree(root, "x");
     }
@@ -36,7 +35,7 @@ public class KDTree {
     }
 
     private KDNode buildNode(List<Shape3D> shapes) {
-        BoundingBox3D box = calculateBoundingBox(shapes);
+        AxisAlignedBoundingBox3D box = ShapeUtils.getBoundsForShapes(shapes);
         KDNode node = new KDNode();
         node.setBoundingBox(box);
         node.setShapes(shapes);
@@ -81,13 +80,4 @@ public class KDTree {
         populateTree(leftNode, nextCoordToUse);
         populateTree(rightNode, nextCoordToUse);
     }
-
-    private BoundingBox3D calculateBoundingBox(List<Shape3D> shapes) {
-        Preconditions.checkNotNull(shapes);
-        Preconditions.checkArgument(!shapes.isEmpty());
-
-        Bounds3D bounds = ShapeUtils.getBoundsForShapes(shapes);
-        return new BoundingBox3D(bounds);
-    }
-
 }
