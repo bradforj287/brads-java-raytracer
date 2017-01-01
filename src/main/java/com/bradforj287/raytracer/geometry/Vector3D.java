@@ -1,5 +1,8 @@
 package com.bradforj287.raytracer.geometry;
 
+import java.lang.reflect.Field;
+import org.apache.commons.lang3.reflect.FieldUtils;
+
 /**
  * Class for 3d vector
  *
@@ -15,6 +18,18 @@ public class Vector3D {
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public double getZ() {
+        return z;
     }
 
     public Vector3D(Vector3D v) {
@@ -52,10 +67,8 @@ public class Vector3D {
     }
 
     public Double getMagnitude() {
-
         double sum = x * x + y * y + z * z;
         return Math.sqrt(sum);
-
     }
 
     public Vector3D getUnitVector() {
@@ -91,5 +104,14 @@ public class Vector3D {
         x = result[0];
         y = result[1];
         z = result[2];
+    }
+
+    public double getCoordiateByName(final String coord) {
+        Field coordField = FieldUtils.getField(Vector3D.class, coord);
+        try {
+            return coordField.getDouble(this);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }

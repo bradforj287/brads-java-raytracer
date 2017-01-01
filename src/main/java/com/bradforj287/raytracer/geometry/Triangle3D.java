@@ -162,6 +162,74 @@ public class Triangle3D extends Shape3D {
             returnArgs.beta = beta;
         }
         return true;
+    }
 
+    private Vector3D[] toVertexArray() {
+        Vector3D[] r = new Vector3D[3];
+        r[0] = v1;
+        r[1] = v2;
+        r[2] = v3;
+        return r;
+    }
+
+    private double getMin(final String coord) {
+        Vector3D[] r = toVertexArray();
+        double min = r[0].getCoordiateByName(coord);
+        for (int i = 1; i < r.length; i++) {
+            double val = r[i].getCoordiateByName(coord);
+            if (val < min) {
+                min = val;
+            }
+        }
+        return min;
+    }
+
+    private double getMax(final String coord) {
+        Vector3D[] r = toVertexArray();
+        double max = r[0].getCoordiateByName(coord);
+        for (int i = 1; i < r.length; i++) {
+            double val = r[i].getCoordiateByName(coord);
+            if (val > max) {
+                max = val;
+            }
+        }
+        return max;
+    }
+
+    @Override
+    public double minX() {
+        return getMin("x");
+    }
+
+    @Override
+    public double minY() {
+        return getMin("y");
+    }
+
+    @Override
+    public double minZ() {
+        return getMin("z");
+    }
+
+    @Override
+    public double maxX() {
+        return getMax("x");
+    }
+
+    @Override
+    public double maxY() {
+        return getMax("y");
+    }
+
+    @Override
+    public double maxZ() {
+        return getMax("z");
+    }
+
+    @Override
+    public Vector3D getCentroid() {
+        return new Vector3D((v1.x + v2.x + v3.x) / 3,
+                (v1.y + v2.y + v3.y) / 3,
+                (v1.z + v2.z + v3.z) / 3);
     }
 }

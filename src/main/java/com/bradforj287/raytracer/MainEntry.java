@@ -3,7 +3,11 @@ package com.bradforj287.raytracer;
 import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import javax.swing.*;
+import com.bradforj287.raytracer.geometry.Shape3D;
+import com.bradforj287.raytracer.model.KDTree;
 import com.bradforj287.raytracer.model.SceneModel3D;
 import com.bradforj287.raytracer.parser.ObjFileParser;
 import com.bradforj287.raytracer.geometry.Triangle3D;
@@ -21,6 +25,16 @@ public class MainEntry {
         SceneModel3D model = null;
         try {
             model = ObjFileParser.parseObjFile(objFile);
+
+            // quick test
+            ArrayList<Shape3D> shapes = new ArrayList<>();
+            model.getShapes().forEach(tri -> shapes.add(tri));
+
+            KDTree kdtree = new KDTree(shapes);
+            System.out.println("done test");
+
+
+            // end test
         } catch (FileNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
