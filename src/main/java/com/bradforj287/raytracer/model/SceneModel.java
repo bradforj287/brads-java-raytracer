@@ -11,18 +11,18 @@ import com.google.common.base.Preconditions;
 
 public class SceneModel implements SpacialStructure {
 
-    private KDTree kdTree;
+    private KDTree shapesTree;
 
     public SceneModel(final List<Shape3d> shapes) {
         Preconditions.checkNotNull(shapes);
         Preconditions.checkArgument(!shapes.isEmpty());
 
-        kdTree = new KDTree(shapes);
+        shapesTree = new KDTree(shapes);
         printKdTreeStats();
     }
 
     private void printKdTreeStats() {
-        KDTreeStats stats = kdTree.getStats();
+        KDTreeStats stats = shapesTree.getStats();
         System.out.println("Num shapes: " + stats.getTotalShapes());
         System.out.println("Max Depth: " + stats.getMaxDepth());
         System.out.println("Num Leaf Nodes: " + stats.getNumLeafNoes());
@@ -32,12 +32,12 @@ public class SceneModel implements SpacialStructure {
 
     @Override
     public void visitPossibleIntersections(Ray3d ray, ShapeVisitor visitor) {
-        kdTree.visitPossibleIntersections(ray, visitor);
+        shapesTree.visitPossibleIntersections(ray, visitor);
     }
 
     @Override
     public AxisAlignedBoundingBox3d getBounds() {
-        return kdTree.getBounds();
+        return shapesTree.getBounds();
     }
 
    /** public void scaleScene(double scaleFactor) {
