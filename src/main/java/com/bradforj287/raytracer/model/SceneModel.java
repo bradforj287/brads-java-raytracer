@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import com.bradforj287.raytracer.geometry.Matrix3d;
 import com.bradforj287.raytracer.geometry.Triangle3d;
-import com.bradforj287.raytracer.geometry.Vector3D;
+import com.bradforj287.raytracer.geometry.Vector3d;
 
 public class SceneModel {
     private List<Triangle3d> shapes = new ArrayList<Triangle3d>();
@@ -18,7 +18,7 @@ public class SceneModel {
     }
 
     public void scaleScene(double scaleFactor) {
-        Iterator<Vector3D> itr = getVertexIterator();
+        Iterator<Vector3d> itr = getVertexIterator();
 
         while (itr.hasNext()) {
             itr.next().scaleBy(scaleFactor);

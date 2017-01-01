@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import com.bradforj287.raytracer.ProgramArguments;
+import com.bradforj287.raytracer.geometry.Vector3d;
 import com.bradforj287.raytracer.model.SceneModel;
 import com.bradforj287.raytracer.geometry.Matrix3d;
 import com.bradforj287.raytracer.geometry.RayCastArguments;
 import com.bradforj287.raytracer.geometry.Triangle3d;
-import com.bradforj287.raytracer.geometry.Vector3D;
 import com.bradforj287.raytracer.utils.VideoDataPointBuffer;
 
 public class RayTracer {
@@ -157,16 +157,16 @@ public class RayTracer {
 					}
 		
 					// calculate pointOnScreen and eyePoint
-					Vector3D pointOnScreen = new Vector3D(xStart + i * xIncrement +xOffset ,
+					Vector3d pointOnScreen = new Vector3d(xStart + i * xIncrement +xOffset ,
 							yStart + j * yIncrement  +yOffset, ProgramArguments.SCREEN_POSITION.z);
-					Vector3D eyePosition = new Vector3D(ProgramArguments.EYE_POSITION);
+					Vector3d eyePosition = new Vector3d(ProgramArguments.EYE_POSITION);
 	
 					// rotate both points according to theta
 					pointOnScreen.multiplyByMatrix(rot);
 					eyePosition.multiplyByMatrix(rot);
 	
 					// calculate view ray
-					Vector3D eyeDirection = Vector3D.vectorSubtract(pointOnScreen,
+					Vector3d eyeDirection = com.bradforj287.raytracer.geometry.Vector3d.vectorSubtract(pointOnScreen,
 							eyePosition);
 
 					int color = getColorForRay( eyeDirection, eyePosition, i, j);
@@ -196,8 +196,8 @@ public class RayTracer {
 	 * 
 	 * @param eyeDirection
 	 */
-	private int getColorForRay(final Vector3D eyeDirection,
-			final Vector3D eyePosition, int i, int j) {
+	private int getColorForRay(final Vector3d eyeDirection,
+							   final Vector3d eyePosition, int i, int j) {
 
 		RayCastArguments returnArgs = new RayCastArguments();
 
@@ -207,22 +207,22 @@ public class RayTracer {
 			
 			double t = returnArgs.t;
 
-			Vector3D intersectLoc = new Vector3D(eyePosition.x + t
+			Vector3d intersectLoc = new Vector3d(eyePosition.x + t
 					* eyeDirection.x, eyePosition.y + t * eyeDirection.y,
 					eyePosition.z + t * eyeDirection.z);
-			Vector3D normalToShape = interesectTriangle.getNormalVector();
+			Vector3d normalToShape = interesectTriangle.getNormalVector();
 
 			int color = interesectTriangle.color;
 
 
-			Vector3D lightVector = Vector3D.vectorSubtract(ProgramArguments.LIGHT_LOCATION, intersectLoc);
+			Vector3d lightVector = com.bradforj287.raytracer.geometry.Vector3d.vectorSubtract(ProgramArguments.LIGHT_LOCATION, intersectLoc);
 
 			lightVector.makeUnitVector();
 
-			double angleBetweenNormalAndLight = Vector3D.dotProduct(
+			double angleBetweenNormalAndLight = com.bradforj287.raytracer.geometry.Vector3d.dotProduct(
 					normalToShape, lightVector);
 
-			lightVector = Vector3D.vectorSubtract(intersectLoc, ProgramArguments.LIGHT_LOCATION);
+			lightVector = com.bradforj287.raytracer.geometry.Vector3d.vectorSubtract(intersectLoc, ProgramArguments.LIGHT_LOCATION);
 			lightVector.makeUnitVector();
 			if (angleBetweenNormalAndLight < 0) {
 				angleBetweenNormalAndLight = 0;
@@ -268,8 +268,8 @@ public class RayTracer {
 
 	}
 
-	private boolean isInShadow(Triangle3d hitTriangle, Vector3D intersectLoc,
-							   Vector3D lightDir) {
+	private boolean isInShadow(Triangle3d hitTriangle, Vector3d intersectLoc,
+							   Vector3d lightDir) {
 		Triangle3d interesectTriangle = doesRayHitAnyShape(lightDir,
 				intersectLoc, new RayCastArguments());
 
@@ -282,8 +282,8 @@ public class RayTracer {
 		}
 	}
 
-	private Triangle3d doesRayHitAnyShape(Vector3D direction,
-										  final Vector3D eyePosition, RayCastArguments returnArgs) {
+	private Triangle3d doesRayHitAnyShape(Vector3d direction,
+										  final Vector3d eyePosition, RayCastArguments returnArgs) {
 
 		double t0 = .0001;
 		double t1 = Double.MAX_VALUE; // switch this to max float

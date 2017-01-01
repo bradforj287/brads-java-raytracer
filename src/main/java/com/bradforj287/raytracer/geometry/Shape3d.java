@@ -7,5 +7,5 @@ public abstract class Shape3d {
     public abstract double maxX();
     public abstract double maxY();
     public abstract double maxZ();
-    public abstract Vector3D getCentroid();
+    public abstract Vector3d getCentroid();
 }

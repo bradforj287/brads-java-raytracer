@@ -8,13 +8,13 @@ import org.apache.commons.lang3.reflect.FieldUtils;
  *
  * @author brad
  */
-public class Vector3D {
+public class Vector3d {
 
     public double x;
     public double y;
     public double z;
 
-    public Vector3D(double x, double y, double z) {
+    public Vector3d(double x, double y, double z) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -32,7 +32,7 @@ public class Vector3D {
         return z;
     }
 
-    public Vector3D(Vector3D v) {
+    public Vector3d(Vector3d v) {
 
         this.x = v.x;
         this.y = v.y;
@@ -45,24 +45,24 @@ public class Vector3D {
         z = z * d;
     }
 
-    public void subtract(Vector3D v) {
+    public void subtract(Vector3d v) {
         x = x - v.x;
         y = y - v.y;
         z = z - v.z;
     }
 
-    public static double dotProduct(Vector3D a, Vector3D b) {
+    public static double dotProduct(Vector3d a, Vector3d b) {
         return (a.x * b.x + a.y * b.y + a.z * b.z);
     }
 
-    public static Vector3D vectorSubtract(Vector3D a, Vector3D b) {
-        return new Vector3D(a.x - b.x, a.y - b.y, a.z - b.z);
+    public static Vector3d vectorSubtract(Vector3d a, Vector3d b) {
+        return new Vector3d(a.x - b.x, a.y - b.y, a.z - b.z);
     }
 
-    public static Vector3D vectorCross(Vector3D a, Vector3D b) {
+    public static Vector3d vectorCross(Vector3d a, Vector3d b) {
         // From Shirley p.27: a x b = (ay*bz - az*by, az*bx - ax*zb,
         // ax*by-ay*bx)
-        return new Vector3D(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x
+        return new Vector3d(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x
                 * b.y - a.y * b.x);
     }
 
@@ -71,12 +71,12 @@ public class Vector3D {
         return Math.sqrt(sum);
     }
 
-    public Vector3D getUnitVector() {
+    public Vector3d getUnitVector() {
         double m = getMagnitude();
         double x1 = x / m;
         double y1 = y / m;
         double z1 = z / m;
-        return new Vector3D(x1, y1, z1);
+        return new Vector3d(x1, y1, z1);
     }
 
     public void makeUnitVector() {
@@ -107,7 +107,7 @@ public class Vector3D {
     }
 
     public double getCoordiateByName(final String coord) {
-        Field coordField = FieldUtils.getField(Vector3D.class, coord);
+        Field coordField = FieldUtils.getField(Vector3d.class, coord);
         try {
             return coordField.getDouble(this);
         } catch (Exception ex) {

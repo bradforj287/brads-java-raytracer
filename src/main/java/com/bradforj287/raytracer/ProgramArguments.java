@@ -1,7 +1,7 @@
 package com.bradforj287.raytracer;
 
 import java.awt.*;
-import com.bradforj287.raytracer.geometry.Vector3D;
+import com.bradforj287.raytracer.geometry.Vector3d;
 
 public class ProgramArguments {
     public static final boolean ROTATION_ON = true;
@@ -11,11 +11,11 @@ public class ProgramArguments {
     public static final Dimension SIZE_OF_SCENE = new Dimension(320, 240);
 
     // Ray tracing arguments
-    public final static Vector3D EYE_POSITION = new Vector3D(0, 0, 300);
-    public final static Vector3D SCREEN_POSITION = new Vector3D(0, 0, 290);
+    public final static Vector3d EYE_POSITION = new Vector3d(0, 0, 300);
+    public final static Vector3d SCREEN_POSITION = new Vector3d(0, 0, 290);
     public final static double SCREEN_WIDTH = 8;
     public final static double SCREEN_HEIGHT = 6;
     public final static double AMBIENT_LIGHT = .20;
     public final static int ANTIALIASING_SAMPLES = 1;
-    public final static Vector3D LIGHT_LOCATION = new Vector3D(100, 100, 100);
+    public final static Vector3d LIGHT_LOCATION = new Vector3d(100, 100, 100);
 }

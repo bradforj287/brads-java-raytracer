@@ -4,9 +4,9 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Iterator;
 import com.bradforj287.raytracer.geometry.Triangle3d;
-import com.bradforj287.raytracer.geometry.Vector3D;
+import com.bradforj287.raytracer.geometry.Vector3d;
 
-public class VertexIterator implements Iterator<Vector3D> {
+public class VertexIterator implements Iterator<Vector3d> {
     private final SceneModel scene;
     private int index = 0;
     private int vIndex = 0;
@@ -21,11 +21,11 @@ public class VertexIterator implements Iterator<Vector3D> {
     }
 
     @Override
-    public Vector3D next() {
+    public Vector3d next() {
 
         Triangle3d tri = scene.getShape(index);
 
-        Vector3D retVal = null;
+        Vector3d retVal = null;
         if (vIndex == 0) {
             retVal = tri.v1;
         } else if (vIndex == 1) {

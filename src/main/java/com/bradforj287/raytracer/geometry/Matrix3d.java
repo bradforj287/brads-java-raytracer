@@ -36,7 +36,7 @@ public class Matrix3d {
         return result;
     }
 
-    public static Vector3D matrixMultiply(Matrix3d a, Vector3D v) {
+    public static Vector3d matrixMultiply(Matrix3d a, Vector3d v) {
         double[] result = new double[3];
         double[] h = new double[4];
         h[0] = v.x;
@@ -51,7 +51,7 @@ public class Matrix3d {
             }
             result[i] = sum;
         }
-        Vector3D res = new Vector3D(result[0], result[1], result[2]);
+        Vector3d res = new Vector3d(result[0], result[1], result[2]);
         return res;
     }
 

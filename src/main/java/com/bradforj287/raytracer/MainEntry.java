@@ -6,11 +6,11 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import javax.swing.*;
 import com.bradforj287.raytracer.geometry.Shape3d;
+import com.bradforj287.raytracer.geometry.Vector3d;
 import com.bradforj287.raytracer.model.KDTree;
 import com.bradforj287.raytracer.model.SceneModel;
 import com.bradforj287.raytracer.parser.ObjFileParser;
 import com.bradforj287.raytracer.geometry.Triangle3d;
-import com.bradforj287.raytracer.geometry.Vector3D;
 import com.bradforj287.raytracer.utils.Utils;
 
 public class MainEntry {
@@ -60,16 +60,16 @@ public class MainEntry {
         int boundingColor = Color.blue.darker().getRGB();
 
         // top vertices
-        Vector3D top1 = new Vector3D(0, 0, cubeWidth);
-        Vector3D top2 = new Vector3D(cubeWidth, 0, cubeWidth);
-        Vector3D top3 = new Vector3D(0, cubeWidth, cubeWidth);
-        Vector3D top4 = new Vector3D(cubeWidth, cubeWidth, cubeWidth);
+        Vector3d top1 = new Vector3d(0, 0, cubeWidth);
+        Vector3d top2 = new Vector3d(cubeWidth, 0, cubeWidth);
+        Vector3d top3 = new Vector3d(0, cubeWidth, cubeWidth);
+        Vector3d top4 = new Vector3d(cubeWidth, cubeWidth, cubeWidth);
 
         // bottom vertices
-        Vector3D bottom1 = new Vector3D(0, 0, 0);
-        Vector3D bottom2 = new Vector3D(cubeWidth, 0, 0);
-        Vector3D bottom3 = new Vector3D(0, cubeWidth, 0);
-        Vector3D bottom4 = new Vector3D(cubeWidth, cubeWidth, 0);
+        Vector3d bottom1 = new Vector3d(0, 0, 0);
+        Vector3d bottom2 = new Vector3d(cubeWidth, 0, 0);
+        Vector3d bottom3 = new Vector3d(0, cubeWidth, 0);
+        Vector3d bottom4 = new Vector3d(cubeWidth, cubeWidth, 0);
 
         // top triangles
         scene.addShape(new Triangle3d(top1, top2, top3, boundingColor));
@@ -108,7 +108,7 @@ public class MainEntry {
                 boundingColor)));
 
         double offset = (cubeWidth / 2);
-        Vector3D offsetV = new Vector3D(offset, offset, offset);
+        Vector3d offsetV = new Vector3d(offset, offset, offset);
         for (int i = 0; i < scene.size(); i++) {
             Triangle3d t = scene.getShape(i);
             t.v1.subtract(offsetV);
@@ -136,20 +136,20 @@ public class MainEntry {
         SceneModel scene = new SceneModel();
 
         // define icosahedron
-        Vector3D[] figurepoints = new Vector3D[12];
+        Vector3d[] figurepoints = new Vector3d[12];
 
-        figurepoints[0] = new Vector3D(-0.692, 0, 0.427);
-        figurepoints[1] = new Vector3D(0.0, 0.427, -0.692);
-        figurepoints[2] = new Vector3D(0.0, 0.427, 0.692);
-        figurepoints[3] = new Vector3D(0.692, 0.0, -0.427);
-        figurepoints[4] = new Vector3D(-0.427, -0.692, 0.0);
-        figurepoints[5] = new Vector3D(-0.427, 0.692, 0.0);
-        figurepoints[6] = new Vector3D(0.0, -0.427, 0.692);
-        figurepoints[7] = new Vector3D(0.427, 0.692, 0.0);
-        figurepoints[8] = new Vector3D(0.0, -0.427, -0.692);
-        figurepoints[9] = new Vector3D(0.692, 0.0, 0.427);
-        figurepoints[10] = new Vector3D(0.427, -0.692, 0.0);
-        figurepoints[11] = new Vector3D(-0.692, 0.0, -0.427);
+        figurepoints[0] = new Vector3d(-0.692, 0, 0.427);
+        figurepoints[1] = new Vector3d(0.0, 0.427, -0.692);
+        figurepoints[2] = new Vector3d(0.0, 0.427, 0.692);
+        figurepoints[3] = new Vector3d(0.692, 0.0, -0.427);
+        figurepoints[4] = new Vector3d(-0.427, -0.692, 0.0);
+        figurepoints[5] = new Vector3d(-0.427, 0.692, 0.0);
+        figurepoints[6] = new Vector3d(0.0, -0.427, 0.692);
+        figurepoints[7] = new Vector3d(0.427, 0.692, 0.0);
+        figurepoints[8] = new Vector3d(0.0, -0.427, -0.692);
+        figurepoints[9] = new Vector3d(0.692, 0.0, 0.427);
+        figurepoints[10] = new Vector3d(0.427, -0.692, 0.0);
+        figurepoints[11] = new Vector3d(-0.692, 0.0, -0.427);
         double scaleFactor = 1;
         for (int i = 0; i < 12; i++) {
             figurepoints[i].x = figurepoints[i].x * scaleFactor;
@@ -209,11 +209,11 @@ public class MainEntry {
 
         // get normals to point in right direction
         for (int i = 0; i < scene.size(); i++) {
-            Vector3D fromOriginToTriangle = scene.getShape(i).v1;
+            Vector3d fromOriginToTriangle = scene.getShape(i).v1;
             fromOriginToTriangle = fromOriginToTriangle.getUnitVector();
-            Vector3D normal = ((Triangle3d) scene.getShape(i))
+            Vector3d normal = ((Triangle3d) scene.getShape(i))
                     .getNormalVector();
-            if (Vector3D.dotProduct(normal, fromOriginToTriangle) < 0) {
+            if (com.bradforj287.raytracer.geometry.Vector3d.dotProduct(normal, fromOriginToTriangle) < 0) {
                 // flip two verticies;
 
                 scene.getShape(i).flipNormal();

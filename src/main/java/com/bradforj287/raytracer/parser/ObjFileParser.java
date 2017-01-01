@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
+import com.bradforj287.raytracer.geometry.Vector3d;
 import com.bradforj287.raytracer.model.SceneModel;
 import com.bradforj287.raytracer.geometry.Triangle3d;
-import com.bradforj287.raytracer.geometry.Vector3D;
 
 public class ObjFileParser {
 
@@ -20,7 +20,7 @@ public class ObjFileParser {
 
         Scanner scanner = new Scanner(in);
 
-        ArrayList<Vector3D> verticies = new ArrayList<Vector3D>();
+        ArrayList<Vector3d> verticies = new ArrayList<Vector3d>();
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
 
@@ -34,16 +34,16 @@ public class ObjFileParser {
                 double x = Double.parseDouble(tok.nextToken());
                 double y = Double.parseDouble(tok.nextToken());
                 double z = Double.parseDouble(tok.nextToken());
-                verticies.add(new Vector3D(x, y, z));
+                verticies.add(new Vector3d(x, y, z));
 
             } else if (firstToken.equals("f")) {
                 int i = Integer.parseInt(tok.nextToken()) - 1;
                 int j = Integer.parseInt(tok.nextToken()) - 1;
                 int k = Integer.parseInt(tok.nextToken()) - 1;
 
-                Vector3D v1 = new Vector3D(verticies.get(i));
-                Vector3D v2 = new Vector3D(verticies.get(j));
-                Vector3D v3 = new Vector3D(verticies.get(k));
+                Vector3d v1 = new Vector3d(verticies.get(i));
+                Vector3d v2 = new Vector3d(verticies.get(j));
+                Vector3d v3 = new Vector3d(verticies.get(k));
 
                 m.addShape(new Triangle3d(v1, v2, v3, 123123));
             }

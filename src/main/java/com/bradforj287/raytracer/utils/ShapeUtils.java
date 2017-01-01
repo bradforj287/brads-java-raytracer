@@ -3,7 +3,7 @@ package com.bradforj287.raytracer.utils;
 import java.util.List;
 import com.bradforj287.raytracer.geometry.AxisAlignedBoundingBox3d;
 import com.bradforj287.raytracer.geometry.Shape3d;
-import com.bradforj287.raytracer.geometry.Vector3D;
+import com.bradforj287.raytracer.geometry.Vector3d;
 import com.google.common.base.Preconditions;
 
 public class ShapeUtils {
@@ -42,23 +42,23 @@ public class ShapeUtils {
                 maxZ = shape.maxZ();
             }
         }
-        Vector3D minPoint = new Vector3D(minX, minY, minZ);
-        Vector3D maxPoint = new Vector3D(maxX, maxY, maxZ);
+        Vector3d minPoint = new Vector3d(minX, minY, minZ);
+        Vector3d maxPoint = new Vector3d(maxX, maxY, maxZ);
 
         return new AxisAlignedBoundingBox3d(minPoint, maxPoint);
     }
 
-    public static Vector3D getMidpoint(List<Shape3d> shapes) {
+    public static Vector3d getMidpoint(List<Shape3d> shapes) {
         double x = 0;
         double y = 0;
         double z = 0;
         double numShapes = shapes.size();
         for (Shape3d s : shapes) {
-            Vector3D center = s.getCentroid();
+            Vector3d center = s.getCentroid();
             x += center.x;
             y += center.y;
             z += center.z;
         }
-        return new Vector3D(x / numShapes, y / numShapes, z / numShapes);
+        return new Vector3d(x / numShapes, y / numShapes, z / numShapes);
     }
 }

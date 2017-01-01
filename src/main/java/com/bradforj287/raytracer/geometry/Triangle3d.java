@@ -2,9 +2,9 @@ package com.bradforj287.raytracer.geometry;
 
 public class Triangle3d extends Shape3d {
 
-    public Vector3D v1;
-    public Vector3D v2;
-    public Vector3D v3;
+    public Vector3d v1;
+    public Vector3d v2;
+    public Vector3d v3;
     public int color;
 
     public Triangle3d() {
@@ -15,7 +15,7 @@ public class Triangle3d extends Shape3d {
 
     /**
      * This is important: we make a new fresh copy of all
-     * vertices. No two triangles should share the same Vector3D object
+     * vertices. No two triangles should share the same Vector3d object
      * they will need separate objects. This makes performing transformations
      * on triangle meshes much easier.
      *
@@ -24,10 +24,10 @@ public class Triangle3d extends Shape3d {
      * @param c
      * @param color1
      */
-    public Triangle3d(Vector3D a, Vector3D b, Vector3D c, int color1) {
-        v1 = new Vector3D(a);
-        v2 = new Vector3D(b);
-        v3 = new Vector3D(c);
+    public Triangle3d(Vector3d a, Vector3d b, Vector3d c, int color1) {
+        v1 = new Vector3d(a);
+        v2 = new Vector3d(b);
+        v3 = new Vector3d(c);
         color = color1;
         flipNormal();
     }
@@ -39,15 +39,15 @@ public class Triangle3d extends Shape3d {
     }
 
     public void flipNormal() {
-        Vector3D temp = v2;
+        Vector3d temp = v2;
         v2 = v1;
         v1 = temp;
     }
 
-    public Vector3D getNormalVector() {
-        Vector3D a = Vector3D.vectorSubtract(v2, v1);
-        Vector3D b = Vector3D.vectorSubtract(v3, v1);
-        Vector3D normal = Vector3D.vectorCross(a, b);
+    public Vector3d getNormalVector() {
+        Vector3d a = com.bradforj287.raytracer.geometry.Vector3d.vectorSubtract(v2, v1);
+        Vector3d b = com.bradforj287.raytracer.geometry.Vector3d.vectorSubtract(v3, v1);
+        Vector3d normal = com.bradforj287.raytracer.geometry.Vector3d.vectorCross(a, b);
         return normal.getUnitVector();
     }
 
@@ -61,7 +61,7 @@ public class Triangle3d extends Shape3d {
         return (crossProd * .5);
     }
 
-    void baryXY(Vector3D v, double alpha, double beta, double gamma) {
+    void baryXY(Vector3d v, double alpha, double beta, double gamma) {
         double x1;
         double y1;
         double x2;
@@ -106,11 +106,11 @@ public class Triangle3d extends Shape3d {
         v3.multiplyByMatrix(mat);
     }
 
-    public boolean isHitByRay(Vector3D eye, Vector3D dir, double t0, double t1,
+    public boolean isHitByRay(Vector3d eye, Vector3d dir, double t0, double t1,
                               RayCastArguments returnArgs) {
-        Vector3D v_a = this.v1;
-        Vector3D v_b = this.v2;
-        Vector3D v_c = this.v3;
+        Vector3d v_a = this.v1;
+        Vector3d v_b = this.v2;
+        Vector3d v_c = this.v3;
 
         double a = v_a.x - v_b.x;
         double b = v_a.y - v_b.y;
@@ -164,8 +164,8 @@ public class Triangle3d extends Shape3d {
         return true;
     }
 
-    private Vector3D[] toVertexArray() {
-        Vector3D[] r = new Vector3D[3];
+    private Vector3d[] toVertexArray() {
+        Vector3d[] r = new Vector3d[3];
         r[0] = v1;
         r[1] = v2;
         r[2] = v3;
@@ -173,7 +173,7 @@ public class Triangle3d extends Shape3d {
     }
 
     private double getMin(final String coord) {
-        Vector3D[] r = toVertexArray();
+        Vector3d[] r = toVertexArray();
         double min = r[0].getCoordiateByName(coord);
         for (int i = 1; i < r.length; i++) {
             double val = r[i].getCoordiateByName(coord);
@@ -185,7 +185,7 @@ public class Triangle3d extends Shape3d {
     }
 
     private double getMax(final String coord) {
-        Vector3D[] r = toVertexArray();
+        Vector3d[] r = toVertexArray();
         double max = r[0].getCoordiateByName(coord);
         for (int i = 1; i < r.length; i++) {
             double val = r[i].getCoordiateByName(coord);
@@ -227,8 +227,8 @@ public class Triangle3d extends Shape3d {
     }
 
     @Override
-    public Vector3D getCentroid() {
-        return new Vector3D((v1.x + v2.x + v3.x) / 3,
+    public Vector3d getCentroid() {
+        return new Vector3d((v1.x + v2.x + v3.x) / 3,
                 (v1.y + v2.y + v3.y) / 3,
                 (v1.z + v2.z + v3.z) / 3);
     }

@@ -1,19 +1,19 @@
 package com.bradforj287.raytracer.geometry;
 
 public class AxisAlignedBoundingBox3d {
-    private Vector3D min;
-    private Vector3D max;
+    private Vector3d min;
+    private Vector3d max;
 
-    public AxisAlignedBoundingBox3d(Vector3D min, Vector3D max) {
+    public AxisAlignedBoundingBox3d(Vector3d min, Vector3d max) {
         this.min = min;
         this.max = max;
     }
 
-    public Vector3D getMin() {
+    public Vector3d getMin() {
         return min;
     }
 
-    public Vector3D getMax() {
+    public Vector3d getMax() {
         return max;
     }
 }

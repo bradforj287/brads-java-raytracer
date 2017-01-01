@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.bradforj287.raytracer.geometry.AxisAlignedBoundingBox3d;
 import com.bradforj287.raytracer.geometry.Shape3d;
-import com.bradforj287.raytracer.geometry.Vector3D;
+import com.bradforj287.raytracer.geometry.Vector3d;
 import com.bradforj287.raytracer.utils.ShapeUtils;
 
 public class KDTree {
@@ -50,12 +50,12 @@ public class KDTree {
         List<Shape3d> leftShapes = new ArrayList<>();
         List<Shape3d> rightShapes = new ArrayList<>();
 
-        Vector3D midpoint = ShapeUtils.getMidpoint(node.getShapes());
+        Vector3d midpoint = ShapeUtils.getMidpoint(node.getShapes());
         double midpointCoord = midpoint.getCoordiateByName(coord);
 
         //bucket shapes
         for (Shape3d shape : node.getShapes()) {
-            Vector3D shapeMidpoint = shape.getCentroid();
+            Vector3d shapeMidpoint = shape.getCentroid();
             double shapeCoord = shapeMidpoint.getCoordiateByName(coord);
             if (shapeCoord <= midpointCoord) {
                 leftShapes.add(shape);
