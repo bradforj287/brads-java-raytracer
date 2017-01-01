@@ -106,6 +106,7 @@ public class Triangle3d extends Shape3d {
         v3.multiplyByMatrix(mat);
     }
 
+    @Override
     public boolean isHitByRay(Ray3d ray,  double t0, double t1,
                               RayCastArguments returnArgs) {
 

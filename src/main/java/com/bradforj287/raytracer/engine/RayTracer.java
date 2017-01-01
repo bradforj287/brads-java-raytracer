@@ -4,15 +4,14 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Random;
-
 import com.bradforj287.raytracer.ProgramArguments;
 import com.bradforj287.raytracer.geometry.*;
 import com.bradforj287.raytracer.model.SceneModel;
 import com.bradforj287.raytracer.utils.VideoDataPointBuffer;
 
 public class RayTracer {
-    private SceneModel scene = null;
-    private Dimension sceneResolution = null;
+    private SceneModel scene;
+    private Dimension sceneResolution;
     private VideoDataPointBuffer fpsBuffer = new VideoDataPointBuffer();
 
     public RayTracer(SceneModel model, Dimension sceneResolution) {
@@ -195,7 +194,7 @@ public class RayTracer {
 
             double t = returnArgs.t;
 
-            //todo fix this.
+            //todo: make this more elegant
             Vector3d eyePosition = ray.getPoint();
             Vector3d eyeDirection = ray.getDirection();
 
@@ -273,22 +272,25 @@ public class RayTracer {
         }
     }
 
+    private class VisitingResults {
+        double t1 = Double.MAX_VALUE;
+        Triangle3d visibleTriangle;
+    }
+
     private Triangle3d doesRayHitAnyShape(final Ray3d ray, final RayCastArguments returnArgs) {
 
-        double t0 = .0001;
-        double t1 = Double.MAX_VALUE; // switch this to max float
+        final double t0 = .0001;
+        final VisitingResults results = new VisitingResults();
 
-        Triangle3d visibleTriangle = null;
-        // check triangles
-        for (int i = 0; i < scene.size(); i++) {
-            if (scene.getShape(i).isHitByRay(ray, t0, t1,
+        scene.visitPossibleMatches(ray, shape -> {
+            if (shape.isHitByRay(ray, t0, results.t1,
                     returnArgs)) {
-                t1 = returnArgs.t;
-                visibleTriangle = scene.getShape(i);
+                results.t1 = returnArgs.t;
+                results.visibleTriangle = (Triangle3d) shape;
             }
-        }
+        });
 
-        return visibleTriangle;
+        return results.visibleTriangle;
     }
 
     private void clearImage(BufferedImage image) {

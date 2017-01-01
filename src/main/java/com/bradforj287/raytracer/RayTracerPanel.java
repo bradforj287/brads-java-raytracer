@@ -1,14 +1,9 @@
 package com.bradforj287.raytracer;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-
-import javax.swing.JPanel;
+import javax.swing.*;
 import com.bradforj287.raytracer.engine.RayTracer;
 import com.bradforj287.raytracer.model.SceneModel;
 
