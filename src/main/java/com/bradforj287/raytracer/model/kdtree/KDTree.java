@@ -41,7 +41,7 @@ public class KDTree implements SpacialStructure {
             return leftShapes.isEmpty() || rightShapes.isEmpty();
         }
 
-        // lower value is better
+        // lower value is better. Ranges from 0 to .5
         public double getSplitScore() {
             double leftSize = leftShapes.size();
             double rightSize = rightShapes.size();
@@ -67,18 +67,18 @@ public class KDTree implements SpacialStructure {
     }
 
     private void populateTree(KDNode node) {
+        // base case #1
         if (node == null || node.getShapes().isEmpty() || node.getShapes().size() <=  1) {
-            return; // todo: enhance logic for detecting when to stop
+            return;
         }
 
         // split shapes
         final String coord = node.getBoundingBox().getLongestAxis().toString();
-        double midpointCoord =  ShapeUtils.getMedianCenterCoordiate(coord, node.getShapes());
-        double length = node.getBoundingBox().getMax().getCoordiateByName(coord) - node.getBoundingBox().getMin().getCoordiateByName(coord);
-        final double randomShift = .01 * length;
+        double midpointCoord =  ShapeUtils.getAverageCenterCoordiate(coord, node.getShapes());
 
         SplitResult splitResult = splitShapes(node.getShapes(), coord, midpointCoord);
 
+        // base case #2 - if the split is poor don't continue to split
         if (splitResult.isEmptySplit()) {
             return;
         }
