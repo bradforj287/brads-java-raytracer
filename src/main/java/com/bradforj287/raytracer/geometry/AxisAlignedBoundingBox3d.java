@@ -1,5 +1,8 @@
 package com.bradforj287.raytracer.geometry;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class AxisAlignedBoundingBox3d {
     private Vector3d min;
     private Vector3d max;
@@ -18,6 +21,41 @@ public class AxisAlignedBoundingBox3d {
 
     public Vector3d getMax() {
         return max;
+    }
+
+    public double xLength() {
+        return this.max.x - this.min.x;
+    }
+
+    public double yLength() {
+        return this.max.y - this.min.y;
+    }
+
+    public double zLength() {
+        return this.max.z - this.min.z;
+    }
+
+    private class AxisLength {
+        private Axis axis;
+        private double length;
+
+        public AxisLength(Axis axis, double length) {
+            this.axis = axis;
+            this.length = length;
+        }
+    }
+
+    public Axis getLongestAxis() {
+        List<AxisLength> lengths = new ArrayList<>();
+        lengths.add(new AxisLength(Axis.X, xLength()));
+        lengths.add(new AxisLength(Axis.Y, yLength()));
+        lengths.add(new AxisLength(Axis.Z, zLength()));
+
+        return lengths.stream().max( (a, b) -> {
+            Double ad = a.length;
+            Double ab = b.length;
+            return ad.compareTo(ab);
+        }).get().axis;
     }
 
     /**

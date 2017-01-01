@@ -20,7 +20,7 @@ public class KDTree implements SpacialStructure {
 
     private void init() {
         root = buildNode(shapes);
-        populateTree(root, "x");
+        populateTree(root);
     }
 
     private String getNextCoordInSequence(String currentCoord) {
@@ -36,18 +36,18 @@ public class KDTree implements SpacialStructure {
         return null;
     }
 
-    private KDNode buildNode(List<Shape3d> shapes) {
-        if (shapes.isEmpty()) {
+    private KDNode buildNode(List<Shape3d> theShapes) {
+        if (theShapes.isEmpty()) {
             return null;
         }
-        AxisAlignedBoundingBox3d box = ShapeUtils.getBoundsForShapes(shapes);
+        AxisAlignedBoundingBox3d box = ShapeUtils.getBoundsForShapes(theShapes);
         KDNode node = new KDNode();
         node.setBoundingBox(box);
-        node.setShapes(shapes);
+        node.setShapes(theShapes);
         return node;
     }
 
-    private void populateTree(KDNode node, final String coord) {
+    private void populateTree(KDNode node) {
         if (node == null || node.getShapes().isEmpty() || node.getShapes().size() <=  1) {
             return; // todo: enhance logic for detecting when to stop
         }
@@ -55,9 +55,12 @@ public class KDTree implements SpacialStructure {
         List<Shape3d> leftShapes = new ArrayList<>();
         List<Shape3d> rightShapes = new ArrayList<>();
 
+        // split shapes
+
+        // final String coord = getNextCoordInSequence();
+        final String coord = node.getBoundingBox().getLongestAxis().toString();
         double midpointCoord =  ShapeUtils.getAverageCenterCoordiate(coord, node.getShapes());
 
-        //bucket shapes
         for (Shape3d shape : node.getShapes()) {
             Vector3d shapeMidpoint = shape.getCentroid();
             double shapeCoord = shapeMidpoint.getCoordiateByName(coord);
@@ -66,6 +69,10 @@ public class KDTree implements SpacialStructure {
             } else {
                 rightShapes.add(shape);
             }
+        }
+
+        if (leftShapes.isEmpty() || rightShapes.isEmpty()) {
+            return;
         }
 
         // left node
@@ -80,9 +87,8 @@ public class KDTree implements SpacialStructure {
         node.setRight(rightNode);
 
         //recurse
-        final String nextCoordToUse = getNextCoordInSequence(coord);
-        populateTree(leftNode, nextCoordToUse);
-        populateTree(rightNode, nextCoordToUse);
+        populateTree(leftNode);
+        populateTree(rightNode);
     }
 
     @Override
