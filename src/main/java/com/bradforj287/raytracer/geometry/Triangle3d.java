@@ -106,8 +106,12 @@ public class Triangle3d extends Shape3d {
         v3.multiplyByMatrix(mat);
     }
 
-    public boolean isHitByRay(Vector3d eye, Vector3d dir, double t0, double t1,
+    public boolean isHitByRay(Ray3d ray,  double t0, double t1,
                               RayCastArguments returnArgs) {
+
+        Vector3d eye = ray.getPoint();
+        Vector3d dir = ray.getDirection();
+
         Vector3d v_a = this.v1;
         Vector3d v_b = this.v2;
         Vector3d v_c = this.v3;
