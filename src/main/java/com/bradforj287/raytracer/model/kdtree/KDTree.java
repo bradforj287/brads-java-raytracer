@@ -123,4 +123,29 @@ public class KDTree implements SpacialStructure {
     public AxisAlignedBoundingBox3d getBounds() {
         return root.getBoundingBox();
     }
+
+    public KDTreeStats getStats() {
+        KDTreeStats stats = new KDTreeStats();
+        stats.setTotalShapes(this.shapes.size());
+        traverseStats(this.root, stats, 0);
+        return stats;
+    }
+
+    private void traverseStats(KDNode node, KDTreeStats stats, int depth) {
+        if (node == null) {
+            return;
+        }
+
+        if (node.isLeaf()) {
+            stats.addLeaf();
+            stats.getLeafNodeSizeStats().addValue(node.getShapes().size());
+        }
+
+        if (depth > stats.getMaxDepth()) {
+            stats.setMaxDepth(depth);
+        }
+        stats.addNode();
+        traverseStats(node.getLeft(), stats, depth + 1);
+        traverseStats(node.getRight(), stats, depth + 1);
+    }
 }
