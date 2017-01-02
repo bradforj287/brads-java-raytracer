@@ -46,19 +46,14 @@ public class Vector3d {
         return new Vector3d(x1, y1, z1);
     }
 
-    public static double dotProduct(Vector3d a, Vector3d b) {
-        return (a.x * b.x + a.y * b.y + a.z * b.z);
+    public double dot(Vector3d b) {
+        return (this.x * b.x + this.y * b.y + this.z * b.z);
     }
 
-    public static Vector3d vectorSubtract(Vector3d a, Vector3d b) {
-        return new Vector3d(a.x - b.x, a.y - b.y, a.z - b.z);
-    }
-
-    public static Vector3d vectorCross(Vector3d a, Vector3d b) {
-        // From Shirley p.27: a x b = (ay*bz - az*by, az*bx - ax*zb,
-        // ax*by-ay*bx)
-        return new Vector3d(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x
-                * b.y - a.y * b.x);
+    public Vector3d cross(Vector3d b) {
+        // From Shirley p.27: a x b = (ay*bz - az*by, az*bx - ax*zb, ax*by-ay*bx)
+        return new Vector3d(this.y * b.z - this.z * b.y, this.z * b.x - this.x * b.z, this.x
+                * b.y - this.y * b.x);
     }
 
     public Double getMagnitude() {

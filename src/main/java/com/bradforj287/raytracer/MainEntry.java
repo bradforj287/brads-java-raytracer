@@ -121,7 +121,7 @@ public class MainEntry {
     private static Triangle3d correctNormal(Triangle3d tri) {
         Vector3d fromOriginToTriangle = tri.v1.getUnitVector();
         Vector3d normal = tri.getNormalVector();
-        if (com.bradforj287.raytracer.geometry.Vector3d.dotProduct(normal, fromOriginToTriangle) < 0) {
+        if (normal.dot(fromOriginToTriangle) < 0) {
             return tri.getFlippedNormal();
         } else {
             return tri;

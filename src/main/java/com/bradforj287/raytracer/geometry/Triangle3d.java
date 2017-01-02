@@ -26,9 +26,9 @@ public class Triangle3d extends Shape3d {
 
     public Vector3d getNormalVector() {
         if (normal == null) {
-            Vector3d a = Vector3d.vectorSubtract(v2, v1);
-            Vector3d b = Vector3d.vectorSubtract(v3, v1);
-            Vector3d nn = Vector3d.vectorCross(a, b);
+            Vector3d a = v2.subtract(v1);
+            Vector3d b = v3.subtract(v1);
+            Vector3d nn = a.cross(b);
             this.normal = nn.getUnitVector();
         }
         return this.normal;
