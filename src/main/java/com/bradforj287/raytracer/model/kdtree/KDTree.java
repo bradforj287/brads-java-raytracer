@@ -6,6 +6,7 @@ import com.bradforj287.raytracer.geometry.AxisAlignedBoundingBox3d;
 import com.bradforj287.raytracer.geometry.Ray3d;
 import com.bradforj287.raytracer.geometry.Shape3d;
 import com.bradforj287.raytracer.geometry.Vector3d;
+import com.bradforj287.raytracer.model.ShapeVisitor;
 import com.bradforj287.raytracer.model.SpacialStructure;
 import com.bradforj287.raytracer.model.SpacialStructureQueryStats;
 import com.bradforj287.raytracer.utils.ShapeUtils;

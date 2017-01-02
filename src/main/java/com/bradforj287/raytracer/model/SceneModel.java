@@ -5,7 +5,6 @@ import com.bradforj287.raytracer.geometry.AxisAlignedBoundingBox3d;
 import com.bradforj287.raytracer.geometry.Ray3d;
 import com.bradforj287.raytracer.geometry.Shape3d;
 import com.bradforj287.raytracer.model.kdtree.KDTree;
-import com.bradforj287.raytracer.model.kdtree.ShapeVisitor;
 import com.google.common.base.Preconditions;
 
 public class SceneModel implements SpacialStructure {

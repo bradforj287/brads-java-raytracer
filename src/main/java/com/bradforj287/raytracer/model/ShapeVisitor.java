@@ -1,4 +1,4 @@
-package com.bradforj287.raytracer.model.kdtree;
+package com.bradforj287.raytracer.model;
 
 import com.bradforj287.raytracer.geometry.Shape3d;
 
