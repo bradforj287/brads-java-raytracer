@@ -45,7 +45,7 @@ public class MainEntry {
     }
 
     private static List<Sphere3d> genRandomSpheres(int numSpheres, Vector3d minCenter, Vector3d maxCenter, double minRadius, double maxRadius) {
-        Random random = new Random();
+        Random random = new Random(1);
         List<Sphere3d> sphere3ds = new ArrayList<>();
         for (int i = 0; i < numSpheres; i++) {
             double xRange = maxCenter.x - minCenter.x;

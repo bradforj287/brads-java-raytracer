@@ -124,14 +124,14 @@ public class KDTree implements SpacialStructure {
         return root.getBoundingBox();
     }
 
-    public KDTreeStats getStats() {
+    public KDTreeStats getCreationStats() {
         KDTreeStats stats = new KDTreeStats();
         stats.setTotalShapes(this.shapes.size());
-        traverseStats(this.root, stats, 0);
+        traverseCreationStats(this.root, stats, 0);
         return stats;
     }
 
-    private void traverseStats(KDNode node, KDTreeStats stats, int depth) {
+    private void traverseCreationStats(KDNode node, KDTreeStats stats, int depth) {
         if (node == null) {
             return;
         }
@@ -145,7 +145,7 @@ public class KDTree implements SpacialStructure {
             stats.setMaxDepth(depth);
         }
         stats.addNode();
-        traverseStats(node.getLeft(), stats, depth + 1);
-        traverseStats(node.getRight(), stats, depth + 1);
+        traverseCreationStats(node.getLeft(), stats, depth + 1);
+        traverseCreationStats(node.getRight(), stats, depth + 1);
     }
 }

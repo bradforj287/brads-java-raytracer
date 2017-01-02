@@ -22,7 +22,7 @@ public class SceneModel implements SpacialStructure {
     }
 
     private void printKdTreeStats() {
-        KDTreeStats stats = shapesTree.getStats();
+        KDTreeStats stats = shapesTree.getCreationStats();
         System.out.println("Num shapes: " + stats.getTotalShapes());
         System.out.println("Max Depth: " + stats.getMaxDepth());
         System.out.println("Num Leaf Nodes: " + stats.getNumLeafNoes());
