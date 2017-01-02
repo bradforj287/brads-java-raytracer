@@ -31,16 +31,13 @@ public class RayTracerPanel extends JPanel {
                     double dDeltaSec = ((double) delta) / 1000;
                     theta = theta + dDeltaSec * rotationRate;
 
-                    try {
-                        lastFrameTime = System.currentTimeMillis();
-                        BufferedImage img = rayTracer.traceScene(theta, theta,
-                                0);
-                        synchronized (paintLock) {
-                            sceneFrame = img;
-                        }
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
+                    lastFrameTime = System.currentTimeMillis();
+                    BufferedImage img = rayTracer.traceScene(theta, theta,
+                            0);
+                    synchronized (paintLock) {
+                        sceneFrame = img;
                     }
+
                     repaint();
                 }
             }
@@ -49,11 +46,7 @@ public class RayTracerPanel extends JPanel {
         if (ProgramArguments.ROTATION_ON) {
             animationTimer.start();
         } else {
-            try {
-                sceneFrame = rayTracer.traceScene(-2.521, -2.521, 0);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            sceneFrame = rayTracer.traceScene(-2.521, -2.521, 0);
         }
     }
 

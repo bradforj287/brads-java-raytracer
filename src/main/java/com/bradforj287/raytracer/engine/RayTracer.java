@@ -19,9 +19,7 @@ public class RayTracer {
         this.scene = model;
     }
 
-    public BufferedImage traceScene(final double thetax, final double thetay, final double thetaz)
-            throws InterruptedException {
-
+    public BufferedImage traceScene(final double thetax, final double thetay, final double thetaz) {
         final BufferedImage image = new BufferedImage(sceneResolution.width,
                 sceneResolution.height, BufferedImage.TYPE_INT_RGB);
 
@@ -37,7 +35,7 @@ public class RayTracer {
         final double ystart = -1 * ProgramArguments.SCREEN_HEIGHT / 2;
         final int threadWidth = sceneResolution.width / numCores;
 
-        ArrayList<Thread> tracePool = new ArrayList<Thread>();
+        ArrayList<Thread> tracePool = new ArrayList<>();
 
         // create the threads
         for (int i = 0; i < numCores; i++) {
@@ -54,15 +52,10 @@ public class RayTracer {
                     width, height);
 
             // create the worker thread
-            Thread traceThread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-
-                    iterateOverScreenRegion(image, threadRect, xIncrement,
-                            yIncrement, xstart, ystart, thetax, thetay, thetaz);
-                }
-            }
-            );
+            Thread traceThread = new Thread( () -> {
+                iterateOverScreenRegion(image, threadRect, xIncrement,
+                        yIncrement, xstart, ystart, thetax, thetay, thetaz);
+            });
 
             tracePool.add(traceThread);
 
@@ -72,7 +65,11 @@ public class RayTracer {
 
         // make sure all threads have finished before we return!
         for (Thread t : tracePool) {
-            t.join();
+            try {
+                t.join();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
         }
 
         fpsBuffer.addToBuffer(System.currentTimeMillis());
