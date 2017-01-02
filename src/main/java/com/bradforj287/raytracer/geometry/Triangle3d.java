@@ -6,33 +6,15 @@ public class Triangle3d extends Shape3d {
     public Vector3d v2;
     public Vector3d v3;
 
-    public Triangle3d() {
-        flipNormal();
-    }
-
-    /**
-     * This is important: we make a new fresh copy of all
-     * vertices. No two triangles should share the same Vector3d object
-     * they will need separate objects. This makes performing transformations
-     * on triangle meshes much easier.
-     *
-     * @param a
-     * @param b
-     * @param c
-     * @param color1
-     */
     public Triangle3d(Vector3d a, Vector3d b, Vector3d c, int color1) {
         v1 = new Vector3d(a);
         v2 = new Vector3d(b);
         v3 = new Vector3d(c);
         this.color = color1;
-        flipNormal();
     }
 
-    public void convertVerticiesToUnitVectors() {
-        v1 = v1.getUnitVector();
-        v2 = v2.getUnitVector();
-        v3 = v3.getUnitVector();
+    public Triangle3d getFlippedNormal() {
+        return new Triangle3d(v2, v1, v3, this.color);
     }
 
     public void flipNormal() {

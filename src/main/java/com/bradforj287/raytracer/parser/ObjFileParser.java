@@ -45,8 +45,8 @@ public class ObjFileParser {
                     Vector3d v1 = new Vector3d(verticies.get(i));
                     Vector3d v2 = new Vector3d(verticies.get(j));
                     Vector3d v3 = new Vector3d(verticies.get(k));
-
-                    r.add(new Triangle3d(v1, v2, v3, 123123));
+                    Triangle3d tri = new Triangle3d(v1, v2, v3, 123123);
+                    r.add(tri.getFlippedNormal());
                 }
             }
             return r;
