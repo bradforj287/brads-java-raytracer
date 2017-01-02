@@ -5,7 +5,7 @@ public class Plane3d {
     private Vector3d point;
 
     public Plane3d(Vector3d normal, Vector3d point) {
-        this.normal = normal.getUnitVector();
+        this.normal = normal.toUnitVector();
         this.point = point;
    }
 

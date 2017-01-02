@@ -1,8 +1,8 @@
 package com.bradforj287.raytracer.geometry;
 
 public class Ray3d {
-    private Vector3d point;
-    private Vector3d direction;
+    private final Vector3d point;
+    private final Vector3d direction;
 
     public Ray3d(Vector3d point, Vector3d direction) {
         this.point = point;

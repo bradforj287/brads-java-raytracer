@@ -154,8 +154,8 @@ public class RayTracer {
                     Vector3d eyePosition = new Vector3d(ProgramArguments.EYE_POSITION);
 
                     // rotate both points according to theta
-                    pointOnScreen.multiplyByMatrix(rot);
-                    eyePosition.multiplyByMatrix(rot);
+                    pointOnScreen = pointOnScreen.multiplyByMatrix(rot);
+                    eyePosition = eyePosition.multiplyByMatrix(rot);
 
                     // calculate view ray
                     Vector3d eyeDirection = pointOnScreen.subtract(eyePosition);
@@ -204,11 +204,11 @@ public class RayTracer {
 
             int color = intersectShape.getColor();
 
-            Vector3d lightVector = ProgramArguments.LIGHT_LOCATION.subtract(intersectLoc).getUnitVector();
+            Vector3d lightVector = ProgramArguments.LIGHT_LOCATION.subtract(intersectLoc).toUnitVector();
 
             double angleBetweenNormalAndLight = normalToShape.dot(lightVector);
 
-            lightVector = intersectLoc.subtract(ProgramArguments.LIGHT_LOCATION).getUnitVector();
+            lightVector = intersectLoc.subtract(ProgramArguments.LIGHT_LOCATION).toUnitVector();
             if (angleBetweenNormalAndLight < 0) {
                 angleBetweenNormalAndLight = 0;
             } else if (isInShadow(intersectShape, ProgramArguments.LIGHT_LOCATION, lightVector)) {

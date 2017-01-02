@@ -29,7 +29,7 @@ public class Triangle3d extends Shape3d {
             Vector3d a = v2.subtract(v1);
             Vector3d b = v3.subtract(v1);
             Vector3d nn = a.cross(b);
-            this.normal = nn.getUnitVector();
+            this.normal = nn.toUnitVector();
         }
         return this.normal;
     }

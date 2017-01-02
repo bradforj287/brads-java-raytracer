@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AxisAlignedBoundingBox3d {
-    private Vector3d min;
-    private Vector3d max;
-    private Vector3d[] bounds = new Vector3d[2];
+    private final Vector3d min;
+    private final Vector3d max;
+    private final Vector3d[] bounds = new Vector3d[2];
 
     public AxisAlignedBoundingBox3d(Vector3d min, Vector3d max) {
         this.min = min;

@@ -4,20 +4,26 @@ import java.lang.reflect.Field;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
 /**
- * Class for 3d vector
+ * Class for 3d vector. Immutable
  *
  * @author brad
  */
 public class Vector3d {
-
-    public double x;
-    public double y;
-    public double z;
+    public final double x;
+    public final double y;
+    public final double z;
 
     public Vector3d(double x, double y, double z) {
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+
+    public Vector3d(Vector3d v) {
+
+        this.x = v.x;
+        this.y = v.y;
+        this.z = v.z;
     }
 
     public double getX() {
@@ -30,13 +36,6 @@ public class Vector3d {
 
     public double getZ() {
         return z;
-    }
-
-    public Vector3d(Vector3d v) {
-
-        this.x = v.x;
-        this.y = v.y;
-        this.z = v.z;
     }
 
     public Vector3d subtract(Vector3d v) {
@@ -61,7 +60,7 @@ public class Vector3d {
         return Math.sqrt(sum);
     }
 
-    public Vector3d getUnitVector() {
+    public Vector3d toUnitVector() {
         double m = getMagnitude();
         double x1 = x / m;
         double y1 = y / m;
@@ -69,7 +68,7 @@ public class Vector3d {
         return new Vector3d(x1, y1, z1);
     }
 
-    public void multiplyByMatrix(Matrix3d a) {
+    public Vector3d multiplyByMatrix(Matrix3d a) {
         double[] result = new double[3];
         double[] h = new double[4];
         h[0] = this.x;
@@ -84,9 +83,10 @@ public class Vector3d {
             }
             result[i] = sum;
         }
-        x = result[0];
-        y = result[1];
-        z = result[2];
+        double x1 = result[0];
+        double y1 = result[1];
+        double z1 = result[2];
+        return new Vector3d(x1, y1, z1);
     }
 
     public double getCoordiateByName(final String coord) {
