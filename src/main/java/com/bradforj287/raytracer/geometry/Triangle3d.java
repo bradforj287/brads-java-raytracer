@@ -9,9 +9,9 @@ public class Triangle3d extends Shape3d {
     private Vector3d normal; // cached for performance
 
     public Triangle3d(Vector3d a, Vector3d b, Vector3d c, int color1) {
-        v1 = new Vector3d(a);
-        v2 = new Vector3d(b);
-        v3 = new Vector3d(c);
+        v1 = a;
+        v2 = b;
+        v3 = c;
         this.color = color1;
     }
 
