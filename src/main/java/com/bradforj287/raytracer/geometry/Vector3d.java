@@ -74,13 +74,6 @@ public class Vector3d {
         return new Vector3d(x1, y1, z1);
     }
 
-    public void makeUnitVector() {
-        double m = getMagnitude();
-        x = x / m;
-        y = y / m;
-        z = z / m;
-    }
-
     public void multiplyByMatrix(Matrix3d a) {
         double[] result = new double[3];
         double[] h = new double[4];

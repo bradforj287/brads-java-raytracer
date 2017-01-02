@@ -205,15 +205,12 @@ public class RayTracer {
 
             int color = intersectShape.getColor();
 
-            Vector3d lightVector = com.bradforj287.raytracer.geometry.Vector3d.vectorSubtract(ProgramArguments.LIGHT_LOCATION, intersectLoc);
-
-            lightVector.makeUnitVector();
+            Vector3d lightVector = com.bradforj287.raytracer.geometry.Vector3d.vectorSubtract(ProgramArguments.LIGHT_LOCATION, intersectLoc).getUnitVector();
 
             double angleBetweenNormalAndLight = com.bradforj287.raytracer.geometry.Vector3d.dotProduct(
                     normalToShape, lightVector);
 
-            lightVector = com.bradforj287.raytracer.geometry.Vector3d.vectorSubtract(intersectLoc, ProgramArguments.LIGHT_LOCATION);
-            lightVector.makeUnitVector();
+            lightVector = com.bradforj287.raytracer.geometry.Vector3d.vectorSubtract(intersectLoc, ProgramArguments.LIGHT_LOCATION).getUnitVector();
             if (angleBetweenNormalAndLight < 0) {
                 angleBetweenNormalAndLight = 0;
             } else if (isInShadow(intersectShape, ProgramArguments.LIGHT_LOCATION, lightVector)) {
