@@ -251,23 +251,19 @@ public class RayTracer {
         }
     }
 
-    private class VisitingResults {
-        double t1 = Double.MAX_VALUE;
-        Shape3d visibleShape;
-    }
-
     private Shape3d doesRayHitAnyShape(final Ray3d ray, final RayCastArguments returnArgs) {
         final double t0 = .0001;
-        final VisitingResults results = new VisitingResults();
+        final RayHitResult results = new RayHitResult();
+        results.setT(Double.MAX_VALUE);
 
         scene.visitPossibleIntersections(ray, shape -> {
-            if (shape.isHitByRay(ray, t0, results.t1,
+            if (shape.isHitByRay(ray, t0, results.getT(),
                     returnArgs)) {
-                results.t1 = returnArgs.t;
-                results.visibleShape = shape;
+                results.setT(returnArgs.t);
+                results.setShape(shape);
             }
         });
-        return results.visibleShape;
+        return results.getShape();
     }
 
     private void clearImage(BufferedImage image) {
