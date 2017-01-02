@@ -7,6 +7,7 @@ import com.bradforj287.raytracer.geometry.Ray3d;
 import com.bradforj287.raytracer.geometry.Shape3d;
 import com.bradforj287.raytracer.geometry.Vector3d;
 import com.bradforj287.raytracer.model.SpacialStructure;
+import com.bradforj287.raytracer.model.SpacialStructureQueryStats;
 import com.bradforj287.raytracer.utils.ShapeUtils;
 
 public class KDTree implements SpacialStructure {
@@ -21,6 +22,16 @@ public class KDTree implements SpacialStructure {
     private void init() {
         root = buildNode(shapes);
         populateTree(root);
+        printKdTreeStats();
+    }
+
+    private void printKdTreeStats() {
+        KDTreeStats stats = getCreationStats();
+        System.out.println("Num shapes: " + stats.getTotalShapes());
+        System.out.println("Max Depth: " + stats.getMaxDepth());
+        System.out.println("Num Leaf Nodes: " + stats.getNumLeafNoes());
+        System.out.println("Num Nodes: " + stats.getNumNodes());
+        System.out.println(stats.getLeafNodeSizeStats());
     }
 
     private KDNode buildNode(List<Shape3d> theShapes) {
@@ -100,22 +111,27 @@ public class KDTree implements SpacialStructure {
     }
 
     @Override
-    public void visitPossibleIntersections(final Ray3d ray, final ShapeVisitor visitor) {
-        visitPossibleMatchesHelper(root, ray, visitor);
+    public SpacialStructureQueryStats visitPossibleIntersections(final Ray3d ray, final ShapeVisitor visitor) {
+        SpacialStructureQueryStats queryStats = new SpacialStructureQueryStats();
+        visitPossibleMatchesHelper(root, ray, visitor, queryStats);
+        return queryStats;
     }
 
-    private void visitPossibleMatchesHelper(KDNode node, final Ray3d ray, final ShapeVisitor visitor) {
+    private void visitPossibleMatchesHelper(KDNode node, final Ray3d ray, final ShapeVisitor visitor, SpacialStructureQueryStats queryStats) {
+        queryStats.incrementNodesVisited();
         if (node.isLeaf()) {
             node.getShapes().forEach(s -> visitor.visit(s));
             return;
         }
 
         if (node.hasLeft() && node.intersectsBoundingBox(ray)) {
-            visitPossibleMatchesHelper(node.getLeft(), ray, visitor);
+            queryStats.incrementIntersectChecks();
+            visitPossibleMatchesHelper(node.getLeft(), ray, visitor, queryStats);
         }
 
         if (node.hasRight() && node.intersectsBoundingBox(ray)) {
-            visitPossibleMatchesHelper(node.getRight(), ray, visitor);
+            queryStats.incrementIntersectChecks();
+            visitPossibleMatchesHelper(node.getRight(), ray, visitor, queryStats);
         }
     }
 
