@@ -1,6 +1,6 @@
 package com.bradforj287.raytracer.utils;
 
-import java.util.LinkedList;
+import java.util.ArrayDeque;
 
 /**
  * Class that represents a fixed-size buffer for storing video data points.
@@ -11,7 +11,7 @@ public class VideoDataPointBuffer {
     private static final int BUFFER_MAX_SIZE = 100;
     private static final long RUNNING_AVERAGE_DURATION = 1000;
 
-    private LinkedList<Long> buffer = new LinkedList<Long>();
+    private ArrayDeque<Long> buffer = new ArrayDeque<Long>();
 
     public synchronized void addToBuffer(Long data) {
         if (buffer.size() >= BUFFER_MAX_SIZE) {
