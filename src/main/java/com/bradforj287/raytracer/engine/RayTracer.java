@@ -8,12 +8,16 @@ import com.bradforj287.raytracer.ProgramArguments;
 import com.bradforj287.raytracer.geometry.*;
 import com.bradforj287.raytracer.model.SceneModel;
 import com.bradforj287.raytracer.model.SpacialStructureQueryStats;
+import com.bradforj287.raytracer.utils.DataPointBuffer;
 import com.bradforj287.raytracer.utils.VideoDataPointBuffer;
 
 public class RayTracer {
     private SceneModel scene;
     private Dimension sceneResolution;
     private VideoDataPointBuffer fpsBuffer = new VideoDataPointBuffer();
+    private DataPointBuffer kdTreeNodeVisitsBuffer = new DataPointBuffer(100);
+    private DataPointBuffer boxIntersectionsBuffer = new DataPointBuffer(100);
+
 
     public RayTracer(SceneModel model, Dimension sceneResolution) {
         this.sceneResolution = sceneResolution;
@@ -84,19 +88,25 @@ public class RayTracer {
 
         // print FPS
         String fpsString = Double.toString(fpsBuffer.getFramesPerSecond());
-        drawString(g2d, "FPS = " + fpsString, 10, 10);
+        drawString(g2d, "FPS=" + fpsString, 10, 10);
 
         // print rotation
-        drawString(g2d, "rX= " + Double.toString(thetax), 10, 20);
-        drawString(g2d, "rY = " + Double.toString(thetay), 10, 30);
-        drawString(g2d, "rZ = " + Double.toString(thetaz), 10, 40);
+        drawString(g2d, "rX=" + Double.toString(thetax), 10, 20);
+        drawString(g2d, "rY=" + Double.toString(thetay), 10, 30);
+        drawString(g2d, "rZ=" + Double.toString(thetaz), 10, 40);
 
         // print spacial structure query stats
+        String avgNodeVisits = Double.toString(kdTreeNodeVisitsBuffer.getAvg());
+        drawString(g2d, "N_VST=" + avgNodeVisits, 10, 50);
+
+        String avgBoxIntersects = Double.toString(boxIntersectionsBuffer.getAvg());
+        drawString(g2d, "B_INT=" + avgBoxIntersects, 10, 60);
+
     }
 
     private void drawString(Graphics2D g2d, String s, int i, int j) {
-        if (s.length() > 10) {
-            s = s.substring(0, 10);
+        if (s.length() > 11) {
+            s = s.substring(0, 11);
         }
         char[] charA = s.toCharArray();
         g2d.drawChars(charA, 0, charA.length, i, j);
@@ -237,6 +247,9 @@ public class RayTracer {
                 }
             }
         });
+
+        kdTreeNodeVisitsBuffer.addToBuffer(queryStats.getNodesVisited());
+        boxIntersectionsBuffer.addToBuffer(queryStats.getIntersectionChecksPerformed());
 
         return results;
     }
