@@ -39,11 +39,6 @@ public class Vector3d {
         this.z = v.z;
     }
 
-    public void scaleBy(double d) {
-        x = x * d;
-        y = y * d;
-        z = z * d;
-    }
 
     public void subtract(Vector3d v) {
         x = x - v.x;

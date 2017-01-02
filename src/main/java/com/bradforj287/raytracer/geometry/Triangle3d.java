@@ -2,9 +2,11 @@ package com.bradforj287.raytracer.geometry;
 
 public class Triangle3d extends Shape3d {
 
-    public Vector3d v1;
-    public Vector3d v2;
-    public Vector3d v3;
+    public final Vector3d v1;
+    public final Vector3d v2;
+    public final Vector3d v3;
+
+    private Vector3d normal; // cached for performance
 
     public Triangle3d(Vector3d a, Vector3d b, Vector3d c, int color1) {
         v1 = new Vector3d(a);
@@ -17,77 +19,19 @@ public class Triangle3d extends Shape3d {
         return new Triangle3d(v2, v1, v3, this.color);
     }
 
-    public void flipNormal() {
-        Vector3d temp = v2;
-        v2 = v1;
-        v1 = temp;
-    }
-
     @Override
     public Vector3d normalAtSurfacePoint(Vector3d intersectPoint) {
         return getNormalVector();
     }
 
     public Vector3d getNormalVector() {
-        Vector3d a = Vector3d.vectorSubtract(v2, v1);
-        Vector3d b = Vector3d.vectorSubtract(v3, v1);
-        Vector3d normal = Vector3d.vectorCross(a, b);
-        return normal.getUnitVector();
-    }
-
-    public double signedAreaXY() {
-        double x1 = v3.x - v1.x;
-        double y1 = v3.y - v1.y;
-        double x2 = v2.x - v1.x;
-        double y2 = v2.y - v1.y;
-
-        double crossProd = x2 * y1 - x1 * y2;
-        return (crossProd * .5);
-    }
-
-    void baryXY(Vector3d v, double alpha, double beta, double gamma) {
-        double x1;
-        double y1;
-        double x2;
-        double y2;
-
-        // get areaA
-        double areaB;
-        x1 = v2.x - v1.x;
-        y1 = v2.y - v1.y;
-        x2 = v.x - v1.x;
-        y2 = v.y - v1.y;
-
-        areaB = .5 * (x1 * y2 - x2 * y1);
-
-        // get areaB
-        double areaA;
-        x1 = v2.x - v.x;
-        y1 = v2.y - v.y;
-        x2 = v3.x - v.x;
-        y2 = v3.y - v.y;
-        areaA = .5 * (x1 * y2 - x2 * y1);
-
-        // get areaY
-        double areaY;
-        x1 = v3.x - v.x;
-        y1 = v3.y - v.y;
-        x2 = v1.x - v.x;
-        y2 = v1.y - v.y;
-        areaY = .5 * (x1 * y2 - x2 * y1);
-
-        // get Total area;
-        double totalArea = signedAreaXY();
-
-        alpha = areaA / totalArea;
-        beta = areaB / totalArea;
-        gamma = areaY / totalArea;
-    }
-
-    public void multiplyByMatrix(Matrix3d mat) {
-        v1.multiplyByMatrix(mat);
-        v2.multiplyByMatrix(mat);
-        v3.multiplyByMatrix(mat);
+        if (normal == null) {
+            Vector3d a = Vector3d.vectorSubtract(v2, v1);
+            Vector3d b = Vector3d.vectorSubtract(v3, v1);
+            Vector3d nn = Vector3d.vectorCross(a, b);
+            this.normal = nn.getUnitVector();
+        }
+        return this.normal;
     }
 
     @Override
