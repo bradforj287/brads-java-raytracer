@@ -173,11 +173,13 @@ public class RayTracer {
     private int getColorForRay(final Ray3d ray, int i, int j) {
         RayCastArguments returnArgs = new RayCastArguments();
 
-        Shape3d intersectShape = doesRayHitAnyShape(ray, returnArgs);
+        RayHitResult rayHitResult = doesRayHitAnyShape(ray, returnArgs);
 
-        if (intersectShape == null) {
+        if (!rayHitResult.didHitShape()) {
             return 0; // doesn't hit anything.
         }
+
+        Shape3d intersectShape = rayHitResult.getShape();
 
         double t = returnArgs.t;
 
@@ -240,18 +242,18 @@ public class RayTracer {
     private boolean isInShadow(Shape3d hitShape, Vector3d intersectLoc,
                                Vector3d lightDir) {
         Ray3d ray = new Ray3d(intersectLoc, lightDir);
-        Shape3d intersectShape = doesRayHitAnyShape(ray, new RayCastArguments());
+        RayHitResult hitResults = doesRayHitAnyShape(ray, new RayCastArguments());
 
-        if (intersectShape == null) {
+        if (!hitResults.didHitShape()) {
             return false;
-        } else if (intersectShape != hitShape) {
+        } else if (hitResults.getShape() != hitShape) {
             return true;
         } else {
             return false;
         }
     }
 
-    private Shape3d doesRayHitAnyShape(final Ray3d ray, final RayCastArguments returnArgs) {
+    private RayHitResult doesRayHitAnyShape(final Ray3d ray, final RayCastArguments returnArgs) {
         final double t0 = .0001;
         final RayHitResult results = new RayHitResult();
         results.setT(Double.MAX_VALUE);
@@ -265,7 +267,7 @@ public class RayTracer {
                 }
             }
         });
-        return results.getShape();
+        return results;
     }
 
     private void clearImage(BufferedImage image) {
