@@ -259,8 +259,10 @@ public class RayTracer {
         scene.visitPossibleIntersections(ray, shape -> {
             if (shape.isHitByRay(ray, t0, results.getT(),
                     returnArgs)) {
-                results.setT(returnArgs.t);
-                results.setShape(shape);
+                if (returnArgs.t < results.getT()) {
+                    results.setT(returnArgs.t);
+                    results.setShape(shape);
+                }
             }
         });
         return results.getShape();
