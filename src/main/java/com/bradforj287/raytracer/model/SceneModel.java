@@ -7,7 +7,7 @@ import com.bradforj287.raytracer.geometry.Shape3d;
 import com.bradforj287.raytracer.model.kdtree.KDTree;
 import com.google.common.base.Preconditions;
 
-public class SceneModel implements SpacialStructure {
+public class SceneModel {
 
     private SpacialStructure shapesTree;
 
@@ -18,13 +18,10 @@ public class SceneModel implements SpacialStructure {
         shapesTree = new KDTree(shapes);
     }
 
-
-    @Override
     public SpacialStructureQueryStats visitPossibleIntersections(Ray3d ray, ShapeVisitor visitor) {
         return shapesTree.visitPossibleIntersections(ray, visitor);
     }
 
-    @Override
     public AxisAlignedBoundingBox3d getBounds() {
         return shapesTree.getBounds();
     }
