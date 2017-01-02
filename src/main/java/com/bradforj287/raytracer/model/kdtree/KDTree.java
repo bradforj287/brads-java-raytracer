@@ -66,21 +66,31 @@ public class KDTree implements SpacialStructure {
 
     private SplitResult splitShapes(final List<Shape3d> shapes, final String coord, final double midpoint) {
         SplitResult res = new SplitResult();
+        List<Shape3d> equalShapes = new ArrayList<>();
         for (Shape3d shape : shapes) {
             Vector3d shapeMidpoint = shape.getCentroid();
             double shapeCoord = shapeMidpoint.getCoordiateByName(coord);
-            if (shapeCoord <= midpoint) {
+            if (shapeCoord == midpoint) {
+                equalShapes.add(shape);
+            }
+            else if (shapeCoord < midpoint) {
                 res.leftShapes.add(shape);
             } else {
                 res.rightShapes.add(shape);
             }
+        }
+        // add equal shapes to the list that is smaller.
+        if (res.leftShapes.size() < res.rightShapes.size()) {
+            res.leftShapes.addAll(equalShapes);
+        } else {
+            res.rightShapes.addAll(equalShapes);
         }
         return res;
     }
 
     private void populateTree(KDNode node) {
         // base case #1
-        if (node == null || node.getShapes().isEmpty() || node.getShapes().size() <=  10) {
+        if (node == null || node.getShapes().isEmpty() || node.getShapes().size() <=  2) {
             return;
         }
 
@@ -92,7 +102,8 @@ public class KDTree implements SpacialStructure {
 
         // base case #2 - if the split is poor don't continue to split
         // TODO: improve heuristic for splitting
-        if (splitResult.isEmptySplit() || splitResult.getSplitScore() >= .25) {
+        if (splitResult.isEmptySplit()) {
+            //SplitResult splitAgain = splitShapes(node.getShapes(), coord, midpointCoord);
             return;
         }
 
