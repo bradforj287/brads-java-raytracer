@@ -14,4 +14,8 @@ public enum Axis {
     public String toString() {
         return axis;
     }
+
+    public String toCoordinateName() {
+        return toString();
+    }
 }

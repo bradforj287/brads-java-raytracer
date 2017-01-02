@@ -189,8 +189,8 @@ public class RayTracer {
 
         RayCastArguments returnArgs = new RayCastArguments();
 
-        Triangle3d interesectTriangle = doesRayHitAnyShape(ray, returnArgs);
-        if (interesectTriangle != null) {
+        Shape3d intersectShape = doesRayHitAnyShape(ray, returnArgs);
+        if (intersectShape != null) {
 
             double t = returnArgs.t;
 
@@ -201,9 +201,9 @@ public class RayTracer {
             Vector3d intersectLoc = new Vector3d(eyePosition.x + t
                     * eyeDirection.x, eyePosition.y + t * eyeDirection.y,
                     eyePosition.z + t * eyeDirection.z);
-            Vector3d normalToShape = interesectTriangle.getNormalVector();
+            Vector3d normalToShape = intersectShape.normalAtSurfacePoint(intersectLoc);
 
-            int color = interesectTriangle.color;
+            int color = intersectShape.getColor();
 
             Vector3d lightVector = com.bradforj287.raytracer.geometry.Vector3d.vectorSubtract(ProgramArguments.LIGHT_LOCATION, intersectLoc);
 
@@ -216,7 +216,7 @@ public class RayTracer {
             lightVector.makeUnitVector();
             if (angleBetweenNormalAndLight < 0) {
                 angleBetweenNormalAndLight = 0;
-            } else if (isInShadow(interesectTriangle, ProgramArguments.LIGHT_LOCATION, lightVector)) {
+            } else if (isInShadow(intersectShape, ProgramArguments.LIGHT_LOCATION, lightVector)) {
                 angleBetweenNormalAndLight = 0;
             }
 
@@ -258,14 +258,14 @@ public class RayTracer {
 
     }
 
-    private boolean isInShadow(Triangle3d hitTriangle, Vector3d intersectLoc,
+    private boolean isInShadow(Shape3d hitShape, Vector3d intersectLoc,
                                Vector3d lightDir) {
         Ray3d ray = new Ray3d(intersectLoc, lightDir);
-        Triangle3d interesectTriangle = doesRayHitAnyShape(ray, new RayCastArguments());
+        Shape3d intersectShape = doesRayHitAnyShape(ray, new RayCastArguments());
 
-        if (interesectTriangle == null) {
+        if (intersectShape == null) {
             return false;
-        } else if (interesectTriangle != hitTriangle) {
+        } else if (intersectShape != hitShape) {
             return true;
         } else {
             return false;
@@ -274,11 +274,10 @@ public class RayTracer {
 
     private class VisitingResults {
         double t1 = Double.MAX_VALUE;
-        Triangle3d visibleTriangle;
+        Shape3d visibleShape;
     }
 
-    private Triangle3d doesRayHitAnyShape(final Ray3d ray, final RayCastArguments returnArgs) {
-
+    private Shape3d doesRayHitAnyShape(final Ray3d ray, final RayCastArguments returnArgs) {
         final double t0 = .0001;
         final VisitingResults results = new VisitingResults();
 
@@ -286,11 +285,10 @@ public class RayTracer {
             if (shape.isHitByRay(ray, t0, results.t1,
                     returnArgs)) {
                 results.t1 = returnArgs.t;
-                results.visibleTriangle = (Triangle3d) shape;
+                results.visibleShape = shape;
             }
         });
-
-        return results.visibleTriangle;
+        return results.visibleShape;
     }
 
     private void clearImage(BufferedImage image) {

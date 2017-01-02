@@ -5,11 +5,8 @@ public class Triangle3d extends Shape3d {
     public Vector3d v1;
     public Vector3d v2;
     public Vector3d v3;
-    public int color;
 
     public Triangle3d() {
-        color = 0;
-
         flipNormal();
     }
 
@@ -28,7 +25,7 @@ public class Triangle3d extends Shape3d {
         v1 = new Vector3d(a);
         v2 = new Vector3d(b);
         v3 = new Vector3d(c);
-        color = color1;
+        this.color = color1;
         flipNormal();
     }
 
@@ -44,10 +41,15 @@ public class Triangle3d extends Shape3d {
         v1 = temp;
     }
 
+    @Override
+    public Vector3d normalAtSurfacePoint(Vector3d intersectPoint) {
+        return getNormalVector();
+    }
+
     public Vector3d getNormalVector() {
-        Vector3d a = com.bradforj287.raytracer.geometry.Vector3d.vectorSubtract(v2, v1);
-        Vector3d b = com.bradforj287.raytracer.geometry.Vector3d.vectorSubtract(v3, v1);
-        Vector3d normal = com.bradforj287.raytracer.geometry.Vector3d.vectorCross(a, b);
+        Vector3d a = Vector3d.vectorSubtract(v2, v1);
+        Vector3d b = Vector3d.vectorSubtract(v3, v1);
+        Vector3d normal = Vector3d.vectorCross(a, b);
         return normal.getUnitVector();
     }
 
@@ -177,7 +179,8 @@ public class Triangle3d extends Shape3d {
         return r;
     }
 
-    private double getMin(final String coord) {
+    private double getMin(final Axis axis) {
+        final String coord = axis.toCoordinateName();
         Vector3d[] r = toVertexArray();
         double min = r[0].getCoordiateByName(coord);
         for (int i = 1; i < r.length; i++) {
@@ -189,7 +192,8 @@ public class Triangle3d extends Shape3d {
         return min;
     }
 
-    private double getMax(final String coord) {
+    private double getMax(final Axis axis) {
+        final String coord = axis.toCoordinateName();
         Vector3d[] r = toVertexArray();
         double max = r[0].getCoordiateByName(coord);
         for (int i = 1; i < r.length; i++) {
@@ -202,33 +206,10 @@ public class Triangle3d extends Shape3d {
     }
 
     @Override
-    public double minX() {
-        return getMin("x");
-    }
-
-    @Override
-    public double minY() {
-        return getMin("y");
-    }
-
-    @Override
-    public double minZ() {
-        return getMin("z");
-    }
-
-    @Override
-    public double maxX() {
-        return getMax("x");
-    }
-
-    @Override
-    public double maxY() {
-        return getMax("y");
-    }
-
-    @Override
-    public double maxZ() {
-        return getMax("z");
+    public AxisAlignedBoundingBox3d getBoundingBox() {
+        Vector3d min = new Vector3d(getMin(Axis.X), getMin(Axis.Y), getMin(Axis.Z));
+        Vector3d max = new Vector3d(getMax(Axis.X), getMax(Axis.Y), getMax(Axis.Z));
+        return new AxisAlignedBoundingBox3d(min, max);
     }
 
     @Override
