@@ -4,6 +4,7 @@ import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.swing.*;
 import com.bradforj287.raytracer.geometry.Shape3d;
 import com.bradforj287.raytracer.geometry.Triangle3d;
@@ -101,33 +102,28 @@ public class MainEntry {
             t.v3.subtract(offsetV);
         }
 
-        getNormalsInCorrectDirection(scene);
+        scene = scene.stream()
+                .map(triangle3d -> correctNormal(triangle3d))
+                .collect(Collectors.toList());
 
-        for (int i = 0; i < scene.size(); i++) {
-            scene.get(i).flipNormal();
-        }
+        scene = scene.stream()
+                .map(triangle3d -> triangle3d.getFlippedNormal())
+                .collect(Collectors.toList());
 
         return scene;
     }
 
-    private static Triangle3d flipNormal(Triangle3d t) {
-        t.flipNormal();
-        return t;
+    private static Triangle3d flipNormal(Triangle3d triangle3d) {
+        return triangle3d.getFlippedNormal();
     }
 
-    private static void getNormalsInCorrectDirection(List<Triangle3d> triangle3ds) {
-
-        // get normals to point in right direction
-        for (int i = 0; i < triangle3ds.size(); i++) {
-            Vector3d fromOriginToTriangle = triangle3ds.get(i).v1;
-            fromOriginToTriangle = fromOriginToTriangle.getUnitVector();
-            Vector3d normal = ((Triangle3d) triangle3ds.get(i))
-                    .getNormalVector();
-            if (com.bradforj287.raytracer.geometry.Vector3d.dotProduct(normal, fromOriginToTriangle) < 0) {
-                // flip two verticies;
-
-                triangle3ds.get(i).flipNormal();
-            }
+    private static Triangle3d correctNormal(Triangle3d tri) {
+        Vector3d fromOriginToTriangle = tri.v1.getUnitVector();
+        Vector3d normal = tri.getNormalVector();
+        if (com.bradforj287.raytracer.geometry.Vector3d.dotProduct(normal, fromOriginToTriangle) < 0) {
+            return tri.getFlippedNormal();
+        } else {
+            return tri;
         }
     }
 }
