@@ -51,7 +51,7 @@ public class AxisAlignedBoundingBox3d {
         lengths.add(new AxisLength(Axis.Y, yLength()));
         lengths.add(new AxisLength(Axis.Z, zLength()));
 
-        return lengths.stream().max( (a, b) -> {
+        return lengths.stream().max((a, b) -> {
             Double ad = a.length;
             Double ab = b.length;
             return ad.compareTo(ab);
@@ -61,12 +61,13 @@ public class AxisAlignedBoundingBox3d {
     /**
      * algorithm adatped from
      * https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
+     *
      * @param ray
      * @return
      */
     public boolean rayItersects(Ray3d ray) {
         int[] sign = new int[3];
-        Vector3d invdir = new Vector3d(1/ray.getDirection().x, 1/ray.getDirection().y, 1/ray.getDirection().z);
+        Vector3d invdir = new Vector3d(1 / ray.getDirection().x, 1 / ray.getDirection().y, 1 / ray.getDirection().z);
         Vector3d orig = ray.getPoint();
         sign[0] = (invdir.x < 0) ? 1 : 0;
         sign[1] = (invdir.y < 0) ? 1 : 0;
@@ -75,9 +76,9 @@ public class AxisAlignedBoundingBox3d {
         double tmin, tmax, tymin, tymax, tzmin, tzmax;
 
         tmin = (bounds[sign[0]].x - orig.x) * invdir.x;
-        tmax = (bounds[1-sign[0]].x - orig.x) * invdir.x;
+        tmax = (bounds[1 - sign[0]].x - orig.x) * invdir.x;
         tymin = (bounds[sign[1]].y - orig.y) * invdir.y;
-        tymax = (bounds[1-sign[1]].y - orig.y) * invdir.y;
+        tymax = (bounds[1 - sign[1]].y - orig.y) * invdir.y;
 
         if ((tmin > tymax) || (tymin > tmax))
             return false;
@@ -87,16 +88,13 @@ public class AxisAlignedBoundingBox3d {
             tmax = tymax;
 
         tzmin = (bounds[sign[2]].z - orig.z) * invdir.z;
-        tzmax = (bounds[1-sign[2]].z - orig.z) * invdir.z;
+        tzmax = (bounds[1 - sign[2]].z - orig.z) * invdir.z;
 
         if ((tmin > tzmax) || (tzmin > tmax))
             return false;
-        /*if (tzmin > tmin)
-            tmin = tzmin;
         if (tzmax < tmax)
-            tmax = tzmax;*/
+            tmax = tzmax;
 
-        return true;
-
+        return (tmax > 0);
     }
 }
