@@ -122,17 +122,18 @@ public class KDTree implements SpacialStructure {
     private void visitPossibleMatchesHelper(KDNode node, final Ray3d ray, final ShapeVisitor visitor, SpacialStructureQueryStats queryStats) {
         queryStats.incrementNodesVisited();
         if (node.isLeaf()) {
-            node.getShapes().forEach(s -> visitor.visit(s));
+            for (Shape3d shape : node.getShapes()) {
+                queryStats.incrementShapesVisited();
+                visitor.visit(shape);
+            }
             return;
         }
 
         if (node.hasLeft() && node.intersectsBoundingBox(ray)) {
-            queryStats.incrementIntersectChecks();
             visitPossibleMatchesHelper(node.getLeft(), ray, visitor, queryStats);
         }
 
         if (node.hasRight() && node.intersectsBoundingBox(ray)) {
-            queryStats.incrementIntersectChecks();
             visitPossibleMatchesHelper(node.getRight(), ray, visitor, queryStats);
         }
     }

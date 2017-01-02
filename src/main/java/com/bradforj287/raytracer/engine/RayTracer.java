@@ -16,7 +16,7 @@ public class RayTracer {
     private Dimension sceneResolution;
     private VideoDataPointBuffer fpsBuffer = new VideoDataPointBuffer();
     private DataPointBuffer kdTreeNodeVisitsBuffer = new DataPointBuffer(100);
-    private DataPointBuffer boxIntersectionsBuffer = new DataPointBuffer(100);
+    private DataPointBuffer shapeVisitsBuffer = new DataPointBuffer(100);
 
 
     public RayTracer(SceneModel model, Dimension sceneResolution) {
@@ -99,9 +99,8 @@ public class RayTracer {
         String avgNodeVisits = Double.toString(kdTreeNodeVisitsBuffer.getAvg());
         drawString(g2d, "N_VST=" + avgNodeVisits, 10, 50);
 
-        String avgBoxIntersects = Double.toString(boxIntersectionsBuffer.getAvg());
-        drawString(g2d, "B_INT=" + avgBoxIntersects, 10, 60);
-
+        String avgShapeVisits = Double.toString(shapeVisitsBuffer.getAvg());
+        drawString(g2d, "S_VST=" + avgShapeVisits, 10, 60);
     }
 
     private void drawString(Graphics2D g2d, String s, int i, int j) {
@@ -249,7 +248,7 @@ public class RayTracer {
         });
 
         kdTreeNodeVisitsBuffer.addToBuffer(queryStats.getNodesVisited());
-        boxIntersectionsBuffer.addToBuffer(queryStats.getIntersectionChecksPerformed());
+        shapeVisitsBuffer.addToBuffer(queryStats.getShapesVisited());
 
         return results;
     }
