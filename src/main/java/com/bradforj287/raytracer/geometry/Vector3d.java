@@ -45,6 +45,14 @@ public class Vector3d {
         return new Vector3d(x1, y1, z1);
     }
 
+    public Vector3d multiply(double a) {
+        return new Vector3d(this.x*a, this.y*a, this.z*a);
+    }
+
+    public Vector3d add(Vector3d v) {
+        return new Vector3d(this.x + v.x, this.y + v.y, + this.z + v.z);
+    }
+
     public double dot(Vector3d b) {
         return (this.x * b.x + this.y * b.y + this.z * b.z);
     }
