@@ -75,12 +75,10 @@ public class KDTree implements SpacialStructure {
         Preconditions.checkNotNull(node.getShapes());
         Preconditions.checkArgument(!node.getShapes().isEmpty());
 
-        // base case #1 - cant split any more
-        if (node.getShapes().size() == 1) {
+        // base case #1 - min split
+        if (node.getShapes().size() <= 2) {
             return;
         }
-
-        final double sahInitial = node.getBoundingBox().getSurfaceArea()*node.getShapes().size();
 
         // split shapes
         List<PotentialTreeSplit> potentialTreeSplits = new ArrayList<>();
@@ -94,12 +92,6 @@ public class KDTree implements SpacialStructure {
 
         // base case #2 - if the split is empty we cant split
         if (optimal.isEmptySplit()) {
-            return;
-        }
-
-        // base case #3 - check if split cost outweighs benefits
-        final double percent = optimal.getSahHeuristic() / sahInitial;
-        if (percent >= .99999) {
             return;
         }
 
