@@ -185,13 +185,13 @@ public class RayTracer {
 
         int color = intersectShape.getColor();
 
-        Vector3d lightVector = ProgramArguments.LIGHT_LOCATION.subtract(intersectLoc).toUnitVector();
+        Vector3d vectorToLight = ProgramArguments.LIGHT_LOCATION.subtract(intersectLoc).toUnitVector();
 
-        double angleBetweenNormalAndLight = normalToShape.dot(lightVector);
+        double angleBetweenNormalAndLight = normalToShape.dot(vectorToLight);
 
         if (angleBetweenNormalAndLight < 0) {
             angleBetweenNormalAndLight = 0;
-        } else if (isInShadow(intersectShape, ProgramArguments.LIGHT_LOCATION, intersectLoc.subtract(ProgramArguments.LIGHT_LOCATION).toUnitVector())) {
+        } else if (isInShadow(intersectLoc, ProgramArguments.LIGHT_LOCATION)) {
             angleBetweenNormalAndLight = 0;
         }
 
@@ -201,24 +201,27 @@ public class RayTracer {
         return scaleColor(colorscalar, color);
     }
 
-    private boolean isInShadow(Shape3d hitShape, Vector3d intersectLoc,
-                               Vector3d lightDir) {
-        Ray3d ray = new Ray3d(intersectLoc, lightDir);
-        RayHitResult hitResults = doesRayHitAnyShape(ray);
+    private boolean isInShadow(Vector3d hitLoc, Vector3d lightLocation) {
+        Vector3d directionToLight = lightLocation.subtract(hitLoc);
+        Ray3d shadowRay = new Ray3d(hitLoc, directionToLight);
+        double tThatHitsLight = (lightLocation.x - hitLoc.x) / directionToLight.x;
 
-        if (!hitResults.didHitShape()) {
-            return false;
-        } else if (hitResults.getShape() != hitShape) {
-            return true;
-        } else {
-            return false;
-        }
+        RayHitResult hitResult = doesRayHitAnyShape(shadowRay, tThatHitsLight);
+        return hitResult.didHitShape();
     }
 
     private RayHitResult doesRayHitAnyShape(final Ray3d ray) {
+        return doesRayHitAnyShapeHelper(ray, Double.MAX_VALUE);
+    }
+
+    private RayHitResult doesRayHitAnyShape(final Ray3d ray, double maxT) {
+        return doesRayHitAnyShapeHelper(ray, maxT);
+    }
+
+    private RayHitResult doesRayHitAnyShapeHelper(final Ray3d ray, double maxT) {
         final double t0 = .0001;
         final RayHitResult results = new RayHitResult();
-        results.setT(Double.MAX_VALUE);
+        results.setT(maxT);
 
         final RayCastArguments rayCastArgs = new RayCastArguments();
 
