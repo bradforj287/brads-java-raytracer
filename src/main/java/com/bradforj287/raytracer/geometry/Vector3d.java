@@ -39,11 +39,11 @@ public class Vector3d {
         this.z = v.z;
     }
 
-
-    public void subtract(Vector3d v) {
-        x = x - v.x;
-        y = y - v.y;
-        z = z - v.z;
+    public Vector3d subtract(Vector3d v) {
+        double x1 = x - v.x;
+        double y1 = y - v.y;
+        double z1 = z - v.z;
+        return new Vector3d(x1, y1, z1);
     }
 
     public static double dotProduct(Vector3d a, Vector3d b) {

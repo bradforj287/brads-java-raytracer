@@ -95,12 +95,13 @@ public class MainEntry {
 
         double offset = (cubeWidth / 2);
         Vector3d offsetV = new Vector3d(offset, offset, offset);
-        for (int i = 0; i < scene.size(); i++) {
-            Triangle3d t = scene.get(i);
-            t.v1.subtract(offsetV);
-            t.v2.subtract(offsetV);
-            t.v3.subtract(offsetV);
-        }
+
+        scene = scene.stream().map(t -> {
+            Vector3d v1 = t.v1.subtract(offsetV);
+            Vector3d v2 =t.v2.subtract(offsetV);
+            Vector3d v3 =t.v3.subtract(offsetV);
+            return new Triangle3d(v1, v2, v3, t.getColor());
+        }).collect(Collectors.toList());
 
         scene = scene.stream()
                 .map(triangle3d -> correctNormal(triangle3d))
