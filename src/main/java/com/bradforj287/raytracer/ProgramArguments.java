@@ -15,7 +15,7 @@ public class ProgramArguments {
     public final static Vector3d SCREEN_POSITION = new Vector3d(0, 0, 290);
     public final static double SCREEN_WIDTH = 8;
     public final static double SCREEN_HEIGHT = 6;
-    public final static double AMBIENT_LIGHT = .20;
+    public final static double AMBIENT_LIGHT = .10;
     public final static int ANTIALIASING_SAMPLES = 1;
     public final static Vector3d LIGHT_LOCATION = new Vector3d(100, 100, 100);
 }

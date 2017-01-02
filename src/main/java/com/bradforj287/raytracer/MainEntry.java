@@ -4,13 +4,14 @@ import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 import javax.swing.*;
 import com.bradforj287.raytracer.geometry.Shape3d;
+import com.bradforj287.raytracer.geometry.Sphere3d;
 import com.bradforj287.raytracer.geometry.Triangle3d;
 import com.bradforj287.raytracer.geometry.Vector3d;
 import com.bradforj287.raytracer.model.SceneModel;
-import com.bradforj287.raytracer.parser.ObjFileParser;
 import com.bradforj287.raytracer.utils.Utils;
 
 public class MainEntry {
@@ -19,8 +20,14 @@ public class MainEntry {
         JFrame frame = new JFrame("Brad's Ray Tracer");
 
         final File objFile = Utils.tryGetResourceFile("teapot.obj");
-        final List<Shape3d> shapes = ObjFileParser.parseObjFile(objFile);
+        //final List<Shape3d> shapes = ObjFileParser.parseObjFile(objFile);
+        final List<Shape3d> shapes = new ArrayList<>();
         final List<Triangle3d> boundingBoxTriangles = getBoundingBox();
+
+        // test adding a sphere
+        Vector3d min = new Vector3d(-1000, -1000, -1000);
+        Vector3d max = new Vector3d(1000, 1000, 1000);
+        shapes.addAll(genRandomSpheres(200, min, max, 20, 100));
 
         //install bounding box
         shapes.addAll(boundingBoxTriangles);
@@ -37,8 +44,30 @@ public class MainEntry {
         frame.setVisible(true);
     }
 
-    private static List<Triangle3d> getBoundingBox() {
+    private static List<Sphere3d> genRandomSpheres(int numSpheres, Vector3d minCenter, Vector3d maxCenter, double minRadius, double maxRadius) {
+        Random random = new Random();
+        List<Sphere3d> sphere3ds = new ArrayList<>();
+        for (int i = 0; i < numSpheres; i++) {
+            double xRange = maxCenter.x - minCenter.x;
+            double yRange = maxCenter.y - minCenter.y;
+            double zRange = maxCenter.z - minCenter.z;
 
+            double x = xRange * random.nextDouble() + minCenter.x;
+            double y = yRange * random.nextDouble() + minCenter.y;
+            double z = zRange * random.nextDouble() + minCenter.z;
+
+            Vector3d center = new Vector3d(x, y, z);
+
+            double radSpan = maxRadius - minRadius;
+            double rad = radSpan * random.nextDouble() + minRadius;
+
+            Sphere3d sphere3d = new Sphere3d(center, rad, random.nextInt());
+            sphere3ds.add(sphere3d);
+        }
+        return sphere3ds;
+    }
+
+    private static List<Triangle3d> getBoundingBox() {
         List<Triangle3d> scene = new ArrayList<>();
         // create cube vertices
 
@@ -98,8 +127,8 @@ public class MainEntry {
 
         scene = scene.stream().map(t -> {
             Vector3d v1 = t.v1.subtract(offsetV);
-            Vector3d v2 =t.v2.subtract(offsetV);
-            Vector3d v3 =t.v3.subtract(offsetV);
+            Vector3d v2 = t.v2.subtract(offsetV);
+            Vector3d v3 = t.v3.subtract(offsetV);
             return new Triangle3d(v1, v2, v3, t.getColor());
         }).collect(Collectors.toList());
 
