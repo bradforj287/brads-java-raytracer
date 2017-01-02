@@ -46,7 +46,7 @@ public class KDTree implements SpacialStructure {
 
     private PotentialTreeSplit splitShapesByAxis(final List<Shape3d> shapes, final Axis axis) {
         final String coord = axis.toCoordinateName();
-        double midpoint = ShapeUtils.getMedianCenterCoordiate(coord, shapes);
+        double midpoint = ShapeUtils.getAverageCenterCoordiate(coord, shapes);
         List<Shape3d> left = new ArrayList<>();
         List<Shape3d> right = new ArrayList<>();
         List<Shape3d> equalShapes = new ArrayList<>();
@@ -90,7 +90,7 @@ public class KDTree implements SpacialStructure {
                 .min((a, b) -> a.getSahHeuristic().compareTo(b.getSahHeuristic()))
                 .get();
 
-        // base case #2 - if the split is empty we cant split
+        // base case #2 - if the split is empty we cant split */
         if (optimal.isEmptySplit()) {
             return;
         }

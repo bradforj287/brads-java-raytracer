@@ -12,6 +12,7 @@ import com.bradforj287.raytracer.geometry.Sphere3d;
 import com.bradforj287.raytracer.geometry.Triangle3d;
 import com.bradforj287.raytracer.geometry.Vector3d;
 import com.bradforj287.raytracer.model.SceneModel;
+import com.bradforj287.raytracer.parser.ObjFileParser;
 import com.bradforj287.raytracer.utils.Utils;
 
 public class MainEntry {
@@ -27,7 +28,8 @@ public class MainEntry {
         // test adding a sphere
         Vector3d min = new Vector3d(-1000, -1000, -1000);
         Vector3d max = new Vector3d(1000, 1000, 1000);
-        shapes.addAll(genRandomSpheres(50, min, max, 20, 100));
+        shapes.addAll(genRandomSpheres(200, min, max, 20, 100));
+        shapes.addAll(ObjFileParser.parseObjFile(objFile));
 
         //install bounding box
         shapes.addAll(boundingBoxTriangles);
