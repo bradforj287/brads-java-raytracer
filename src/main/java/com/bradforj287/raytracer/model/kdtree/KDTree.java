@@ -3,6 +3,7 @@ package com.bradforj287.raytracer.model.kdtree;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import com.bradforj287.raytracer.geometry.*;
 import com.bradforj287.raytracer.model.ShapeVisitor;
 import com.bradforj287.raytracer.model.SpacialStructure;
@@ -70,7 +71,7 @@ public class KDTree implements SpacialStructure {
         return new PotentialTreeSplit(left, right);
     }
 
-    private PotentialTreeSplit getBestSplitOnAxisSah(final List<Shape3d> shapes, Axis axis) {
+    private PotentialTreeSplit getBestSplitOnAxisSahBruteForce(final List<Shape3d> shapes, Axis axis) {
         List<Shape3d> sortedByAxis = shapes.stream().sorted((a, b) -> {
             Double aa = a.getCentroid().getCoordiateByAxis(axis);
             Double bb = b.getCentroid().getCoordiateByAxis(axis);
@@ -78,15 +79,46 @@ public class KDTree implements SpacialStructure {
         }).collect(Collectors.toList());
 
         List<PotentialTreeSplit> splits = new ArrayList<>();
-        for (Shape3d shape: sortedByAxis) {
+        for (Shape3d shape : sortedByAxis) {
             double splitPoint = shape.getCentroid().getCoordiateByAxis(axis);
             splits.add(splitShapesByAxisPoint(shapes, axis, splitPoint));
         }
 
-        PotentialTreeSplit optimal = splits.stream()
+        return getBestSplitSah(splits);
+    }
+
+    private PotentialTreeSplit getBestSplitSah(final List<PotentialTreeSplit> splits) {
+        return splits.stream()
                 .min((a, b) -> a.getSahHeuristic().compareTo(b.getSahHeuristic()))
                 .get();
-        return optimal;
+    }
+
+    private PotentialTreeSplit getBestSplitOnAxisStrategy(final List<Shape3d> shapes, Axis axis) {
+        if (shapes.size() <= 25) { // do brute force
+            return getBestSplitOnAxisSahBruteForce(shapes, axis);
+        } else { // do percentile splitting
+            DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics();
+            shapes.forEach(s -> descriptiveStatistics.addValue(s.getCentroid().getCoordiateByAxis(axis)));
+            List<PotentialTreeSplit> splits = new ArrayList<>();
+            for (int i = 10; i <= 90; i += 10) {
+                double splitPoint = descriptiveStatistics.getPercentile(i);
+                PotentialTreeSplit percentileSplit = splitShapesByAxisPoint(shapes, axis, splitPoint);
+                splits.add(percentileSplit);
+            }
+            return getBestSplitSah(splits);
+        }
+    }
+
+    private PotentialTreeSplit getBestSplitSahStrategy(final List<Shape3d> shapes) {
+        // split shapes on all axis
+        List<PotentialTreeSplit> potentialTreeSplits = new ArrayList<>();
+        potentialTreeSplits.add(getBestSplitOnAxisStrategy(shapes, Axis.X));
+        potentialTreeSplits.add(getBestSplitOnAxisStrategy(shapes, Axis.Y));
+        potentialTreeSplits.add(getBestSplitOnAxisStrategy(shapes, Axis.Z));
+
+        return potentialTreeSplits.stream()
+                .min((a, b) -> a.getSahHeuristic().compareTo(b.getSahHeuristic()))
+                .get();
     }
 
     private PotentialTreeSplit splitShapesByAxisAvg(final List<Shape3d> shapes, final Axis axis) {
@@ -106,14 +138,7 @@ public class KDTree implements SpacialStructure {
         }
 
         // split shapes
-        List<PotentialTreeSplit> potentialTreeSplits = new ArrayList<>();
-        potentialTreeSplits.add(splitShapesByAxisAvg(node.getShapes(), Axis.X));
-        potentialTreeSplits.add(splitShapesByAxisAvg(node.getShapes(), Axis.Y));
-        potentialTreeSplits.add(splitShapesByAxisAvg(node.getShapes(), Axis.Z));
-
-        PotentialTreeSplit optimal = potentialTreeSplits.stream()
-                .min((a, b) -> a.getSahHeuristic().compareTo(b.getSahHeuristic()))
-                .get();
+        PotentialTreeSplit optimal = getBestSplitSahStrategy(node.getShapes());
 
         // base case #2 - if the split is empty we cant split */
         if (optimal.isEmptySplit()) {
