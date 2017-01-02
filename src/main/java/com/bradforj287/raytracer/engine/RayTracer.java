@@ -189,6 +189,9 @@ public class RayTracer {
             return 0; // doesn't hit anything.
         }
 
+        kdTreeNodeVisitsBuffer.addToBuffer(rayHitResult.getQueryStats().getNodesVisited());
+        shapeVisitsBuffer.addToBuffer(rayHitResult.getQueryStats().getShapesVisited());
+
         Shape3d intersectShape = rayHitResult.getShape();
         final double t = rayHitResult.getT();
 
@@ -234,7 +237,6 @@ public class RayTracer {
         final double t0 = .0001;
         final RayHitResult results = new RayHitResult();
         results.setT(maxT);
-
         final RayCastArguments rayCastArgs = new RayCastArguments();
 
         SpacialStructureQueryStats queryStats = scene.visitPossibleIntersections(ray, shape -> {
@@ -246,10 +248,7 @@ public class RayTracer {
                 }
             }
         });
-
-        kdTreeNodeVisitsBuffer.addToBuffer(queryStats.getNodesVisited());
-        shapeVisitsBuffer.addToBuffer(queryStats.getShapesVisited());
-
+        results.setQueryStats(queryStats);
         return results;
     }
 
