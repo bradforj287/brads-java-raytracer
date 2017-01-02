@@ -171,9 +171,7 @@ public class RayTracer {
     }
 
     private int getColorForRay(final Ray3d ray, int i, int j) {
-        RayCastArguments returnArgs = new RayCastArguments();
-
-        RayHitResult rayHitResult = doesRayHitAnyShape(ray, returnArgs);
+        RayHitResult rayHitResult = doesRayHitAnyShape(ray);
 
         if (!rayHitResult.didHitShape()) {
             return 0; // doesn't hit anything.
@@ -181,7 +179,7 @@ public class RayTracer {
 
         Shape3d intersectShape = rayHitResult.getShape();
 
-        double t = returnArgs.t;
+        final double t = rayHitResult.getT();
 
         //todo: make this more elegant
         Vector3d eyePosition = ray.getPoint();
@@ -242,7 +240,7 @@ public class RayTracer {
     private boolean isInShadow(Shape3d hitShape, Vector3d intersectLoc,
                                Vector3d lightDir) {
         Ray3d ray = new Ray3d(intersectLoc, lightDir);
-        RayHitResult hitResults = doesRayHitAnyShape(ray, new RayCastArguments());
+        RayHitResult hitResults = doesRayHitAnyShape(ray);
 
         if (!hitResults.didHitShape()) {
             return false;
@@ -253,16 +251,18 @@ public class RayTracer {
         }
     }
 
-    private RayHitResult doesRayHitAnyShape(final Ray3d ray, final RayCastArguments returnArgs) {
+    private RayHitResult doesRayHitAnyShape(final Ray3d ray) {
         final double t0 = .0001;
         final RayHitResult results = new RayHitResult();
         results.setT(Double.MAX_VALUE);
 
+        final RayCastArguments rayCastArgs = new RayCastArguments();
+
         scene.visitPossibleIntersections(ray, shape -> {
             if (shape.isHitByRay(ray, t0, results.getT(),
-                    returnArgs)) {
-                if (returnArgs.t < results.getT()) {
-                    results.setT(returnArgs.t);
+                    rayCastArgs)) {
+                if (rayCastArgs.t < results.getT()) {
+                    results.setT(rayCastArgs.t);
                     results.setShape(shape);
                 }
             }
