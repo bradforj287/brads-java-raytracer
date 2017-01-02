@@ -52,7 +52,7 @@ public class RayTracer {
                     width, height);
 
             // create the worker thread
-            Thread traceThread = new Thread( () -> {
+            Thread traceThread = new Thread(() -> {
                 iterateOverScreenRegion(image, threadRect, xIncrement,
                         yIncrement, xstart, ystart, thetax, thetay, thetaz);
             });
@@ -89,7 +89,6 @@ public class RayTracer {
         drawString(g2d, "rX= " + Double.toString(thetax), 10, 20);
         drawString(g2d, "rY = " + Double.toString(thetay), 10, 30);
         drawString(g2d, "rZ = " + Double.toString(thetaz), 10, 40);
-
     }
 
     private void drawString(Graphics2D g2d, String s, int i, int j) {
@@ -97,20 +96,12 @@ public class RayTracer {
             s = s.substring(0, 10);
         }
         char[] charA = s.toCharArray();
-
         g2d.drawChars(charA, 0, charA.length, i, j);
     }
 
     /**
      * Iterates over a subset of the screen resolution specified by Region. The
      * purpose of this is to distribute across threads.
-     *
-     * @param region
-     * @param xIncrement
-     * @param yIncrement
-     * @param xStart
-     * @param yStart
-     * @param theta
      */
     private void iterateOverScreenRegion(BufferedImage image, Rectangle region,
                                          double xIncrement, double yIncrement, double xStart, double yStart,
@@ -158,7 +149,6 @@ public class RayTracer {
                     Vector3d eyeDirection = pointOnScreen.subtract(eyePosition);
 
                     Ray3d ray = new Ray3d(eyePosition, eyeDirection);
-
                     int color = getColorForRay(ray, i, j);
 
                     Color c = new Color(color);
@@ -175,79 +165,76 @@ public class RayTracer {
                 aveA = aveA / ProgramArguments.ANTIALIASING_SAMPLES;
 
                 Color c1 = new Color(aveR, aveG, aveB, aveA);
-
                 image.setRGB(i, j, c1.getRGB());
             }
         }
     }
 
     private int getColorForRay(final Ray3d ray, int i, int j) {
-
         RayCastArguments returnArgs = new RayCastArguments();
 
         Shape3d intersectShape = doesRayHitAnyShape(ray, returnArgs);
-        if (intersectShape != null) {
 
-            double t = returnArgs.t;
-
-            //todo: make this more elegant
-            Vector3d eyePosition = ray.getPoint();
-            Vector3d eyeDirection = ray.getDirection();
-
-            Vector3d intersectLoc = new Vector3d(eyePosition.x + t
-                    * eyeDirection.x, eyePosition.y + t * eyeDirection.y,
-                    eyePosition.z + t * eyeDirection.z);
-            Vector3d normalToShape = intersectShape.normalAtSurfacePoint(intersectLoc);
-
-            int color = intersectShape.getColor();
-
-            Vector3d lightVector = ProgramArguments.LIGHT_LOCATION.subtract(intersectLoc).toUnitVector();
-
-            double angleBetweenNormalAndLight = normalToShape.dot(lightVector);
-
-            lightVector = intersectLoc.subtract(ProgramArguments.LIGHT_LOCATION).toUnitVector();
-            if (angleBetweenNormalAndLight < 0) {
-                angleBetweenNormalAndLight = 0;
-            } else if (isInShadow(intersectShape, ProgramArguments.LIGHT_LOCATION, lightVector)) {
-                angleBetweenNormalAndLight = 0;
-            }
-
-            /**
-             * Set the color for the pixel
-             */
-            double colorscalar = ProgramArguments.AMBIENT_LIGHT + (1 - ProgramArguments.AMBIENT_LIGHT)
-                    * angleBetweenNormalAndLight;
-
-            int mask = 0x00FFFFFF;
-            int redChannel = color & mask;
-            redChannel = redChannel >> 16;
-
-            mask = 0x0000FF00;
-            int greenChannel = color & mask;
-
-            greenChannel = greenChannel >> 8;
-
-            mask = 0x000000FF;
-            int blueChannel = color & mask;
-
-            double nRed = colorscalar * ((double) redChannel);
-            double nGreen = colorscalar * ((double) greenChannel);
-            double nBlue = colorscalar * ((double) blueChannel);
-
-            redChannel = (int) nRed;
-            greenChannel = (int) nGreen;
-            blueChannel = (int) nBlue;
-
-            redChannel = redChannel << 16;
-            greenChannel = greenChannel << 8;
-
-            int colorToAssign = redChannel + greenChannel + blueChannel;
-
-            return colorToAssign;
-        } else {
-            return 0;
+        if (intersectShape == null) {
+            return 0; // doesn't hit anything.
         }
 
+        double t = returnArgs.t;
+
+        //todo: make this more elegant
+        Vector3d eyePosition = ray.getPoint();
+        Vector3d eyeDirection = ray.getDirection();
+
+        Vector3d intersectLoc = new Vector3d(eyePosition.x + t
+                * eyeDirection.x, eyePosition.y + t * eyeDirection.y,
+                eyePosition.z + t * eyeDirection.z);
+        Vector3d normalToShape = intersectShape.normalAtSurfacePoint(intersectLoc);
+
+        int color = intersectShape.getColor();
+
+        Vector3d lightVector = ProgramArguments.LIGHT_LOCATION.subtract(intersectLoc).toUnitVector();
+
+        double angleBetweenNormalAndLight = normalToShape.dot(lightVector);
+
+        lightVector = intersectLoc.subtract(ProgramArguments.LIGHT_LOCATION).toUnitVector();
+        if (angleBetweenNormalAndLight < 0) {
+            angleBetweenNormalAndLight = 0;
+        } else if (isInShadow(intersectShape, ProgramArguments.LIGHT_LOCATION, lightVector)) {
+            angleBetweenNormalAndLight = 0;
+        }
+
+        /**
+         * Set the color for the pixel
+         */
+        double colorscalar = ProgramArguments.AMBIENT_LIGHT + (1 - ProgramArguments.AMBIENT_LIGHT)
+                * angleBetweenNormalAndLight;
+
+        int mask = 0x00FFFFFF;
+        int redChannel = color & mask;
+        redChannel = redChannel >> 16;
+
+        mask = 0x0000FF00;
+        int greenChannel = color & mask;
+
+        greenChannel = greenChannel >> 8;
+
+        mask = 0x000000FF;
+        int blueChannel = color & mask;
+
+        double nRed = colorscalar * ((double) redChannel);
+        double nGreen = colorscalar * ((double) greenChannel);
+        double nBlue = colorscalar * ((double) blueChannel);
+
+        redChannel = (int) nRed;
+        greenChannel = (int) nGreen;
+        blueChannel = (int) nBlue;
+
+        redChannel = redChannel << 16;
+        greenChannel = greenChannel << 8;
+
+        int colorToAssign = redChannel + greenChannel + blueChannel;
+
+        return colorToAssign;
     }
 
     private boolean isInShadow(Shape3d hitShape, Vector3d intersectLoc,

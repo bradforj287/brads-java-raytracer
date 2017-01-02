@@ -73,7 +73,6 @@ public class Matrix3d {
         result.matrix[2][0] = -Math.sin(theta);
         result.matrix[2][2] = Math.cos(theta);
         return result;
-
     }
 
     public static Matrix3d getZRotationMatrix(double theta) {
