@@ -80,18 +80,19 @@ public class KDTree implements SpacialStructure {
 
     private void populateTree(KDNode node) {
         // base case #1
-        if (node == null || node.getShapes().isEmpty() || node.getShapes().size() <=  1) {
+        if (node == null || node.getShapes().isEmpty() || node.getShapes().size() <=  10) {
             return;
         }
 
         // split shapes
         final String coord = node.getBoundingBox().getLongestAxis().toString();
-        double midpointCoord =  ShapeUtils.getAverageCenterCoordiate(coord, node.getShapes());
+        double midpointCoord =  ShapeUtils.getMedianCenterCoordiate(coord, node.getShapes());
 
         SplitResult splitResult = splitShapes(node.getShapes(), coord, midpointCoord);
 
         // base case #2 - if the split is poor don't continue to split
-        if (splitResult.isEmptySplit()) {
+        // TODO: improve heuristic for splitting
+        if (splitResult.isEmptySplit() || splitResult.getSplitScore() >= .25) {
             return;
         }
 
