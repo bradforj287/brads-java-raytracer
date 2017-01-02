@@ -97,6 +97,10 @@ public class Vector3d {
         return new Vector3d(x1, y1, z1);
     }
 
+    public double getCoordiateByAxis(final Axis axis) {
+        return getCoordiateByName(axis.toCoordinateName());
+    }
+
     public double getCoordiateByName(final String coord) {
         Field coordField = FieldUtils.getField(Vector3d.class, coord);
         try {

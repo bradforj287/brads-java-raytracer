@@ -2,6 +2,7 @@ package com.bradforj287.raytracer.model.kdtree;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import com.bradforj287.raytracer.geometry.*;
 import com.bradforj287.raytracer.model.ShapeVisitor;
 import com.bradforj287.raytracer.model.SpacialStructure;
@@ -44,18 +45,17 @@ public class KDTree implements SpacialStructure {
         return node;
     }
 
-    private PotentialTreeSplit splitShapesByAxis(final List<Shape3d> shapes, final Axis axis) {
+    private PotentialTreeSplit splitShapesByAxisPoint(final List<Shape3d> shapes, final Axis axis, double splitPoint) {
         final String coord = axis.toCoordinateName();
-        double midpoint = ShapeUtils.getAverageCenterCoordiate(coord, shapes);
         List<Shape3d> left = new ArrayList<>();
         List<Shape3d> right = new ArrayList<>();
         List<Shape3d> equalShapes = new ArrayList<>();
         for (Shape3d shape : shapes) {
             Vector3d shapeMidpoint = shape.getCentroid();
             double shapeCoord = shapeMidpoint.getCoordiateByName(coord);
-            if (shapeCoord == midpoint) {
+            if (shapeCoord == splitPoint) {
                 equalShapes.add(shape);
-            } else if (shapeCoord < midpoint) {
+            } else if (shapeCoord < splitPoint) {
                 left.add(shape);
             } else {
                 right.add(shape);
@@ -70,6 +70,31 @@ public class KDTree implements SpacialStructure {
         return new PotentialTreeSplit(left, right);
     }
 
+    private PotentialTreeSplit getBestSplitOnAxisSah(final List<Shape3d> shapes, Axis axis) {
+        List<Shape3d> sortedByAxis = shapes.stream().sorted((a, b) -> {
+            Double aa = a.getCentroid().getCoordiateByAxis(axis);
+            Double bb = b.getCentroid().getCoordiateByAxis(axis);
+            return aa.compareTo(bb);
+        }).collect(Collectors.toList());
+
+        List<PotentialTreeSplit> splits = new ArrayList<>();
+        for (Shape3d shape: sortedByAxis) {
+            double splitPoint = shape.getCentroid().getCoordiateByAxis(axis);
+            splits.add(splitShapesByAxisPoint(shapes, axis, splitPoint));
+        }
+
+        PotentialTreeSplit optimal = splits.stream()
+                .min((a, b) -> a.getSahHeuristic().compareTo(b.getSahHeuristic()))
+                .get();
+        return optimal;
+    }
+
+    private PotentialTreeSplit splitShapesByAxisAvg(final List<Shape3d> shapes, final Axis axis) {
+        final String coord = axis.toCoordinateName();
+        double midpoint = ShapeUtils.getAverageCenterCoordiate(coord, shapes);
+        return splitShapesByAxisPoint(shapes, axis, midpoint);
+    }
+
     private void populateTree(KDNode node) {
         Preconditions.checkNotNull(node);
         Preconditions.checkNotNull(node.getShapes());
@@ -82,9 +107,9 @@ public class KDTree implements SpacialStructure {
 
         // split shapes
         List<PotentialTreeSplit> potentialTreeSplits = new ArrayList<>();
-        potentialTreeSplits.add(splitShapesByAxis(node.getShapes(), Axis.X));
-        potentialTreeSplits.add(splitShapesByAxis(node.getShapes(), Axis.Y));
-        potentialTreeSplits.add(splitShapesByAxis(node.getShapes(), Axis.Z));
+        potentialTreeSplits.add(splitShapesByAxisAvg(node.getShapes(), Axis.X));
+        potentialTreeSplits.add(splitShapesByAxisAvg(node.getShapes(), Axis.Y));
+        potentialTreeSplits.add(splitShapesByAxisAvg(node.getShapes(), Axis.Z));
 
         PotentialTreeSplit optimal = potentialTreeSplits.stream()
                 .min((a, b) -> a.getSahHeuristic().compareTo(b.getSahHeuristic()))
