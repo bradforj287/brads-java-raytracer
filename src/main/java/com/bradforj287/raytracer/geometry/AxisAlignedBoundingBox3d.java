@@ -35,6 +35,13 @@ public class AxisAlignedBoundingBox3d {
         return this.max.z - this.min.z;
     }
 
+    public double getSurfaceArea() {
+        double botAndTop = 2*xLength()*yLength();
+        double sides = 2*zLength()*xLength();
+        double frontBack = 2*zLength()*yLength();
+        return botAndTop + sides + frontBack;
+    }
+
     private class AxisLength {
         private Axis axis;
         private double length;

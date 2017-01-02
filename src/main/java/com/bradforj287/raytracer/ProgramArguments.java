@@ -4,7 +4,7 @@ import java.awt.*;
 import com.bradforj287.raytracer.geometry.Vector3d;
 
 public class ProgramArguments {
-    public static final boolean ROTATION_ON = true;
+    public static final boolean ROTATION_ON = false;
 
     // UI Arguments for window sizing
     public static final Dimension SIZE_OF_WINDOW = new Dimension(320, 240);

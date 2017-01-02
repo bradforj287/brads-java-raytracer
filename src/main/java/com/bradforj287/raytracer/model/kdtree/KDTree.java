@@ -2,14 +2,12 @@ package com.bradforj287.raytracer.model.kdtree;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.bradforj287.raytracer.geometry.AxisAlignedBoundingBox3d;
-import com.bradforj287.raytracer.geometry.Ray3d;
-import com.bradforj287.raytracer.geometry.Shape3d;
-import com.bradforj287.raytracer.geometry.Vector3d;
+import com.bradforj287.raytracer.geometry.*;
 import com.bradforj287.raytracer.model.ShapeVisitor;
 import com.bradforj287.raytracer.model.SpacialStructure;
 import com.bradforj287.raytracer.model.SpacialStructureQueryStats;
 import com.bradforj287.raytracer.utils.ShapeUtils;
+import com.google.common.base.Preconditions;
 
 public class KDTree implements SpacialStructure {
     private KDNode root;
@@ -46,72 +44,70 @@ public class KDTree implements SpacialStructure {
         return node;
     }
 
-    private class SplitResult {
-        List<Shape3d> leftShapes = new ArrayList<>();
-        List<Shape3d> rightShapes = new ArrayList<>();
-        public boolean isEmptySplit() {
-            return leftShapes.isEmpty() || rightShapes.isEmpty();
-        }
-
-        // lower value is better. Ranges from 0 to .5
-        public double getSplitScore() {
-            double leftSize = leftShapes.size();
-            double rightSize = rightShapes.size();
-            double totalSize = leftSize + rightSize;
-            double percentLeft = leftSize/totalSize;
-            final double idealSplit = .50;
-            return Math.abs(percentLeft - idealSplit);
-        }
-    }
-
-    private SplitResult splitShapes(final List<Shape3d> shapes, final String coord, final double midpoint) {
-        SplitResult res = new SplitResult();
+    private PotentialTreeSplit splitShapesByAxis(final List<Shape3d> shapes, final Axis axis) {
+        final String coord = axis.toCoordinateName();
+        double midpoint = ShapeUtils.getMedianCenterCoordiate(coord, shapes);
+        List<Shape3d> left = new ArrayList<>();
+        List<Shape3d> right = new ArrayList<>();
         List<Shape3d> equalShapes = new ArrayList<>();
         for (Shape3d shape : shapes) {
             Vector3d shapeMidpoint = shape.getCentroid();
             double shapeCoord = shapeMidpoint.getCoordiateByName(coord);
             if (shapeCoord == midpoint) {
                 equalShapes.add(shape);
-            }
-            else if (shapeCoord < midpoint) {
-                res.leftShapes.add(shape);
+            } else if (shapeCoord < midpoint) {
+                left.add(shape);
             } else {
-                res.rightShapes.add(shape);
+                right.add(shape);
             }
         }
         // add equal shapes to the list that is smaller.
-        if (res.leftShapes.size() < res.rightShapes.size()) {
-            res.leftShapes.addAll(equalShapes);
+        if (left.size() < right.size()) {
+            left.addAll(equalShapes);
         } else {
-            res.rightShapes.addAll(equalShapes);
+            right.addAll(equalShapes);
         }
-        return res;
+        return new PotentialTreeSplit(left, right);
     }
 
     private void populateTree(KDNode node) {
-        // base case #1
-        if (node == null || node.getShapes().isEmpty() || node.getShapes().size() <=  2) {
+        Preconditions.checkNotNull(node);
+        Preconditions.checkNotNull(node.getShapes());
+        Preconditions.checkArgument(!node.getShapes().isEmpty());
+
+        // base case #1 - cant split any more
+        if (node.getShapes().size() == 1) {
             return;
         }
 
+        final double sahInitial = node.getBoundingBox().getSurfaceArea()*node.getShapes().size();
+
         // split shapes
-        final String coord = node.getBoundingBox().getLongestAxis().toString();
-        double midpointCoord =  ShapeUtils.getMedianCenterCoordiate(coord, node.getShapes());
+        List<PotentialTreeSplit> potentialTreeSplits = new ArrayList<>();
+        potentialTreeSplits.add(splitShapesByAxis(node.getShapes(), Axis.X));
+        potentialTreeSplits.add(splitShapesByAxis(node.getShapes(), Axis.Y));
+        potentialTreeSplits.add(splitShapesByAxis(node.getShapes(), Axis.Z));
 
-        SplitResult splitResult = splitShapes(node.getShapes(), coord, midpointCoord);
+        PotentialTreeSplit optimal = potentialTreeSplits.stream()
+                .min((a, b) -> a.getSahHeuristic().compareTo(b.getSahHeuristic()))
+                .get();
 
-        // base case #2 - if the split is poor don't continue to split
-        // TODO: improve heuristic for splitting
-        if (splitResult.isEmptySplit()) {
-            //SplitResult splitAgain = splitShapes(node.getShapes(), coord, midpointCoord);
+        // base case #2 - if the split is empty we cant split
+        if (optimal.isEmptySplit()) {
+            return;
+        }
+
+        // base case #3 - check if split cost outweighs benefits
+        final double percent = optimal.getSahHeuristic() / sahInitial;
+        if (percent >= .99999) {
             return;
         }
 
         // left node
-        KDNode leftNode = buildNode(splitResult.leftShapes);
+        KDNode leftNode = buildNode(optimal.getLeftShapes());
 
         // right node
-        KDNode rightNode = buildNode(splitResult.rightShapes);
+        KDNode rightNode = buildNode(optimal.getRightShapes());
 
         // current node
         node.setShapes(null);
