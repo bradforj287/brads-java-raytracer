@@ -7,6 +7,7 @@ import java.util.Random;
 import com.bradforj287.raytracer.ProgramArguments;
 import com.bradforj287.raytracer.geometry.*;
 import com.bradforj287.raytracer.model.SceneModel;
+import com.bradforj287.raytracer.model.SpacialStructureQueryStats;
 import com.bradforj287.raytracer.utils.VideoDataPointBuffer;
 
 public class RayTracer {
@@ -89,6 +90,8 @@ public class RayTracer {
         drawString(g2d, "rX= " + Double.toString(thetax), 10, 20);
         drawString(g2d, "rY = " + Double.toString(thetay), 10, 30);
         drawString(g2d, "rZ = " + Double.toString(thetaz), 10, 40);
+
+        // print spacial structure query stats
     }
 
     private void drawString(Graphics2D g2d, String s, int i, int j) {
@@ -225,7 +228,7 @@ public class RayTracer {
 
         final RayCastArguments rayCastArgs = new RayCastArguments();
 
-        scene.visitPossibleIntersections(ray, shape -> {
+        SpacialStructureQueryStats queryStats = scene.visitPossibleIntersections(ray, shape -> {
             if (shape.isHitByRay(ray, t0, results.getT(),
                     rayCastArgs)) {
                 if (rayCastArgs.t < results.getT()) {
@@ -234,6 +237,7 @@ public class RayTracer {
                 }
             }
         });
+
         return results;
     }
 
