@@ -7,10 +7,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 import javax.swing.*;
-import com.bradforj287.raytracer.geometry.Shape3d;
-import com.bradforj287.raytracer.geometry.Sphere3d;
-import com.bradforj287.raytracer.geometry.Triangle3d;
-import com.bradforj287.raytracer.geometry.Vector3d;
+import com.bradforj287.raytracer.geometry.*;
 import com.bradforj287.raytracer.model.SceneModel;
 import com.bradforj287.raytracer.parser.ObjFileParser;
 import com.bradforj287.raytracer.utils.Utils;
@@ -63,12 +60,19 @@ public class MainEntry {
             double radSpan = maxRadius - minRadius;
             double rad = radSpan * random.nextDouble() + minRadius;
 
-            Sphere3d sphere3d = new Sphere3d(center, rad, random.nextInt());
+            Surface surface = new Surface();
+            surface.setColor(random.nextInt());
+            Sphere3d sphere3d = new Sphere3d(center, rad, surface);
             sphere3ds.add(sphere3d);
         }
         return sphere3ds;
     }
 
+    private static Surface color2Surface(int color) {
+        Surface surface = new Surface();
+        surface.setColor(color);
+        return surface;
+    }
     private static List<Triangle3d> getBoundingBox() {
         List<Triangle3d> scene = new ArrayList<>();
         // create cube vertices
@@ -90,39 +94,39 @@ public class MainEntry {
         Vector3d bottom4 = new Vector3d(cubeWidth, cubeWidth, 0);
 
         // top triangles
-        scene.add(new Triangle3d(top1, top2, top3, boundingColor));
+        scene.add(new Triangle3d(top1, top2, top3, color2Surface(boundingColor)));
         scene.add(flipNormal(new Triangle3d(top2, top3, top4,
-                boundingColor)));
+                color2Surface(boundingColor))));
 
         boundingColor = Color.blue.getRGB();
         // bottom triangles
         scene.add(new Triangle3d(bottom1, bottom2, bottom3,
-                boundingColor));
+                color2Surface(boundingColor)));
         scene.add(flipNormal(new Triangle3d(bottom2, bottom3, bottom4,
-                boundingColor)));
+                color2Surface(boundingColor))));
 
         boundingColor = Color.gray.getRGB();
         // left triangles
-        scene.add(new Triangle3d(top1, top3, bottom1, boundingColor));
+        scene.add(new Triangle3d(top1, top3, bottom1, color2Surface(boundingColor)));
         scene.add(flipNormal(new Triangle3d(bottom1, bottom3, top3,
-                boundingColor)));
+                color2Surface(boundingColor))));
 
         // right triangles
-        scene.add(new Triangle3d(top2, top4, bottom2, boundingColor));
+        scene.add(new Triangle3d(top2, top4, bottom2, color2Surface(boundingColor)));
         scene.add(flipNormal(new Triangle3d(bottom2, bottom4, top4,
-                boundingColor)));
+                color2Surface(boundingColor))));
 
         boundingColor = Color.green.getRGB();
 
         // back triangles
-        scene.add(new Triangle3d(top1, top2, bottom1, boundingColor));
+        scene.add(new Triangle3d(top1, top2, bottom1, color2Surface(boundingColor)));
         scene.add(flipNormal(new Triangle3d(bottom1, bottom2, top2,
-                boundingColor)));
+                color2Surface(boundingColor))));
 
         // front triangles
-        scene.add(new Triangle3d(top3, top4, bottom3, boundingColor));
+        scene.add(new Triangle3d(top3, top4, bottom3, color2Surface(boundingColor)));
         scene.add(flipNormal(new Triangle3d(bottom3, bottom4, top4,
-                boundingColor)));
+                color2Surface(boundingColor))));
 
         double offset = (cubeWidth / 2);
         Vector3d offsetV = new Vector3d(offset, offset, offset);
@@ -131,7 +135,7 @@ public class MainEntry {
             Vector3d v1 = t.v1.subtract(offsetV);
             Vector3d v2 = t.v2.subtract(offsetV);
             Vector3d v3 = t.v3.subtract(offsetV);
-            return new Triangle3d(v1, v2, v3, t.getColor());
+            return new Triangle3d(v1, v2, v3, t.getSurface());
         }).collect(Collectors.toList());
 
         scene = scene.stream()

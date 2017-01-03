@@ -1,7 +1,8 @@
 package com.bradforj287.raytracer.geometry;
 
 public abstract class Shape3d {
-    protected int color = 0;
+
+    public abstract Surface getSurface();
 
     public abstract AxisAlignedBoundingBox3d getBoundingBox();
 
@@ -10,10 +11,6 @@ public abstract class Shape3d {
     public abstract Vector3d getCentroid();
 
     public abstract boolean isHitByRay(Ray3d ray, double t0, double t1, RayCastArguments returnArgs);
-
-    public int getColor() {
-        return color;
-    }
 
     public double minX() {
         return getBoundingBox().getMin().getX();

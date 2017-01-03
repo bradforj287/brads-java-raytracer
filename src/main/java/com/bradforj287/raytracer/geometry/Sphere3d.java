@@ -3,11 +3,12 @@ package com.bradforj287.raytracer.geometry;
 public class Sphere3d extends Shape3d {
     private final Vector3d center;
     private final double radius;
+    private final Surface surface;
 
-    public Sphere3d(Vector3d center, double radius, int color) {
+    public Sphere3d(Vector3d center, double radius, Surface surface) {
         this.center = center;
         this.radius = radius;
-        this.color = color;
+        this.surface = surface;
     }
 
     @Override
@@ -66,5 +67,10 @@ public class Sphere3d extends Shape3d {
         }
 
         return true;
+    }
+
+    @Override
+    public Surface getSurface() {
+        return surface;
     }
 }

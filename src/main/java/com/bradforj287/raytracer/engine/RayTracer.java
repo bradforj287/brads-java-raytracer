@@ -198,7 +198,7 @@ public class RayTracer {
         Vector3d intersectLoc = ray.getPoint().add(ray.getDirection().multiply(t));
         Vector3d normalToShape = intersectShape.normalAtSurfacePoint(intersectLoc);
 
-        int color = intersectShape.getColor();
+        int color = intersectShape.getSurface().getColor();
 
         Vector3d vectorToLight = ProgramArguments.LIGHT_LOCATION.subtract(intersectLoc).toUnitVector();
 

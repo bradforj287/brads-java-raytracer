@@ -6,17 +6,18 @@ public class Triangle3d extends Shape3d {
     public final Vector3d v2;
     public final Vector3d v3;
 
+    private final Surface surface;
     private Vector3d normal; // cached for performance
 
-    public Triangle3d(Vector3d a, Vector3d b, Vector3d c, int color1) {
+    public Triangle3d(Vector3d a, Vector3d b, Vector3d c, Surface surface) {
         v1 = a;
         v2 = b;
         v3 = c;
-        this.color = color1;
+        this.surface = surface;
     }
 
     public Triangle3d getFlippedNormal() {
-        return new Triangle3d(v2, v1, v3, this.color);
+        return new Triangle3d(v2, v1, v3, this.surface);
     }
 
     @Override
@@ -143,5 +144,10 @@ public class Triangle3d extends Shape3d {
         return new Vector3d((v1.x + v2.x + v3.x) / 3,
                 (v1.y + v2.y + v3.y) / 3,
                 (v1.z + v2.z + v3.z) / 3);
+    }
+
+    @Override
+    public Surface getSurface() {
+        return this.surface;
     }
 }
