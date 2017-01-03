@@ -131,10 +131,10 @@ public class KDTree implements SpacialStructure {
         return getBestSplitSah(potentialTreeSplits);
     }
 
-    private PotentialTreeSplit splitShapesByAxisAvg(final List<Shape3d> shapes, final Axis axis) {
-        final String coord = axis.toCoordinateName();
-        double midpoint = ShapeUtils.getAverageCenterCoordiate(coord, shapes);
-        return splitShapesByAxisPoint(shapes, axis, midpoint);
+    private PotentialTreeSplit splitShapesByAxisAvgLongestAxis(final List<Shape3d> shapes) {
+        Axis longestAxis = ShapeUtils.getBoundsForShapes(shapes).getLongestAxis();
+        double midpoint = ShapeUtils.getAverageCenterCoordiate(longestAxis.toCoordinateName(), shapes);
+        return splitShapesByAxisPoint(shapes, longestAxis, midpoint);
     }
 
     private void populateTree(KDNode node) {
@@ -148,7 +148,7 @@ public class KDTree implements SpacialStructure {
         }
 
         // split shapes
-        PotentialTreeSplit optimal = getBestSplitSahStrategy(node.getShapes());
+        PotentialTreeSplit optimal = splitShapesByAxisAvgLongestAxis(node.getShapes());
 
         // base case #2 - if the split is empty we cant split */
         if (optimal.isEmptySplit()) {
