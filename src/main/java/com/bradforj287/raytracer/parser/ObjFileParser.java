@@ -48,6 +48,7 @@ public class ObjFileParser {
                     Vector3d v3 = new Vector3d(verticies.get(k));
                     Surface surface = new Surface();
                     surface.setColor(123123);
+                    surface.setReflective(true);
                     Triangle3d tri = new Triangle3d(v1, v2, v3, surface);
                     r.add(tri.getFlippedNormal());
                 }
