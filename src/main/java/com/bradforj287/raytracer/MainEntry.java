@@ -26,7 +26,16 @@ public class MainEntry {
         Vector3d min = new Vector3d(-1000, -1000, -1000);
         Vector3d max = new Vector3d(1000, 1000, 1000);
         shapes.addAll(genRandomSpheres(200, min, max, 20, 100));
-        shapes.addAll(ObjFileParser.parseObjFile(objFile));
+
+        //test reflective sphere
+        Vector3d center = new Vector3d(50, 50, 50);
+        Surface surface = new Surface();
+        surface.setColor(1212);
+        surface.setReflective(true);
+
+        Sphere3d reflectiveSphere = new Sphere3d(center, 40, surface);
+        shapes.add(reflectiveSphere);
+
 
         //install bounding box
         shapes.addAll(boundingBoxTriangles);
@@ -62,6 +71,7 @@ public class MainEntry {
 
             Surface surface = new Surface();
             surface.setColor(random.nextInt());
+
             Sphere3d sphere3d = new Sphere3d(center, rad, surface);
             sphere3ds.add(sphere3d);
         }

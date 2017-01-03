@@ -18,7 +18,7 @@ public class RayTracer {
     private DataPointBuffer kdTreeNodeVisitsBuffer = new DataPointBuffer(100);
     private DataPointBuffer shapeVisitsBuffer = new DataPointBuffer(100);
 
-    private final static int MAX_RECURSE_DEPTH = 4;
+    private final static int MAX_RECURSE_DEPTH = 16;
 
     public RayTracer(SceneModel model, Dimension sceneResolution) {
         this.sceneResolution = sceneResolution;
@@ -184,7 +184,7 @@ public class RayTracer {
     }
 
     private Vector3d getReflectionVector(Ray3d ray, Vector3d normalToShape) {
-        double dDotN = ray.getDirection().dot(normalToShape)*2;
+        double dDotN = ray.getDirection().dot(normalToShape) * 2;
         return ray.getDirection().subtract(normalToShape.multiply(dDotN));
     }
 
@@ -194,9 +194,6 @@ public class RayTracer {
         if (!rayHitResult.didHitShape()) {
             return 0; // doesn't hit anything.
         }
-
-        kdTreeNodeVisitsBuffer.addToBuffer(rayHitResult.getQueryStats().getNodesVisited());
-        shapeVisitsBuffer.addToBuffer(rayHitResult.getQueryStats().getShapesVisited());
 
         Shape3d intersectShape = rayHitResult.getShape();
         Surface intersectSurface = intersectShape.getSurface();
@@ -222,7 +219,7 @@ public class RayTracer {
             }
 
             double colorscalar = ProgramArguments.AMBIENT_LIGHT + (1 - ProgramArguments.AMBIENT_LIGHT)
-                    * angleBetweenNormalAndLight;
+                    * (angleBetweenNormalAndLight * ProgramArguments.LIGHT_INTENSITY);
 
             return scaleColor(colorscalar, color);
         }
@@ -260,6 +257,11 @@ public class RayTracer {
                 }
             }
         });
+
+        //log some stats
+        kdTreeNodeVisitsBuffer.addToBuffer(queryStats.getNodesVisited());
+        shapeVisitsBuffer.addToBuffer(queryStats.getShapesVisited());
+
         results.setQueryStats(queryStats);
         return results;
     }
