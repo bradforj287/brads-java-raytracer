@@ -78,13 +78,12 @@ public class KDTree implements SpacialStructure {
             return aa.compareTo(bb);
         }).collect(Collectors.toList());
 
-        List<PotentialTreeSplit> splits = new ArrayList<>();
-        for (Shape3d shape : sortedByAxis) {
-            double splitPoint = shape.getCentroid().getCoordiateByAxis(axis);
-            splits.add(splitShapesByAxisPoint(shapes, axis, splitPoint));
-        }
-
-        return getBestSplitSah(splits);
+        return sortedByAxis.parallelStream()
+                .map(s -> {
+                    double splitPoint = s.getCentroid().getCoordiateByAxis(axis);
+                    return splitShapesByAxisPoint(shapes, axis, splitPoint);
+                })
+                .min((a, b) -> a.getSahHeuristic().compareTo(b.getSahHeuristic())).get();
     }
 
     private PotentialTreeSplit getBestSplitSah(final List<PotentialTreeSplit> splits) {
@@ -94,18 +93,31 @@ public class KDTree implements SpacialStructure {
     }
 
     private PotentialTreeSplit getBestSplitOnAxisStrategy(final List<Shape3d> shapes, Axis axis) {
+        Preconditions.checkArgument(shapes.size() > 1);
         if (shapes.size() <= 25) { // do brute force
             return getBestSplitOnAxisSahBruteForce(shapes, axis);
         } else { // do percentile splitting
             DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics();
             shapes.forEach(s -> descriptiveStatistics.addValue(s.getCentroid().getCoordiateByAxis(axis)));
-            List<PotentialTreeSplit> splits = new ArrayList<>();
-            for (int i = 10; i <= 90; i += 10) {
-                double splitPoint = descriptiveStatistics.getPercentile(i);
-                PotentialTreeSplit percentileSplit = splitShapesByAxisPoint(shapes, axis, splitPoint);
-                splits.add(percentileSplit);
+
+            double maxPercentile = 100;
+            double increment = 1;
+            double size = shapes.size();
+
+            if (size < maxPercentile) {
+                increment = 100 * (1/size);
             }
-            return getBestSplitSah(splits);
+
+            List<Double> percentiles = new ArrayList<>();
+            for (double p = increment; p < maxPercentile; p+= increment) {
+                percentiles.add(p);
+            }
+
+            return percentiles.parallelStream()
+                    .map(p -> {
+                        double splitPoint = descriptiveStatistics.getPercentile(p);
+                        return splitShapesByAxisPoint(shapes, axis, splitPoint);
+                    }).min((a, b) -> a.getSahHeuristic().compareTo(b.getSahHeuristic())).get();
         }
     }
 
@@ -116,9 +128,7 @@ public class KDTree implements SpacialStructure {
         potentialTreeSplits.add(getBestSplitOnAxisStrategy(shapes, Axis.Y));
         potentialTreeSplits.add(getBestSplitOnAxisStrategy(shapes, Axis.Z));
 
-        return potentialTreeSplits.stream()
-                .min((a, b) -> a.getSahHeuristic().compareTo(b.getSahHeuristic()))
-                .get();
+        return getBestSplitSah(potentialTreeSplits);
     }
 
     private PotentialTreeSplit splitShapesByAxisAvg(final List<Shape3d> shapes, final Axis axis) {
