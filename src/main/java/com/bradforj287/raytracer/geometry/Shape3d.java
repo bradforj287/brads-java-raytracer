@@ -10,7 +10,7 @@ public abstract class Shape3d {
 
     public abstract Vector3d getCentroid();
 
-    public abstract boolean isHitByRay(Ray3d ray, double t0, double t1, RayCastArguments returnArgs);
+    public abstract boolean isHitByRay(Ray3d ray, double t1, RayCastArguments returnArgs);
 
     public double minX() {
         return getBoundingBox().getMin().getX();

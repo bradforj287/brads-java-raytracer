@@ -29,7 +29,7 @@ public class Sphere3d extends Shape3d {
     }
 
     @Override
-    public boolean isHitByRay(Ray3d ray, double t0, double t1, RayCastArguments returnArgs) {
+    public boolean isHitByRay(Ray3d ray, double t1, RayCastArguments returnArgs) {
         Vector3d dir = ray.getDirection();
         Vector3d eye = ray.getPoint();
 
@@ -62,7 +62,7 @@ public class Sphere3d extends Shape3d {
                 returnArgs.t = time_2;
             }
         }
-        if (returnArgs.t < t0 || returnArgs.t > t1) {
+        if (returnArgs.t < 0 || returnArgs.t > t1) {
             return false;
         }
 

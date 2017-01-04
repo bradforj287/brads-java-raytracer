@@ -183,11 +183,11 @@ public class RayTracer {
         }
     }
 
-    private static double clamp(double val, double min, double max) {
+    private static double clamp(final double val, final double min, final double max) {
         return Math.max(min, Math.min(max, val));
     }
 
-    private Vector3d getRefractionVector(Vector3d I, Vector3d N, final double ior) {
+    private Vector3d getRefractionVector(final Vector3d I, final Vector3d N, final double ior) {
         double cosi = clamp(-1, 1, I.dot(N));
         double etai = 1, etat = ior;
         Vector3d n = N;
@@ -208,12 +208,12 @@ public class RayTracer {
         }
     }
 
-    private Vector3d getReflectionVector(Ray3d ray, Vector3d normalToShape) {
+    private Vector3d getReflectionVector(final Ray3d ray, final Vector3d normalToShape) {
         double dDotN = ray.getDirection().dot(normalToShape) * 2;
         return ray.getDirection().subtract(normalToShape.multiply(dDotN));
     }
 
-    private int getColorForRay(final Ray3d ray, int depth) {
+    private int getColorForRay(final Ray3d ray, final int depth) {
         RayHitResult rayHitResult = doesRayHitAnyShape(ray);
 
         if (!rayHitResult.didHitShape()) {
@@ -263,18 +263,19 @@ public class RayTracer {
         return doesRayHitAnyShapeHelper(ray, Double.MAX_VALUE);
     }
 
-    private RayHitResult doesRayHitAnyShape(final Ray3d ray, double maxT) {
+    private RayHitResult doesRayHitAnyShape(final Ray3d ray, final double maxT) {
         return doesRayHitAnyShapeHelper(ray, maxT);
     }
 
-    private RayHitResult doesRayHitAnyShapeHelper(final Ray3d ray, double maxT) {
-        final double t0 = .0001;
+    private RayHitResult doesRayHitAnyShapeHelper(final Ray3d theRay, final double maxT) {
+        final double RAY_OFFSET = .0000001;
+        Ray3d rayToUse = theRay.shiftByT(RAY_OFFSET);
         final RayHitResult results = new RayHitResult();
         results.setT(maxT);
         final RayCastArguments rayCastArgs = new RayCastArguments();
 
-        SpacialStructureQueryStats queryStats = scene.visitPossibleIntersections(ray, shape -> {
-            if (shape.isHitByRay(ray, t0, results.getT(),
+        SpacialStructureQueryStats queryStats = scene.visitPossibleIntersections(rayToUse, shape -> {
+            if (shape.isHitByRay(rayToUse, results.getT(),
                     rayCastArgs)) {
                 if (rayCastArgs.t < results.getT()) {
                     results.setT(rayCastArgs.t);

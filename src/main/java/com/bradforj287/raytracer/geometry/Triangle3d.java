@@ -36,8 +36,7 @@ public class Triangle3d extends Shape3d {
     }
 
     @Override
-    public boolean isHitByRay(Ray3d ray,  double t0, double t1,
-                              RayCastArguments returnArgs) {
+    public boolean isHitByRay(Ray3d ray, double t1, RayCastArguments returnArgs) {
 
         Vector3d eye = ray.getPoint();
         Vector3d dir = ray.getDirection();
@@ -68,7 +67,7 @@ public class Triangle3d extends Shape3d {
                 * (b * l - k * c)))
                 / M;
 
-        if (t < t0 || t > t1) {
+        if (t < 0 || t > t1) {
             return false;
         }
 

@@ -3,9 +3,12 @@ package com.bradforj287.raytracer;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.concurrent.TimeUnit;
 import javax.swing.*;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import com.bradforj287.raytracer.engine.RayTracer;
 import com.bradforj287.raytracer.model.SceneModel;
+import com.google.common.base.Stopwatch;
 
 public class RayTracerPanel extends JPanel {
     private RayTracer rayTracer;
@@ -46,7 +49,19 @@ public class RayTracerPanel extends JPanel {
         if (ProgramArguments.ROTATION_ON) {
             animationTimer.start();
         } else {
-            sceneFrame = rayTracer.traceScene(-2.521, -2.521, 0);
+            boolean perfTest = true;
+            if (perfTest) {
+                DescriptiveStatistics ds = new DescriptiveStatistics();
+                for (int i = 1; i < 10; i++) {
+                    Stopwatch sw = Stopwatch.createStarted();
+                    sceneFrame = rayTracer.traceScene(-2.521, -2.521, 0);
+                    ds.addValue(sw.elapsed(TimeUnit.MILLISECONDS));
+                    System.out.println("Frame render time (ms): " + sw.elapsed(TimeUnit.MILLISECONDS));
+                }
+                System.out.println(ds);
+            } else {
+                sceneFrame = rayTracer.traceScene(-2.521, -2.521, 0);
+            }
         }
     }
 
