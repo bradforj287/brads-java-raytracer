@@ -6,21 +6,18 @@ import java.awt.image.BufferedImage;
 import java.util.concurrent.TimeUnit;
 import javax.swing.*;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import com.bradforj287.raytracer.engine.RayTracer;
-import com.bradforj287.raytracer.model.SceneModel;
+import com.bradforj287.raytracer.model.Camera;
 import com.google.common.base.Stopwatch;
 
 public class RayTracerPanel extends JPanel {
-    private RayTracer rayTracer;
-    private Dimension sceneSize;
+    private Camera camera;
     private BufferedImage sceneFrame;
 
     private Object paintLock = new Object();
 
-    public RayTracerPanel(SceneModel model, Dimension sceneSize) {
-        this.sceneSize = sceneSize;
-        this.setPreferredSize(sceneSize);
-        rayTracer = new RayTracer(model, sceneSize);
+    public RayTracerPanel(Camera camera) {
+        this.camera = camera;
+        this.setPreferredSize(camera.getScreenResolution());
         final double rotationRate = -1 * 5 * Math.PI / 180; // rotation per
         // second
         Thread animationTimer = new Thread(new Runnable() {
@@ -35,7 +32,7 @@ public class RayTracerPanel extends JPanel {
                     theta = theta + dDeltaSec * rotationRate;
 
                     lastFrameTime = System.currentTimeMillis();
-                    BufferedImage img = rayTracer.traceScene(theta, theta,
+                    BufferedImage img = camera.captureImage(theta, theta,
                             0);
                     synchronized (paintLock) {
                         sceneFrame = img;
@@ -54,13 +51,13 @@ public class RayTracerPanel extends JPanel {
                 DescriptiveStatistics ds = new DescriptiveStatistics();
                 for (int i = 1; i < 10; i++) {
                     Stopwatch sw = Stopwatch.createStarted();
-                    sceneFrame = rayTracer.traceScene(-2.521, -2.521, 0);
+                    sceneFrame = camera.captureImage(-2.521, -2.521, 0);
                     ds.addValue(sw.elapsed(TimeUnit.MILLISECONDS));
                     System.out.println("Frame render time (ms): " + sw.elapsed(TimeUnit.MILLISECONDS));
                 }
                 System.out.println(ds);
             } else {
-                sceneFrame = rayTracer.traceScene(-2.521, -2.521, 0);
+                sceneFrame = camera.captureImage(-2.521, -2.521, 0);
             }
         }
     }
@@ -75,7 +72,7 @@ public class RayTracerPanel extends JPanel {
             return;
         }
 
-        Rectangle paintRect = calculateTargetRectangle(sceneSize);
+        Rectangle paintRect = calculateTargetRectangle(camera.getScreenResolution());
         Graphics2D g2d = (Graphics2D) g.create(paintRect.x, paintRect.y,
                 paintRect.width, paintRect.height);
 

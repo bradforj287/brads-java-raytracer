@@ -7,7 +7,10 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 import javax.swing.*;
+import com.bradforj287.raytracer.engine.RayTracer;
+import com.bradforj287.raytracer.engine.Tracer;
 import com.bradforj287.raytracer.geometry.*;
+import com.bradforj287.raytracer.model.Camera;
 import com.bradforj287.raytracer.model.SceneModel;
 import com.bradforj287.raytracer.utils.Utils;
 
@@ -40,9 +43,18 @@ public class MainEntry {
         //install bounding box
         shapes.addAll(boundingBoxTriangles);
 
+        // build model
         SceneModel model = new SceneModel(shapes);
 
-        RayTracerPanel r = new RayTracerPanel(model, ProgramArguments.SIZE_OF_SCENE);
+        // build camera
+        Vector3d eye = ProgramArguments.EYE_POSITION;
+        Dimension sceneRes = ProgramArguments.SIZE_OF_SCENE;
+        Vector3d screenPos = ProgramArguments.SCREEN_POSITION;
+        Tracer rayTracer = new RayTracer(model);
+
+        Camera camera = new Camera(eye, sceneRes, screenPos, rayTracer);
+
+        RayTracerPanel r = new RayTracerPanel(camera);
 
         frame.setContentPane(new JScrollPane(r));
         frame.setPreferredSize(ProgramArguments.SIZE_OF_WINDOW);
