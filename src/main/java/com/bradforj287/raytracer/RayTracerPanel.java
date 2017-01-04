@@ -49,7 +49,7 @@ public class RayTracerPanel extends JPanel {
         if (ProgramArguments.ROTATION_ON) {
             animationTimer.start();
         } else {
-            boolean perfTest = true;
+            boolean perfTest = false;
             if (perfTest) {
                 DescriptiveStatistics ds = new DescriptiveStatistics();
                 for (int i = 1; i < 10; i++) {

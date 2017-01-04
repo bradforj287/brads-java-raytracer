@@ -213,7 +213,7 @@ public class RayTracer {
         return ray.getDirection().subtract(normalToShape.multiply(dDotN));
     }
 
-    private int getColorForRay(final Ray3d ray, final int depth) {
+    private int getColorForRay(final Ray3d ray, int depth) {
         RayHitResult rayHitResult = doesRayHitAnyShape(ray);
 
         if (!rayHitResult.didHitShape()) {
@@ -227,9 +227,15 @@ public class RayTracer {
         Vector3d intersectLoc = ray.getPoint().add(ray.getDirection().multiply(t));
         Vector3d normalToShape = intersectShape.normalAtSurfacePoint(intersectLoc);
 
+        if (intersectSurface.isRefractive() && depth < MAX_RECURSE_DEPTH) {
+            double iof = intersectSurface.getIof();
+            Vector3d refractDir = getRefractionVector(ray.getDirection().toUnitVector(), normalToShape, iof);
+            Ray3d refractRay = Ray3d.createShiftedRay(intersectLoc, refractDir);
+            return getColorForRay(refractRay, depth + 1);
+        }
         if (intersectSurface.isReflective() && depth < MAX_RECURSE_DEPTH) {
             Vector3d reflectDir = getReflectionVector(ray, normalToShape);
-            Ray3d reflectRay = new Ray3d(intersectLoc, reflectDir);
+            Ray3d reflectRay = Ray3d.createShiftedRay(intersectLoc, reflectDir);
             return getColorForRay(reflectRay, depth + 1);
         } else {
             int color = intersectShape.getSurface().getColor();
@@ -252,9 +258,8 @@ public class RayTracer {
 
     private boolean isInShadow(Vector3d hitLoc, Vector3d lightLocation) {
         Vector3d directionToLight = lightLocation.subtract(hitLoc);
-        Ray3d shadowRay = new Ray3d(hitLoc, directionToLight);
+        Ray3d shadowRay = Ray3d.createShiftedRay(hitLoc, directionToLight);
         double tThatHitsLight = (lightLocation.x - hitLoc.x) / directionToLight.x;
-
         RayHitResult hitResult = doesRayHitAnyShape(shadowRay, tThatHitsLight);
         return hitResult.didHitShape();
     }
@@ -268,14 +273,12 @@ public class RayTracer {
     }
 
     private RayHitResult doesRayHitAnyShapeHelper(final Ray3d theRay, final double maxT) {
-        final double RAY_OFFSET = .0000001;
-        Ray3d rayToUse = theRay.shiftByT(RAY_OFFSET);
         final RayHitResult results = new RayHitResult();
         results.setT(maxT);
         final RayCastArguments rayCastArgs = new RayCastArguments();
 
-        SpacialStructureQueryStats queryStats = scene.visitPossibleIntersections(rayToUse, shape -> {
-            if (shape.isHitByRay(rayToUse, results.getT(),
+        SpacialStructureQueryStats queryStats = scene.visitPossibleIntersections(theRay, shape -> {
+            if (shape.isHitByRay(theRay, results.getT(),
                     rayCastArgs)) {
                 if (rayCastArgs.t < results.getT()) {
                     results.setT(rayCastArgs.t);
