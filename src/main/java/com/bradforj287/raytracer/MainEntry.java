@@ -30,8 +30,8 @@ public class MainEntry {
         Vector3d center = new Vector3d(60, 60, 60);
         Surface surface = new Surface();
         surface.setColor(Color.blue.getRGB());
-        //surface.setReflective(true);
-        surface.setIof(1.5);
+        surface.setReflective(true);
+        surface.setIof(1.31);
 
         Sphere3d refractiveSphere = new Sphere3d(center, 40, surface);
         shapes.add(refractiveSphere);

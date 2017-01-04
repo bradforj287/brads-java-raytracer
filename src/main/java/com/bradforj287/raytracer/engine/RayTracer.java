@@ -209,8 +209,12 @@ public class RayTracer {
     }
 
     private Vector3d getReflectionVector(final Ray3d ray, final Vector3d normalToShape) {
-        double dDotN = ray.getDirection().dot(normalToShape) * 2;
-        return ray.getDirection().subtract(normalToShape.multiply(dDotN));
+       return getReflectionVector(ray.getDirection(), normalToShape);
+    }
+
+    private Vector3d getReflectionVector(final Vector3d dir, final Vector3d normalToShape) {
+        double dDotN = dir.dot(normalToShape) * 2;
+        return dir.subtract(normalToShape.multiply(dDotN));
     }
 
     private class FresnelResult {
@@ -232,8 +236,7 @@ public class RayTracer {
         FresnelResult result = new FresnelResult();
         if (sint >= 1) {
             result.kr = 1;
-        }
-        else {
+        } else {
             double cost = Math.sqrt(Math.max(0.f, 1 - sint * sint));
             cosi = Math.abs(cosi);
             double Rs = ((etat * cosi) - (etai * cost)) / ((etat * cosi) + (etai * cost));
@@ -243,6 +246,25 @@ public class RayTracer {
         // As a consequence of the conservation of energy, transmittance is given by:
         result.kt = 1 - result.kr;
         return result;
+    }
+
+    private int getColorShadowAdusted(Shape3d intersectShape, Vector3d intersectLoc, Vector3d normalToShape, int depth) {
+        boolean canRecurseFurther = depth < MAX_RECURSE_DEPTH;
+        // color setting code
+        int color = intersectShape.getSurface().getColor();
+        Vector3d vectorToLight = ProgramArguments.LIGHT_LOCATION.subtract(intersectLoc).toUnitVector();
+
+        double angleBetweenNormalAndLight = normalToShape.dot(vectorToLight);
+
+        if (angleBetweenNormalAndLight < 0) {
+            angleBetweenNormalAndLight = 0;
+        } else if (canRecurseFurther && isInShadow(intersectLoc, ProgramArguments.LIGHT_LOCATION)) {
+            angleBetweenNormalAndLight = 0;
+        }
+
+        double colorscalar = ProgramArguments.AMBIENT_LIGHT + (1 - ProgramArguments.AMBIENT_LIGHT)
+                * (angleBetweenNormalAndLight * ProgramArguments.LIGHT_INTENSITY);
+        return scaleColor(colorscalar, color);
     }
 
     private int getColorForRay(final Ray3d ray, int depth) {
@@ -262,9 +284,27 @@ public class RayTracer {
 
         if (canRecurseFurther) {
             if (intersectSurface.isRefractive() && intersectSurface.isReflective()) {
+                int refractionColor = 0;
+                // compute fresnel
+                Vector3d dir = ray.getDirection().toUnitVector();
+                float kr;
+                FresnelResult fresnelResult = fresnel(dir, normalToShape, intersectSurface.getIof());
+                // compute refraction if it is not a case of total internal reflection
+                if (fresnelResult.kr < 1) {
+                    Vector3d refractionDirection = getRefractionVector(dir, normalToShape, intersectSurface.getIof()).toUnitVector();
+                    Ray3d fresnelRay = Ray3d.createShiftedRay(intersectLoc, refractionDirection);
+                    refractionColor = getColorForRay(fresnelRay, depth + 1);
+                }
 
-            }
-            else if (intersectSurface.isRefractive()) {
+                Vector3d reflectionDirection = getReflectionVector(dir, normalToShape).toUnitVector();
+                Ray3d reflectionRay = Ray3d.createShiftedRay(intersectLoc, reflectionDirection);
+                int reflectionColor = getColorForRay(reflectionRay, depth + 1);
+
+                Vector3d reflectColorVec = toColorVector(reflectionColor).multiply(fresnelResult.kr);
+                Vector3d refractColorVec = toColorVector(refractionColor).multiply(1 -fresnelResult.kr);
+
+                return fromColorVector(reflectColorVec.add(refractColorVec));
+            } else if (intersectSurface.isRefractive()) {
                 double iof = intersectSurface.getIof();
                 Vector3d refractDir = getRefractionVector(ray.getDirection().toUnitVector(), normalToShape, iof);
                 Ray3d refractRay = Ray3d.createShiftedRay(intersectLoc, refractDir);
@@ -275,24 +315,7 @@ public class RayTracer {
                 return getColorForRay(reflectRay, depth + 1);
             }
         }
-
-        // color setting code
-        int color = intersectShape.getSurface().getColor();
-        Vector3d vectorToLight = ProgramArguments.LIGHT_LOCATION.subtract(intersectLoc).toUnitVector();
-
-        double angleBetweenNormalAndLight = normalToShape.dot(vectorToLight);
-
-        if (angleBetweenNormalAndLight < 0) {
-            angleBetweenNormalAndLight = 0;
-        } else if (canRecurseFurther && isInShadow(intersectLoc, ProgramArguments.LIGHT_LOCATION)) {
-            angleBetweenNormalAndLight = 0;
-        }
-
-        double colorscalar = ProgramArguments.AMBIENT_LIGHT + (1 - ProgramArguments.AMBIENT_LIGHT)
-                * (angleBetweenNormalAndLight * ProgramArguments.LIGHT_INTENSITY);
-
-        return scaleColor(colorscalar, color);
-
+        return getColorShadowAdusted(intersectShape, intersectLoc, normalToShape, depth);
     }
 
     private boolean isInShadow(Vector3d hitLoc, Vector3d lightLocation) {
@@ -341,6 +364,27 @@ public class RayTracer {
         g.fillRect(0, 0, sceneResolution.width, sceneResolution.height);
     }
 
+    private int fromColorVector(Vector3d colorVec) {
+        int redChannel = (int) colorVec.x;
+        int greenChannel = (int) colorVec.y;
+        int blueChannel = (int) colorVec.z;
+        redChannel = redChannel << 16;
+        greenChannel = greenChannel << 8;
+        int colorToAssign = redChannel + greenChannel + blueChannel;
+        return colorToAssign;
+    }
+
+    private Vector3d toColorVector(int color) {
+        int mask = 0x00FFFFFF;
+        int redChannel = color & mask;
+        redChannel = redChannel >> 16;
+        mask = 0x0000FF00;
+        int greenChannel = color & mask;
+        greenChannel = greenChannel >> 8;
+        mask = 0x000000FF;
+        int blueChannel = color & mask;
+        return new Vector3d(redChannel, greenChannel, blueChannel);
+    }
     private int scaleColor(final double colorscalar, final int color) {
         int mask = 0x00FFFFFF;
         int redChannel = color & mask;
