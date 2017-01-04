@@ -200,7 +200,7 @@ public class RayTracer {
             n = N.multiply(-1);
         }
         double eta = etai / etat;
-        double k = 1 - (eta * eta )* (1 - (cosi * cosi));
+        double k = 1 - (eta * eta) * (1 - (cosi * cosi));
         if (k <= 0) {
             return Vector3d.ZERO;
         } else {
@@ -214,6 +214,7 @@ public class RayTracer {
     }
 
     private int getColorForRay(final Ray3d ray, int depth) {
+        final boolean canRecurseFurther = depth < MAX_RECURSE_DEPTH;
         RayHitResult rayHitResult = doesRayHitAnyShape(ray);
 
         if (!rayHitResult.didHitShape()) {
@@ -227,33 +228,36 @@ public class RayTracer {
         Vector3d intersectLoc = ray.getPoint().add(ray.getDirection().multiply(t));
         Vector3d normalToShape = intersectShape.normalAtSurfacePoint(intersectLoc);
 
-        if (intersectSurface.isRefractive() && depth < MAX_RECURSE_DEPTH) {
-            double iof = intersectSurface.getIof();
-            Vector3d refractDir = getRefractionVector(ray.getDirection().toUnitVector(), normalToShape, iof);
-            Ray3d refractRay = Ray3d.createShiftedRay(intersectLoc, refractDir);
-            return getColorForRay(refractRay, depth + 1);
-        }
-        if (intersectSurface.isReflective() && depth < MAX_RECURSE_DEPTH) {
-            Vector3d reflectDir = getReflectionVector(ray, normalToShape);
-            Ray3d reflectRay = Ray3d.createShiftedRay(intersectLoc, reflectDir);
-            return getColorForRay(reflectRay, depth + 1);
-        } else {
-            int color = intersectShape.getSurface().getColor();
-            Vector3d vectorToLight = ProgramArguments.LIGHT_LOCATION.subtract(intersectLoc).toUnitVector();
-
-            double angleBetweenNormalAndLight = normalToShape.dot(vectorToLight);
-
-            if (angleBetweenNormalAndLight < 0) {
-                angleBetweenNormalAndLight = 0;
-            } else if (isInShadow(intersectLoc, ProgramArguments.LIGHT_LOCATION)) {
-                angleBetweenNormalAndLight = 0;
+        if (canRecurseFurther) {
+            if (intersectSurface.isRefractive() && depth < MAX_RECURSE_DEPTH) {
+                double iof = intersectSurface.getIof();
+                Vector3d refractDir = getRefractionVector(ray.getDirection().toUnitVector(), normalToShape, iof);
+                Ray3d refractRay = Ray3d.createShiftedRay(intersectLoc, refractDir);
+                return getColorForRay(refractRay, depth + 1);
+            } else if (intersectSurface.isReflective() && depth < MAX_RECURSE_DEPTH) {
+                Vector3d reflectDir = getReflectionVector(ray, normalToShape);
+                Ray3d reflectRay = Ray3d.createShiftedRay(intersectLoc, reflectDir);
+                return getColorForRay(reflectRay, depth + 1);
             }
-
-            double colorscalar = ProgramArguments.AMBIENT_LIGHT + (1 - ProgramArguments.AMBIENT_LIGHT)
-                    * (angleBetweenNormalAndLight * ProgramArguments.LIGHT_INTENSITY);
-
-            return scaleColor(colorscalar, color);
         }
+
+        // color setting code
+        int color = intersectShape.getSurface().getColor();
+        Vector3d vectorToLight = ProgramArguments.LIGHT_LOCATION.subtract(intersectLoc).toUnitVector();
+
+        double angleBetweenNormalAndLight = normalToShape.dot(vectorToLight);
+
+        if (angleBetweenNormalAndLight < 0) {
+            angleBetweenNormalAndLight = 0;
+        } else if (canRecurseFurther && isInShadow(intersectLoc, ProgramArguments.LIGHT_LOCATION)) {
+            angleBetweenNormalAndLight = 0;
+        }
+
+        double colorscalar = ProgramArguments.AMBIENT_LIGHT + (1 - ProgramArguments.AMBIENT_LIGHT)
+                * (angleBetweenNormalAndLight * ProgramArguments.LIGHT_INTENSITY);
+
+        return scaleColor(colorscalar, color);
+
     }
 
     private boolean isInShadow(Vector3d hitLoc, Vector3d lightLocation) {
