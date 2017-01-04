@@ -7,10 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.StringTokenizer;
-import com.bradforj287.raytracer.geometry.Shape3d;
-import com.bradforj287.raytracer.geometry.Surface;
-import com.bradforj287.raytracer.geometry.Triangle3d;
-import com.bradforj287.raytracer.geometry.Vector3d;
+import com.bradforj287.raytracer.geometry.*;
 
 public class ObjFileParser {
 
@@ -47,7 +44,7 @@ public class ObjFileParser {
                     Vector3d v2 = new Vector3d(verticies.get(j));
                     Vector3d v3 = new Vector3d(verticies.get(k));
                     Surface surface = new Surface();
-                    surface.setColor(123123);
+                    surface.setColor(RgbColor.fromInt(123123));
                     Triangle3d tri = new Triangle3d(v1, v2, v3, surface);
                     r.add(tri.getFlippedNormal());
                 }

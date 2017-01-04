@@ -2,9 +2,8 @@ package com.bradforj287.raytracer.geometry;
 
 public class Surface {
     private boolean isReflective;
-    private int color;
     private Double iof;
-
+    private RgbColor color;
     public boolean isRefractive() {
         return iof != null;
     }
@@ -25,11 +24,11 @@ public class Surface {
         isReflective = reflective;
     }
 
-    public int getColor() {
+    public RgbColor getColor() {
         return color;
     }
 
-    public void setColor(int color) {
+    public void setColor(RgbColor color) {
         this.color = color;
     }
 }

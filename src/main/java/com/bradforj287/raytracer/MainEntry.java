@@ -29,7 +29,7 @@ public class MainEntry {
         //test reflective sphere
         Vector3d center = new Vector3d(60, 60, 60);
         Surface surface = new Surface();
-        surface.setColor(Color.blue.getRGB());
+        surface.setColor(RgbColor.fromInt(Color.blue.getRGB()));
         surface.setReflective(true);
         surface.setIof(1.31);
 
@@ -70,7 +70,7 @@ public class MainEntry {
             double rad = radSpan * random.nextDouble() + minRadius;
 
             Surface surface = new Surface();
-            surface.setColor(random.nextInt());
+            surface.setColor(RgbColor.fromInt(random.nextInt()));
 
             Sphere3d sphere3d = new Sphere3d(center, rad, surface);
             sphere3ds.add(sphere3d);
@@ -80,7 +80,7 @@ public class MainEntry {
 
     private static Surface color2Surface(int color) {
         Surface surface = new Surface();
-        surface.setColor(color);
+        surface.setColor(RgbColor.fromInt(color));
         return surface;
     }
     private static List<Triangle3d> getBoundingBox() {

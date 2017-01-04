@@ -162,7 +162,7 @@ public class RayTracer {
                     Vector3d eyeDirection = pointOnScreen.subtract(eyePosition);
 
                     Ray3d ray = new Ray3d(eyePosition, eyeDirection);
-                    int color = getColorForRay(ray, 0);
+                    int color = getColorForRay(ray, 0).asInt();
 
                     Color c = new Color(color);
                     aveR = aveR + c.getRed();
@@ -248,10 +248,9 @@ public class RayTracer {
         return result;
     }
 
-    private int getColorShadowAdusted(Shape3d intersectShape, Vector3d intersectLoc, Vector3d normalToShape, int depth) {
+    private RgbColor getColorShadowAdusted(Shape3d intersectShape, Vector3d intersectLoc, Vector3d normalToShape, int depth) {
         boolean canRecurseFurther = depth < MAX_RECURSE_DEPTH;
-        // color setting code
-        int color = intersectShape.getSurface().getColor();
+        RgbColor color = intersectShape.getSurface().getColor();
         Vector3d vectorToLight = ProgramArguments.LIGHT_LOCATION.subtract(intersectLoc).toUnitVector();
 
         double angleBetweenNormalAndLight = normalToShape.dot(vectorToLight);
@@ -264,15 +263,15 @@ public class RayTracer {
 
         double colorscalar = ProgramArguments.AMBIENT_LIGHT + (1 - ProgramArguments.AMBIENT_LIGHT)
                 * (angleBetweenNormalAndLight * ProgramArguments.LIGHT_INTENSITY);
-        return scaleColor(colorscalar, color);
+        return color.scale(colorscalar);
     }
 
-    private int getColorForRay(final Ray3d ray, int depth) {
+    private RgbColor getColorForRay(final Ray3d ray, int depth) {
         final boolean canRecurseFurther = depth < MAX_RECURSE_DEPTH;
         RayHitResult rayHitResult = doesRayHitAnyShape(ray);
 
         if (!rayHitResult.didHitShape()) {
-            return 0; // doesn't hit anything.
+            return RgbColor.BLACK; // doesn't hit anything.
         }
 
         Shape3d intersectShape = rayHitResult.getShape();
@@ -284,7 +283,7 @@ public class RayTracer {
 
         if (canRecurseFurther) {
             if (intersectSurface.isRefractive() && intersectSurface.isReflective()) {
-                int refractionColor = 0;
+                RgbColor refractionColor = RgbColor.BLACK;
                 // compute fresnel
                 Vector3d dir = ray.getDirection().toUnitVector();
                 float kr;
@@ -298,12 +297,12 @@ public class RayTracer {
 
                 Vector3d reflectionDirection = getReflectionVector(dir, normalToShape).toUnitVector();
                 Ray3d reflectionRay = Ray3d.createShiftedRay(intersectLoc, reflectionDirection);
-                int reflectionColor = getColorForRay(reflectionRay, depth + 1);
+                RgbColor reflectionColor = getColorForRay(reflectionRay, depth + 1);
 
-                Vector3d reflectColorVec = toColorVector(reflectionColor).multiply(fresnelResult.kr);
-                Vector3d refractColorVec = toColorVector(refractionColor).multiply(1 -fresnelResult.kr);
+                RgbColor reflectColorVec = reflectionColor.scale(fresnelResult.kr);
+                RgbColor refractColorVec = refractionColor.scale(1 -fresnelResult.kr);
 
-                return fromColorVector(reflectColorVec.add(refractColorVec));
+                return reflectColorVec.add(refractColorVec);
             } else if (intersectSurface.isRefractive()) {
                 double iof = intersectSurface.getIof();
                 Vector3d refractDir = getRefractionVector(ray.getDirection().toUnitVector(), normalToShape, iof);
@@ -362,55 +361,5 @@ public class RayTracer {
         g.setBackground(Color.red);
         g.setColor(Color.black);
         g.fillRect(0, 0, sceneResolution.width, sceneResolution.height);
-    }
-
-    private int fromColorVector(Vector3d colorVec) {
-        int redChannel = (int) colorVec.x;
-        int greenChannel = (int) colorVec.y;
-        int blueChannel = (int) colorVec.z;
-        redChannel = redChannel << 16;
-        greenChannel = greenChannel << 8;
-        int colorToAssign = redChannel + greenChannel + blueChannel;
-        return colorToAssign;
-    }
-
-    private Vector3d toColorVector(int color) {
-        int mask = 0x00FFFFFF;
-        int redChannel = color & mask;
-        redChannel = redChannel >> 16;
-        mask = 0x0000FF00;
-        int greenChannel = color & mask;
-        greenChannel = greenChannel >> 8;
-        mask = 0x000000FF;
-        int blueChannel = color & mask;
-        return new Vector3d(redChannel, greenChannel, blueChannel);
-    }
-    private int scaleColor(final double colorscalar, final int color) {
-        int mask = 0x00FFFFFF;
-        int redChannel = color & mask;
-        redChannel = redChannel >> 16;
-
-        mask = 0x0000FF00;
-        int greenChannel = color & mask;
-
-        greenChannel = greenChannel >> 8;
-
-        mask = 0x000000FF;
-        int blueChannel = color & mask;
-
-        double nRed = colorscalar * ((double) redChannel);
-        double nGreen = colorscalar * ((double) greenChannel);
-        double nBlue = colorscalar * ((double) blueChannel);
-
-        redChannel = (int) nRed;
-        greenChannel = (int) nGreen;
-        blueChannel = (int) nBlue;
-
-        redChannel = redChannel << 16;
-        greenChannel = greenChannel << 8;
-
-        int colorToAssign = redChannel + greenChannel + blueChannel;
-
-        return colorToAssign;
     }
 }
