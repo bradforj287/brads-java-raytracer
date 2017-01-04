@@ -9,6 +9,11 @@ public class Ray3d {
         this.direction = direction;
     }
 
+    public Ray3d shiftByT(double t) {
+        Vector3d newPoint = point.add(direction.multiply(t));
+        return new Ray3d(newPoint, direction);
+    }
+
     public Vector3d getPoint() {
         return point;
     }

@@ -183,6 +183,31 @@ public class RayTracer {
         }
     }
 
+    private static double clamp(double val, double min, double max) {
+        return Math.max(min, Math.min(max, val));
+    }
+
+    private Vector3d getRefractionVector(Vector3d I, Vector3d N, final double ior) {
+        double cosi = clamp(-1, 1, I.dot(N));
+        double etai = 1, etat = ior;
+        Vector3d n = N;
+        if (cosi < 0) {
+            cosi = -cosi;
+        } else {
+            double temp = etai;
+            etai = etat;
+            etat = temp;
+            n = N.multiply(-1);
+        }
+        double eta = etai / etat;
+        double k = 1 - (eta * eta )* (1 - (cosi * cosi));
+        if (k <= 0) {
+            return Vector3d.ZERO;
+        } else {
+            return I.multiply(eta).add(n.multiply(((eta * cosi) - Math.sqrt(k))));
+        }
+    }
+
     private Vector3d getReflectionVector(Ray3d ray, Vector3d normalToShape) {
         double dDotN = ray.getDirection().dot(normalToShape) * 2;
         return ray.getDirection().subtract(normalToShape.multiply(dDotN));

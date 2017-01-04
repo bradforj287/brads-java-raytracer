@@ -9,6 +9,7 @@ import org.apache.commons.lang3.reflect.FieldUtils;
  * @author brad
  */
 public class Vector3d {
+    public static Vector3d ZERO = new Vector3d(0, 0, 0);
     public final double x;
     public final double y;
     public final double z;
@@ -46,11 +47,11 @@ public class Vector3d {
     }
 
     public Vector3d multiply(double a) {
-        return new Vector3d(this.x*a, this.y*a, this.z*a);
+        return new Vector3d(this.x * a, this.y * a, this.z * a);
     }
 
     public Vector3d add(Vector3d v) {
-        return new Vector3d(this.x + v.x, this.y + v.y, + this.z + v.z);
+        return new Vector3d(this.x + v.x, this.y + v.y, +this.z + v.z);
     }
 
     public double dot(Vector3d b) {
@@ -95,6 +96,10 @@ public class Vector3d {
         double y1 = result[1];
         double z1 = result[2];
         return new Vector3d(x1, y1, z1);
+    }
+
+    public Vector3d flippedInOtherDiretion() {
+        return this.multiply(-1);
     }
 
     public double getCoordiateByAxis(final Axis axis) {

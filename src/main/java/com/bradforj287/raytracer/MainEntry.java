@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import javax.swing.*;
 import com.bradforj287.raytracer.geometry.*;
 import com.bradforj287.raytracer.model.SceneModel;
-import com.bradforj287.raytracer.parser.ObjFileParser;
 import com.bradforj287.raytracer.utils.Utils;
 
 public class MainEntry {
@@ -28,10 +27,10 @@ public class MainEntry {
         shapes.addAll(genRandomSpheres(200, min, max, 20, 100));
 
         //test reflective sphere
-        Vector3d center = new Vector3d(50, 50, 50);
+        Vector3d center = new Vector3d(60, 60, 60);
         Surface surface = new Surface();
-        surface.setColor(1212);
-        surface.setReflective(true);
+        surface.setColor(Color.blue.getRGB());
+        surface.setIof(1.5);
 
         Sphere3d reflectiveSphere = new Sphere3d(center, 40, surface);
         shapes.add(reflectiveSphere);
@@ -87,7 +86,7 @@ public class MainEntry {
         List<Triangle3d> scene = new ArrayList<>();
         // create cube vertices
 
-        double cubeWidth = 2000;
+        double cubeWidth = 5000;
 
         int boundingColor = Color.blue.darker().getRGB();
 
