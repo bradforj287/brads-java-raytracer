@@ -213,6 +213,38 @@ public class RayTracer {
         return ray.getDirection().subtract(normalToShape.multiply(dDotN));
     }
 
+    private class FresnelResult {
+        private double kt;
+        private double kr;
+    }
+
+    private FresnelResult fresnel(final Vector3d I, final Vector3d N, final double ior) {
+        double cosi = clamp(-1, 1, I.dot(N));
+        double etai = 1, etat = ior;
+        if (cosi > 0) {
+            double temp = etai;
+            etai = etat;
+            etat = temp;
+        }
+        // Compute sini using Snell's law
+        double sint = etai / etat * Math.sqrt(Math.max(0.f, 1 - cosi * cosi));
+        // Total internal reflection
+        FresnelResult result = new FresnelResult();
+        if (sint >= 1) {
+            result.kr = 1;
+        }
+        else {
+            double cost = Math.sqrt(Math.max(0.f, 1 - sint * sint));
+            cosi = Math.abs(cosi);
+            double Rs = ((etat * cosi) - (etai * cost)) / ((etat * cosi) + (etai * cost));
+            double Rp = ((etai * cosi) - (etat * cost)) / ((etai * cosi) + (etat * cost));
+            result.kr = (Rs * Rs + Rp * Rp) / 2;
+        }
+        // As a consequence of the conservation of energy, transmittance is given by:
+        result.kt = 1 - result.kr;
+        return result;
+    }
+
     private int getColorForRay(final Ray3d ray, int depth) {
         final boolean canRecurseFurther = depth < MAX_RECURSE_DEPTH;
         RayHitResult rayHitResult = doesRayHitAnyShape(ray);
@@ -229,12 +261,15 @@ public class RayTracer {
         Vector3d normalToShape = intersectShape.normalAtSurfacePoint(intersectLoc);
 
         if (canRecurseFurther) {
-            if (intersectSurface.isRefractive() && depth < MAX_RECURSE_DEPTH) {
+            if (intersectSurface.isRefractive() && intersectSurface.isReflective()) {
+
+            }
+            else if (intersectSurface.isRefractive()) {
                 double iof = intersectSurface.getIof();
                 Vector3d refractDir = getRefractionVector(ray.getDirection().toUnitVector(), normalToShape, iof);
                 Ray3d refractRay = Ray3d.createShiftedRay(intersectLoc, refractDir);
                 return getColorForRay(refractRay, depth + 1);
-            } else if (intersectSurface.isReflective() && depth < MAX_RECURSE_DEPTH) {
+            } else if (intersectSurface.isReflective()) {
                 Vector3d reflectDir = getReflectionVector(ray, normalToShape);
                 Ray3d reflectRay = Ray3d.createShiftedRay(intersectLoc, reflectDir);
                 return getColorForRay(reflectRay, depth + 1);
