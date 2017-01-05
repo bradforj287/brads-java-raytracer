@@ -1,6 +1,16 @@
 # brads-java-raytracer
-A ray tracer written in java. This is code that I originally wrote for a school project in 2006. 
-I have ported it to Java and made it public.
+A ray tracer written in java.
+
+###Key Features:
+* Flexible object oriented data model
+* Triangle meshes and spheres
+* Anti aliasing
+* Shadows
+* Refraction
+* Reflection
+* Fresnel effect
+* KD Tree with SAH (Surface Area Heuristic) splitting. 
+* Multithreaded rendering
 
 # requirements
 1. java 1.8 or higher

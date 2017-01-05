@@ -8,7 +8,7 @@ public class ProgramArguments {
 
     // UI Arguments for window sizing
     public static final Dimension SIZE_OF_WINDOW = new Dimension(320, 240);
-    public static final Dimension SIZE_OF_SCENE = new Dimension(800, 600);
+    public static final Dimension SIZE_OF_SCENE = new Dimension(320, 240);
 
     // Ray tracing arguments
     public final static Vector3d EYE_POSITION = new Vector3d(0, 0, 300);
