@@ -17,6 +17,6 @@ public class ProgramArguments {
     public final static double SCREEN_HEIGHT = 6;
     public final static double AMBIENT_LIGHT = .20;
     public final static double LIGHT_INTENSITY = 1.0;
-    public final static int ANTIALIASING_SAMPLES = 1;
+    public final static int ANTIALIASING_SAMPLES = 8;
     public final static Vector3d LIGHT_LOCATION = new Vector3d(300, 200, 200);
 }
