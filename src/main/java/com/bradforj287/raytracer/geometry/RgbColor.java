@@ -7,6 +7,13 @@ public class RgbColor {
     public final double g;
     public final double b;
 
+    public RgbColor(int rgb) {
+        RgbColor c = fromInt(rgb);
+        this.r = c.r;
+        this.g = c.g;
+        this.b = c.b;
+    }
+
     public RgbColor(double r, double g, double b) {
         this.r = r;
         this.g = g;

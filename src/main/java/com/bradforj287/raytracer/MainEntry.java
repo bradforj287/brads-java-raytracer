@@ -30,11 +30,23 @@ public class MainEntry {
         shapes.addAll(genRandomSpheres(200, min, max, 20, 100));
 
         //test reflective sphere
-        Vector3d center = new Vector3d(60, 60, 60);
+        Vector3d center = new Vector3d(0, 400, 0);
         Surface surface = new Surface();
         surface.setColor(RgbColor.fromInt(Color.blue.getRGB()));
+        surface.setIof(1.5);
+
+        double distance = 1000;
+       /** shapes.add(new Sphere3d(new Vector3d(0, -1 * distance, 0), 40, new Surface(new RgbColor(Color.red.getRGB()))));
+        shapes.add(new Sphere3d(new Vector3d(0,  distance, 0), 40, new Surface(new RgbColor(Color.pink.getRGB()))));
+
+        shapes.add(new Sphere3d(new Vector3d(distance,  0, 0), 40, new Surface(new RgbColor(Color.green.getRGB()))));
+        shapes.add(new Sphere3d(new Vector3d(-1*distance,  0, 0), 40, new Surface(new RgbColor(Color.LIGHT_GRAY.getRGB()))));
+
+        shapes.add(new Sphere3d(new Vector3d(0,  0, -distance), 1000, new Surface(new RgbColor(Color.orange.getRGB()))));*/
+
+
         //surface.setReflective(true);
-        surface.setIof(1.31);
+        //surface.setIof(1.31);
 
         Sphere3d refractiveSphere = new Sphere3d(center, 40, surface);
         shapes.add(refractiveSphere);
@@ -47,12 +59,12 @@ public class MainEntry {
         SceneModel model = new SceneModel(shapes);
 
         // build camera
-        Vector3d eye = ProgramArguments.EYE_POSITION;
         Dimension sceneRes = ProgramArguments.SIZE_OF_SCENE;
-        Vector3d screenPos = ProgramArguments.SCREEN_POSITION;
+        Vector3d screenPos = ProgramArguments.DEFAULT_SCREEN_POSITION;
         Tracer rayTracer = new RayTracer(model);
 
-        Camera camera = new Camera(eye, sceneRes, screenPos, rayTracer);
+        Camera camera = new Camera(sceneRes, rayTracer);
+        camera.setScreenPosition(ProgramArguments.DEFAULT_SCREEN_POSITION);
 
         RayTracerPanel r = new RayTracerPanel(camera);
 

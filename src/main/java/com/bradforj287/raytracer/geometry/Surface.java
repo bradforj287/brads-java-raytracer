@@ -8,6 +8,13 @@ public class Surface {
         return iof != null;
     }
 
+    public Surface() {
+    }
+
+    public Surface(RgbColor color) {
+        this.color = color;
+    }
+
     public Double getIof() {
         return iof;
     }

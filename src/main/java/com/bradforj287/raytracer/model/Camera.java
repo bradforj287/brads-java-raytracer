@@ -12,7 +12,6 @@ import com.bradforj287.raytracer.geometry.Vector3d;
 import com.bradforj287.raytracer.utils.VideoDataPointBuffer;
 
 public class Camera {
-    private Vector3d eye;
     private Dimension screenResolution;
     private Vector3d screenPosition;
     private Tracer tracer;
@@ -23,11 +22,10 @@ public class Camera {
 
     private VideoDataPointBuffer fpsBuffer = new VideoDataPointBuffer();
 
-    public Camera(Vector3d eye, Dimension screenResolution, Vector3d screenPosition, Tracer tracer) {
-        this.eye = eye;
+    public Camera(Dimension screenResolution, Tracer tracer) {
         this.screenResolution = screenResolution;
-        this.screenPosition = screenPosition;
         this.tracer = tracer;
+        this.screenPosition = Vector3d.ZERO;
         this.rotation = Matrix3d.IDENTITY;
     }
 
@@ -120,7 +118,7 @@ public class Camera {
         drawString(g2d, "FPS=" + fpsString, 10, 10);
 
         // print rotation
-        drawString(g2d, "rX=" + Double.toString(thetax), 10, 20);
+         drawString(g2d, "rX=" + Double.toString(thetax), 10, 20);
         drawString(g2d, "rY=" + Double.toString(thetay), 10, 30);
         drawString(g2d, "rZ=" + Double.toString(thetaz), 10, 40);
 
@@ -151,7 +149,6 @@ public class Camera {
         // iterate over all pixels in resolution
         for (int i = region.x; i < region.x + region.width; i++) {
             for (int j = 0; j < region.height; j++) {
-
                 int aveR = 0;
                 int aveG = 0;
                 int aveB = 0;
@@ -170,12 +167,16 @@ public class Camera {
 
                     // calculate pointOnScreen and eyePoint
                     Vector3d pointOnScreen = new Vector3d(xStart + i * xIncrement + xOffset,
-                            yStart + j * yIncrement + yOffset, this.screenPosition.z);
-                    Vector3d eyePosition = new Vector3d(ProgramArguments.EYE_POSITION);
+                            yStart + j * yIncrement + yOffset, 0);
+                    Vector3d eyePosition = new Vector3d(0, 0, ProgramArguments.EYE_CAMERA_DISTANCE);
 
                     // rotate both points according to theta
                     pointOnScreen = pointOnScreen.multiplyByMatrix(rotation);
                     eyePosition = eyePosition.multiplyByMatrix(rotation);
+
+                    // move to screen position
+                    pointOnScreen = pointOnScreen.add(ProgramArguments.DEFAULT_SCREEN_POSITION);
+                    eyePosition = eyePosition.add(ProgramArguments.DEFAULT_SCREEN_POSITION);
 
                     // calculate view ray
                     Vector3d eyeDirection = pointOnScreen.subtract(eyePosition);
@@ -197,25 +198,15 @@ public class Camera {
                 aveA = aveA / ProgramArguments.ANTIALIASING_SAMPLES;
 
                 Color c1 = new Color(aveR, aveG, aveB, aveA);
-                image.setRGB(i, j, c1.getRGB());
+                //set screen coordiates. Need to mirror on y axis for output to buffered image
+                int si = (screenResolution.width -1) - i;
+                image.setRGB(si, j, c1.getRGB());
             }
         }
     }
 
-    public Vector3d getEye() {
-        return eye;
-    }
-
-    public void setEye(Vector3d eye) {
-        this.eye = eye;
-    }
-
     public Dimension getScreenResolution() {
         return screenResolution;
-    }
-
-    public void setScreenResolution(Dimension screenResolution) {
-        this.screenResolution = screenResolution;
     }
 
     public Vector3d getScreenPosition() {
@@ -228,10 +219,6 @@ public class Camera {
 
     public Tracer getTracer() {
         return tracer;
-    }
-
-    public void setTracer(Tracer tracer) {
-        this.tracer = tracer;
     }
 
     public VideoDataPointBuffer getFpsBuffer() {
