@@ -32,8 +32,8 @@ public class RayTracerPanel extends JPanel {
                     theta = theta + dDeltaSec * rotationRate;
 
                     lastFrameTime = System.currentTimeMillis();
-                    BufferedImage img = camera.captureImage(theta, theta,
-                            0);
+                    camera.setCurrentRotation(theta, theta, 0);
+                    BufferedImage img = camera.captureImage();
                     synchronized (paintLock) {
                         sceneFrame = img;
                     }
@@ -51,13 +51,15 @@ public class RayTracerPanel extends JPanel {
                 DescriptiveStatistics ds = new DescriptiveStatistics();
                 for (int i = 1; i < 10; i++) {
                     Stopwatch sw = Stopwatch.createStarted();
-                    sceneFrame = camera.captureImage(-2.521, -2.521, 0);
+                    camera.setCurrentRotation(-2.521, -2.521, 0);
+                    sceneFrame = camera.captureImage();
                     ds.addValue(sw.elapsed(TimeUnit.MILLISECONDS));
                     System.out.println("Frame render time (ms): " + sw.elapsed(TimeUnit.MILLISECONDS));
                 }
                 System.out.println(ds);
             } else {
-                sceneFrame = camera.captureImage(-2.521, -2.521, 0);
+                camera.setCurrentRotation(-2.521, -2.521, 0);
+                sceneFrame = camera.captureImage();
             }
         }
     }

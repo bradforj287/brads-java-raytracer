@@ -1,6 +1,7 @@
 package com.bradforj287.raytracer.geometry;
 
 public class Matrix3d {
+    public static final Matrix3d IDENTITY = getIdentityMatrix();
     public double[][] matrix = new double[4][4];
 
     public Matrix3d() {
@@ -13,6 +14,12 @@ public class Matrix3d {
                 matrix[i][j] = 0;
             }
         }
+    }
+
+    public static Matrix3d getIdentityMatrix() {
+        Matrix3d matrix3d = new Matrix3d();
+        matrix3d.identity();
+        return matrix3d;
     }
 
     public void identity() {
