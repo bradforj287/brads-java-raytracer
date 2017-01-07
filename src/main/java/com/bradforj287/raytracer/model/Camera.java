@@ -12,9 +12,9 @@ import com.bradforj287.raytracer.geometry.Vector3d;
 import com.bradforj287.raytracer.utils.VideoDataPointBuffer;
 
 public class Camera {
-    private Dimension screenResolution;
+    final private Dimension screenResolution;
     private Vector3d screenPosition;
-    private Tracer tracer;
+    final private Tracer tracer;
     private Matrix3d rotation;
     private double thetax = 0;
     private double thetay = 0;
@@ -29,7 +29,7 @@ public class Camera {
         this.rotation = Matrix3d.IDENTITY;
     }
 
-    public void setCurrentRotation(final double thetax, final double thetay, final double thetaz) {
+    public void setRotation(final double thetax, final double thetay, final double thetaz) {
         this.thetax = thetax;
         this.thetay = thetay;
         this.thetaz = thetaz;
@@ -86,7 +86,7 @@ public class Camera {
             // create the worker thread
             Thread traceThread = new Thread(() -> {
                 iterateOverScreenRegion(image, threadRect, xIncrement,
-                        yIncrement, xstart, ystart);
+                        yIncrement, xstart, ystart, screenPosition, rotation);
             });
 
             tracePool.add(traceThread);
@@ -143,7 +143,9 @@ public class Camera {
      * purpose of this is to distribute across threads.
      */
     private void iterateOverScreenRegion(BufferedImage image, Rectangle region,
-                                         double xIncrement, double yIncrement, double xStart, double yStart) {
+                                         double xIncrement, double yIncrement,
+                                         double xStart, double yStart,
+                                         Vector3d screenPos, Matrix3d screenRotation) {
         Random rand = new Random();
 
         // iterate over all pixels in resolution
@@ -171,12 +173,12 @@ public class Camera {
                     Vector3d eyePosition = new Vector3d(0, 0, ProgramArguments.EYE_CAMERA_DISTANCE);
 
                     // rotate both points according to theta
-                    pointOnScreen = pointOnScreen.multiplyByMatrix(rotation);
-                    eyePosition = eyePosition.multiplyByMatrix(rotation);
+                    pointOnScreen = pointOnScreen.multiplyByMatrix(screenRotation);
+                    eyePosition = eyePosition.multiplyByMatrix(screenRotation);
 
                     // move to screen position
-                    pointOnScreen = pointOnScreen.add(ProgramArguments.DEFAULT_SCREEN_POSITION);
-                    eyePosition = eyePosition.add(ProgramArguments.DEFAULT_SCREEN_POSITION);
+                    pointOnScreen = pointOnScreen.add(screenPos);
+                    eyePosition = eyePosition.add(screenPos);
 
                     // calculate view ray
                     Vector3d eyeDirection = pointOnScreen.subtract(eyePosition);
