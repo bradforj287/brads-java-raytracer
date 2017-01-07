@@ -66,8 +66,10 @@ public class MainEntry {
         Camera camera = new Camera(sceneRes, rayTracer);
         camera.setScreenPosition(ProgramArguments.DEFAULT_SCREEN_POSITION);
 
-        RayTracerPanel r = new RayTracerPanel(camera);
-
+        CameraViewPanel r = new CameraViewPanel(camera);
+        r.renderFrame();
+        r.rotate(-1 * Math.PI/2, 0, 0);
+        r.renderFrame();
         frame.setContentPane(new JScrollPane(r));
         frame.setPreferredSize(ProgramArguments.SIZE_OF_WINDOW);
 
