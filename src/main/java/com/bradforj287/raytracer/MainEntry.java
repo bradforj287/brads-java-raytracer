@@ -12,6 +12,8 @@ import com.bradforj287.raytracer.engine.Tracer;
 import com.bradforj287.raytracer.geometry.*;
 import com.bradforj287.raytracer.model.Camera;
 import com.bradforj287.raytracer.model.SceneModel;
+import com.bradforj287.raytracer.ui.CameraControlPanel;
+import com.bradforj287.raytracer.ui.CameraViewPanel;
 import com.bradforj287.raytracer.utils.Utils;
 
 public class MainEntry {
@@ -57,20 +59,10 @@ public class MainEntry {
 
         // build model
         SceneModel model = new SceneModel(shapes);
-
-        // build camera
-        Dimension sceneRes = ProgramArguments.SIZE_OF_SCENE;
-        Vector3d screenPos = ProgramArguments.DEFAULT_SCREEN_POSITION;
         Tracer rayTracer = new RayTracer(model);
 
-        Camera camera = new Camera(sceneRes, rayTracer);
-        camera.setScreenPosition(ProgramArguments.DEFAULT_SCREEN_POSITION);
-
-        CameraViewPanel r = new CameraViewPanel(camera);
-        r.renderFrame();
-        r.rotate(-1 * Math.PI/2, 0, 0);
-        r.renderFrame();
-        frame.setContentPane(new JScrollPane(r));
+        CameraControlPanel r = new CameraControlPanel(rayTracer);
+        frame.setContentPane(r);
         frame.setPreferredSize(ProgramArguments.SIZE_OF_WINDOW);
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

@@ -1,10 +1,9 @@
-package com.bradforj287.raytracer;
+package com.bradforj287.raytracer.ui;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
-import com.bradforj287.raytracer.geometry.Vector3d;
 import com.bradforj287.raytracer.model.Camera;
 import com.bradforj287.raytracer.utils.MathUtils;
 
@@ -20,14 +19,6 @@ public class CameraViewPanel extends JPanel {
     public CameraViewPanel(Camera camera) {
         this.camera = camera;
         this.setPreferredSize(camera.getScreenResolution());
-    }
-
-    public void setCameraPosition(Vector3d cameraPosition) {
-        this.camera.setScreenPosition(cameraPosition);
-    }
-
-    public void rotate(double tx, double ty, double tz) {
-        camera.setRotation(tx, ty, tz);
     }
 
     public void renderFrame() {
