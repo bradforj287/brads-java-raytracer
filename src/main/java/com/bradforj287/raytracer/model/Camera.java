@@ -4,6 +4,9 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import com.bradforj287.raytracer.ProgramArguments;
 import com.bradforj287.raytracer.engine.Tracer;
 import com.bradforj287.raytracer.geometry.Matrix3d;
@@ -12,6 +15,13 @@ import com.bradforj287.raytracer.geometry.Vector3d;
 import com.bradforj287.raytracer.utils.VideoDataPointBuffer;
 
 public class Camera {
+    private static int NUM_THREADS = Runtime.getRuntime().availableProcessors();
+    private static ExecutorService executorService;
+
+    static {
+        executorService = Executors.newFixedThreadPool(NUM_THREADS);
+    }
+
     final private Dimension screenResolution;
     private Vector3d screenPosition;
     final private Tracer tracer;
@@ -70,47 +80,41 @@ public class Camera {
         // first clear the screen to the background color
         clearImage(image);
 
-        final int numCores = Runtime.getRuntime().availableProcessors();
-
         // create some arguments for the trace call
         final double xIncrement = ProgramArguments.SCREEN_WIDTH / screenResolution.getWidth();
         final double yIncrement = ProgramArguments.SCREEN_HEIGHT / screenResolution.getHeight();
         final double xstart = -1 * ProgramArguments.SCREEN_WIDTH / 2;
         final double ystart = -1 * ProgramArguments.SCREEN_HEIGHT / 2;
-        final int threadWidth = screenResolution.width / numCores;
+        final int threadWidth = screenResolution.width / NUM_THREADS;
 
-        ArrayList<Thread> tracePool = new ArrayList<>();
+        ArrayList<Future> futures = new ArrayList<>();
 
         // create the threads
-        for (int i = 0; i < numCores; i++) {
+        for (int i = 0; i < NUM_THREADS; i++) {
             // calculate width and height for this thread
             int width = threadWidth;
             int height = screenResolution.height;
 
-            if (i == numCores - 1) {
-                width += screenResolution.width % numCores;
+            if (i == NUM_THREADS - 1) {
+                width += screenResolution.width % NUM_THREADS;
             }
 
             // pass this to thread
             final Rectangle threadRect = new Rectangle(i * threadWidth, 0,
                     width, height);
 
-            // create the worker thread
-            Thread traceThread = new Thread(() -> {
+            Future future = executorService.submit(() -> {
                 iterateOverScreenRegion(image, threadRect, xIncrement,
                         yIncrement, xstart, ystart, screenPosition, rotation);
             });
 
-            tracePool.add(traceThread);
-
-            // start up the thread we just created
-            traceThread.start();
+            futures.add(future);
         }
 
         // make sure all threads have finished before we return!
-        for (Thread t : tracePool) {
+        for (Future f : futures) {
             try {
-                t.join();
+                f.get();
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
@@ -130,7 +134,7 @@ public class Camera {
         drawString(g2d, "FPS=" + fpsString, 10, 10);
 
         // print rotation
-         drawString(g2d, "rX=" + Double.toString(thetax), 10, 20);
+        drawString(g2d, "rX=" + Double.toString(thetax), 10, 20);
         drawString(g2d, "rY=" + Double.toString(thetay), 10, 30);
         drawString(g2d, "rZ=" + Double.toString(thetaz), 10, 40);
 
@@ -213,7 +217,7 @@ public class Camera {
 
                 Color c1 = new Color(aveR, aveG, aveB, aveA);
                 //set screen coordiates. Need to mirror on y axis for output to buffered image
-                int si = (screenResolution.width -1) - i;
+                int si = (screenResolution.width - 1) - i;
                 image.setRGB(si, j, c1.getRGB());
             }
         }
