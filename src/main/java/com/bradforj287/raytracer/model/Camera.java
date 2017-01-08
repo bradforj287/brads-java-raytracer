@@ -40,6 +40,18 @@ public class Camera {
         rotation = Matrix3d.matrixMultiply(rot, zRot);
     }
 
+    public double getThetax() {
+        return thetax;
+    }
+
+    public double getThetay() {
+        return thetay;
+    }
+
+    public double getThetaz() {
+        return thetaz;
+    }
+
     public BufferedImage captureImage() {
         return traceScene();
     }

@@ -92,4 +92,11 @@ public class Matrix3d {
         return result;
     }
 
+    public static Matrix3d getRotationMatrix(double tx, double ty, double tz) {
+        Matrix3d xRot = Matrix3d.getXRotationMatrix(tx);
+        Matrix3d yRot = Matrix3d.getYRotationMatrix(ty);
+        Matrix3d zRot = Matrix3d.getZRotationMatrix(tz);
+        Matrix3d rot = Matrix3d.matrixMultiply(xRot, yRot);
+        return Matrix3d.matrixMultiply(rot, zRot);
+    }
 };
