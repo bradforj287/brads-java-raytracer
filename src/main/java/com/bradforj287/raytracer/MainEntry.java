@@ -56,7 +56,7 @@ public class MainEntry {
 
 
         //install bounding box
-        shapes.addAll(boundingBoxTriangles);
+      //  shapes.addAll(boundingBoxTriangles);
 
         // build model
         SceneModel model = new SceneModel(shapes);
