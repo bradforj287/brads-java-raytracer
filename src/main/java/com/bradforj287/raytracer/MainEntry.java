@@ -37,6 +37,7 @@ public class MainEntry {
         surface.setColor(RgbColor.fromInt(Color.blue.getRGB()));
         surface.setIof(1.5);
 
+        
         double distance = 1000;
        /** shapes.add(new Sphere3d(new Vector3d(0, -1 * distance, 0), 40, new Surface(new RgbColor(Color.red.getRGB()))));
         shapes.add(new Sphere3d(new Vector3d(0,  distance, 0), 40, new Surface(new RgbColor(Color.pink.getRGB()))));

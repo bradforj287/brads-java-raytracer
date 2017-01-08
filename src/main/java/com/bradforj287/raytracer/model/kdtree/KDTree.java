@@ -6,12 +6,10 @@ import java.util.stream.Collectors;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import com.bradforj287.raytracer.geometry.*;
 import com.bradforj287.raytracer.model.ShapeVisitor;
-import com.bradforj287.raytracer.model.SpacialStructure;
-import com.bradforj287.raytracer.model.SpacialStructureQueryStats;
 import com.bradforj287.raytracer.utils.ShapeUtils;
 import com.google.common.base.Preconditions;
 
-public class KDTree implements SpacialStructure {
+public class KDTree {
     private KDNode root;
     private List<Shape3d> shapes;
 
@@ -171,13 +169,16 @@ public class KDTree implements SpacialStructure {
         populateTree(rightNode);
     }
 
-    @Override
-    public void visitPossibleIntersections(final Ray3d ray, final ShapeVisitor visitor) {
-        visitPossibleMatchesHelper(root, ray, visitor);
+    public KdTreeQueryStats visitPossibleIntersections(final Ray3d ray, final ShapeVisitor visitor) {
+        KdTreeQueryStats queryStats = new KdTreeQueryStats();
+        visitPossibleMatchesHelper(root, ray, visitor, queryStats);
+        return queryStats;
     }
 
-    private void visitPossibleMatchesHelper(KDNode node, final Ray3d ray, final ShapeVisitor visitor) {
+    private void visitPossibleMatchesHelper(KDNode node, final Ray3d ray, final ShapeVisitor visitor, KdTreeQueryStats queryStats) {
+        queryStats.nodesVisited++;
         if (node.isLeaf()) {
+            queryStats.shapesVisited+= node.getShapes().size();
             for (Shape3d shape : node.getShapes()) {
                 visitor.visit(shape);
             }
@@ -185,15 +186,14 @@ public class KDTree implements SpacialStructure {
         }
 
         if (node.hasLeft() && node.intersectsBoundingBox(ray)) {
-            visitPossibleMatchesHelper(node.getLeft(), ray, visitor);
+            visitPossibleMatchesHelper(node.getLeft(), ray, visitor, queryStats);
         }
 
         if (node.hasRight() && node.intersectsBoundingBox(ray)) {
-            visitPossibleMatchesHelper(node.getRight(), ray, visitor);
+            visitPossibleMatchesHelper(node.getRight(), ray, visitor, queryStats);
         }
     }
 
-    @Override
     public AxisAlignedBoundingBox3d getBounds() {
         return root.getBoundingBox();
     }
