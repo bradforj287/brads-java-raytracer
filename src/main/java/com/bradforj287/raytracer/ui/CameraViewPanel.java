@@ -5,6 +5,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 import com.bradforj287.raytracer.model.Camera;
+import com.bradforj287.raytracer.utils.DataPointBuffer;
 import com.bradforj287.raytracer.utils.MathUtils;
 import com.bradforj287.raytracer.utils.VideoDataPointBuffer;
 
@@ -18,6 +19,8 @@ public class CameraViewPanel extends JPanel {
     private BufferedImage sceneFrame;
 
     private VideoDataPointBuffer fpsBuffer = new VideoDataPointBuffer();
+    private DataPointBuffer kdTreeNodeVisitsBuffer = new DataPointBuffer(100);
+    private DataPointBuffer shapeVisitsBuffer = new DataPointBuffer(100);
 
     public CameraViewPanel(Camera camera) {
         this.camera = camera;
@@ -76,11 +79,13 @@ public class CameraViewPanel extends JPanel {
         drawString(g2d, "rZ=" + Double.toString(camera.getThetaz()), 10, 40);
 
         // print spacial structure query stats
-        //String avgNodeVisits = Double.toString(kdTreeNodeVisitsBuffer.getAvg());
-        //drawString(g2d, "N_VST=" + avgNodeVisits, 10, 50);
+        // node visits per ray
+        String avgNodeVisits = Double.toString(kdTreeNodeVisitsBuffer.getAvg());
+        drawString(g2d, "N_VST=" + avgNodeVisits, 10, 50);
 
-        //String avgShapeVisits = Double.toString(shapeVisitsBuffer.getAvg());
-        //drawString(g2d, "S_VST=" + avgShapeVisits, 10, 60);
+        // shape visits per ray
+        String avgShapeVisits = Double.toString(shapeVisitsBuffer.getAvg());
+        drawString(g2d, "S_VST=" + avgShapeVisits, 10, 60);
     }
 
     private void drawString(Graphics2D g2d, String s, int i, int j) {

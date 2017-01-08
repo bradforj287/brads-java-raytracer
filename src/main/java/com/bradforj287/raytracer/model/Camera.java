@@ -173,7 +173,6 @@ public class Camera {
                     aveG = aveG + c.getGreen();
                     aveB = aveB + c.getBlue();
                     aveA = aveA + c.getAlpha();
-
                 }
 
                 aveR = aveR / ProgramArguments.ANTIALIASING_SAMPLES;

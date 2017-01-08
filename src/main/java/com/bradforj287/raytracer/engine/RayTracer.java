@@ -3,12 +3,9 @@ package com.bradforj287.raytracer.engine;
 import com.bradforj287.raytracer.ProgramArguments;
 import com.bradforj287.raytracer.geometry.*;
 import com.bradforj287.raytracer.model.SceneModel;
-import com.bradforj287.raytracer.model.SpacialStructureQueryStats;
 
 public class RayTracer implements Tracer {
     private SceneModel scene;
-    /**private DataPointBuffer kdTreeNodeVisitsBuffer = new DataPointBuffer(100);
-    private DataPointBuffer shapeVisitsBuffer = new DataPointBuffer(100);*/
 
     private final static int MAX_RECURSE_DEPTH = 16;
 
@@ -176,7 +173,7 @@ public class RayTracer implements Tracer {
         results.setT(maxT);
         final RayCastArguments rayCastArgs = new RayCastArguments();
 
-        SpacialStructureQueryStats queryStats = scene.visitPossibleIntersections(theRay, shape -> {
+        scene.visitPossibleIntersections(theRay, shape -> {
             if (shape.isHitByRay(theRay, results.getT(),
                     rayCastArgs)) {
                 if (rayCastArgs.t < results.getT()) {
@@ -186,11 +183,6 @@ public class RayTracer implements Tracer {
             }
         });
 
-        //log some stats
-      /*  kdTreeNodeVisitsBuffer.addToBuffer(queryStats.getNodesVisited());
-        shapeVisitsBuffer.addToBuffer(queryStats.getShapesVisited()); */
-
-        results.setQueryStats(queryStats);
         return results;
     }
 }
