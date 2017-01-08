@@ -4,9 +4,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import com.bradforj287.raytracer.Globals;
 import com.bradforj287.raytracer.ProgramArguments;
 import com.bradforj287.raytracer.engine.Tracer;
 import com.bradforj287.raytracer.geometry.Matrix3d;
@@ -15,11 +14,6 @@ import com.bradforj287.raytracer.geometry.Vector3d;
 
 public class Camera {
     private static int NUM_THREADS = Runtime.getRuntime().availableProcessors();
-    private static ExecutorService executorService;
-
-    static {
-        executorService = Executors.newFixedThreadPool(NUM_THREADS);
-    }
 
     final private Dimension screenResolution;
     private Vector3d screenPosition;
@@ -100,7 +94,7 @@ public class Camera {
             final Rectangle threadRect = new Rectangle(i * threadWidth, 0,
                     width, height);
 
-            Future future = executorService.submit(() -> {
+            Future future = Globals.executorService.submit(() -> {
                 iterateOverScreenRegion(image, threadRect, xIncrement,
                         yIncrement, xstart, ystart, screenPosition, rotation);
             });
