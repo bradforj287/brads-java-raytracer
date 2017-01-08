@@ -3,13 +3,15 @@ package com.bradforj287.raytracer.engine;
 import com.bradforj287.raytracer.ProgramArguments;
 import com.bradforj287.raytracer.geometry.*;
 import com.bradforj287.raytracer.model.SceneModel;
+import com.bradforj287.raytracer.model.kdtree.KdTreeQueryStats;
 
 public class RayTracer implements Tracer {
-    private SceneModel scene;
+    private final SceneModel scene;
+    private KdTreeQueryStats kdTreeQueryStats = new KdTreeQueryStats();
 
     private final static int MAX_RECURSE_DEPTH = 16;
 
-    public RayTracer(SceneModel model) {
+    public RayTracer(final SceneModel model) {
         this.scene = model;
     }
 
@@ -45,6 +47,11 @@ public class RayTracer implements Tracer {
     private Vector3d getReflectionVector(final Vector3d dir, final Vector3d normalToShape) {
         double dDotN = dir.dot(normalToShape) * 2;
         return dir.subtract(normalToShape.multiply(dDotN));
+    }
+
+    @Override
+    public KdTreeQueryStats getKdTreeQueryStats() {
+        return kdTreeQueryStats;
     }
 
     private class FresnelResult {
@@ -173,7 +180,7 @@ public class RayTracer implements Tracer {
         results.setT(maxT);
         final RayCastArguments rayCastArgs = new RayCastArguments();
 
-        scene.visitPossibleIntersections(theRay, shape -> {
+        KdTreeQueryStats stats = scene.visitPossibleIntersections(theRay, shape -> {
             if (shape.isHitByRay(theRay, results.getT(),
                     rayCastArgs)) {
                 if (rayCastArgs.t < results.getT()) {
@@ -183,6 +190,7 @@ public class RayTracer implements Tracer {
             }
         });
 
+        kdTreeQueryStats.add(stats);
         return results;
     }
 }

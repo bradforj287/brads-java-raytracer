@@ -171,6 +171,7 @@ public class KDTree {
 
     public KdTreeQueryStats visitPossibleIntersections(final Ray3d ray, final ShapeVisitor visitor) {
         KdTreeQueryStats queryStats = new KdTreeQueryStats();
+        queryStats.raysCast++;
         visitPossibleMatchesHelper(root, ray, visitor, queryStats);
         return queryStats;
     }

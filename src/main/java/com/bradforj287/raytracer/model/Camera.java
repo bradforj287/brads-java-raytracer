@@ -7,25 +7,27 @@ import java.util.Random;
 import java.util.concurrent.Future;
 import com.bradforj287.raytracer.Globals;
 import com.bradforj287.raytracer.ProgramArguments;
+import com.bradforj287.raytracer.engine.RayTracer;
 import com.bradforj287.raytracer.engine.Tracer;
 import com.bradforj287.raytracer.geometry.Matrix3d;
 import com.bradforj287.raytracer.geometry.Ray3d;
 import com.bradforj287.raytracer.geometry.Vector3d;
+import com.bradforj287.raytracer.model.kdtree.KdTreeQueryStats;
 
 public class Camera {
     private static int NUM_THREADS = Runtime.getRuntime().availableProcessors();
 
     final private Dimension screenResolution;
     private Vector3d screenPosition;
-    final private Tracer tracer;
     private Matrix3d rotation;
+    private final SceneModel sceneModel;
     private double thetax = 0;
     private double thetay = 0;
     private double thetaz = 0;
 
-    public Camera(Dimension screenResolution, Tracer tracer) {
+    public Camera(Dimension screenResolution, SceneModel sceneModel) {
+        this.sceneModel = sceneModel;
         this.screenResolution = screenResolution;
-        this.tracer = tracer;
         this.screenPosition = Vector3d.ZERO;
         this.rotation = Matrix3d.IDENTITY;
     }
@@ -53,7 +55,7 @@ public class Camera {
         return thetaz;
     }
 
-    public BufferedImage captureImage() {
+    public CameraTraceResult captureImage() {
         return traceScene();
     }
 
@@ -64,7 +66,7 @@ public class Camera {
         g.fillRect(0, 0, screenResolution.width, screenResolution.height);
     }
 
-    private BufferedImage traceScene() {
+    private CameraTraceResult traceScene() {
         final BufferedImage image = new BufferedImage(screenResolution.width,
                 screenResolution.height, BufferedImage.TYPE_INT_RGB);
 
@@ -78,7 +80,7 @@ public class Camera {
         final double ystart = -1 * ProgramArguments.SCREEN_HEIGHT / 2;
         final int threadWidth = screenResolution.width / NUM_THREADS;
 
-        ArrayList<Future> futures = new ArrayList<>();
+        ArrayList<Future<KdTreeQueryStats>> futures = new ArrayList<>();
 
         // create the tasks
         for (int i = 0; i < NUM_THREADS; i++) {
@@ -94,35 +96,39 @@ public class Camera {
             final Rectangle threadRect = new Rectangle(i * threadWidth, 0,
                     width, height);
 
-            Future future = Globals.executorService.submit(() -> {
-                iterateOverScreenRegion(image, threadRect, xIncrement,
+            Future<KdTreeQueryStats> future = Globals.executorService.submit(() -> {
+                return iterateOverScreenRegion(image, threadRect, xIncrement,
                         yIncrement, xstart, ystart, screenPosition, rotation);
             });
 
             futures.add(future);
         }
 
+        KdTreeQueryStats total = new KdTreeQueryStats();
         // wait for all tasks to finish
-        for (Future f : futures) {
+        for (Future<KdTreeQueryStats> f : futures) {
             try {
-                f.get();
+                KdTreeQueryStats stats = f.get();
+                total.add(stats);
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
         }
 
-        return image;
+        return new CameraTraceResult(total, image);
     }
 
     /**
      * Iterates over a subset of the screen resolution specified by Region. The
      * purpose of this is to distribute across threads.
      */
-    private void iterateOverScreenRegion(BufferedImage image, Rectangle region,
-                                         double xIncrement, double yIncrement,
-                                         double xStart, double yStart,
-                                         Vector3d screenPos, Matrix3d screenRotation) {
+    private KdTreeQueryStats iterateOverScreenRegion(BufferedImage image, Rectangle region,
+                                                     double xIncrement, double yIncrement,
+                                                     double xStart, double yStart,
+                                                     Vector3d screenPos, Matrix3d screenRotation) {
         Random rand = new Random();
+
+        Tracer tracer = new RayTracer(sceneModel);
 
         // iterate over all pixels in resolution
         for (int i = region.x; i < region.x + region.width; i++) {
@@ -160,7 +166,7 @@ public class Camera {
                     Vector3d eyeDirection = pointOnScreen.subtract(eyePosition);
 
                     Ray3d ray = new Ray3d(eyePosition, eyeDirection);
-                    int color = this.tracer.getColorForRay(ray).asInt();
+                    int color = tracer.getColorForRay(ray).asInt();
 
                     Color c = new Color(color);
                     aveR = aveR + c.getRed();
@@ -180,6 +186,8 @@ public class Camera {
                 image.setRGB(si, j, c1.getRGB());
             }
         }
+
+        return tracer.getKdTreeQueryStats();
     }
 
     public Dimension getScreenResolution() {
@@ -192,9 +200,5 @@ public class Camera {
 
     public void setScreenPosition(Vector3d screenPosition) {
         this.screenPosition = screenPosition;
-    }
-
-    public Tracer getTracer() {
-        return tracer;
     }
 }

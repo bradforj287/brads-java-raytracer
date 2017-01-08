@@ -5,10 +5,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.*;
 import com.bradforj287.raytracer.ProgramArguments;
-import com.bradforj287.raytracer.engine.Tracer;
 import com.bradforj287.raytracer.geometry.Matrix3d;
 import com.bradforj287.raytracer.geometry.Vector3d;
 import com.bradforj287.raytracer.model.Camera;
+import com.bradforj287.raytracer.model.SceneModel;
 
 public class CameraControlPanel extends JPanel {
     private Camera camera;
@@ -25,7 +25,7 @@ public class CameraControlPanel extends JPanel {
 
     final double rotationRate = -1 * 5 * Math.PI / 180;
 
-    public CameraControlPanel(Tracer rayTracer) {
+    public CameraControlPanel(SceneModel sceneModel) {
         this.setLayout(new BorderLayout());
         this.setFocusable(true);
         this.requestFocusInWindow();
@@ -33,7 +33,7 @@ public class CameraControlPanel extends JPanel {
         // build camera
         Dimension sceneRes = ProgramArguments.SIZE_OF_SCENE;
 
-        this.camera = new Camera(sceneRes, rayTracer);
+        this.camera = new Camera(sceneRes, sceneModel);
         camera.setScreenPosition(ProgramArguments.DEFAULT_SCREEN_POSITION);
         camera.setRotation(-1 * Math.PI / 2, 0, 0);
 

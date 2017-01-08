@@ -5,7 +5,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 import com.bradforj287.raytracer.model.Camera;
-import com.bradforj287.raytracer.utils.DataPointBuffer;
+import com.bradforj287.raytracer.model.CameraTraceResult;
+import com.bradforj287.raytracer.model.kdtree.KdTreeQueryStats;
 import com.bradforj287.raytracer.utils.MathUtils;
 import com.bradforj287.raytracer.utils.VideoDataPointBuffer;
 
@@ -17,10 +18,7 @@ public class CameraViewPanel extends JPanel {
     final private Camera camera;
 
     private BufferedImage sceneFrame;
-
     private VideoDataPointBuffer fpsBuffer = new VideoDataPointBuffer();
-    private DataPointBuffer kdTreeNodeVisitsBuffer = new DataPointBuffer(100);
-    private DataPointBuffer shapeVisitsBuffer = new DataPointBuffer(100);
 
     public CameraViewPanel(Camera camera) {
         this.camera = camera;
@@ -28,13 +26,13 @@ public class CameraViewPanel extends JPanel {
     }
 
     public void renderFrame() {
-        BufferedImage newImg = camera.captureImage();
+        CameraTraceResult result = camera.captureImage();
         synchronized (paintLock) {
-            sceneFrame = newImg;
+            sceneFrame = result.getImage();
         }
         fpsBuffer.addToBuffer(System.currentTimeMillis());
 
-        printStatsToImage(newImg);
+        printStatsToImage(sceneFrame, result.getQueryStats());
     }
 
     @Override
@@ -66,7 +64,7 @@ public class CameraViewPanel extends JPanel {
         }
     }
 
-    private void printStatsToImage(BufferedImage image) {
+    private void printStatsToImage(BufferedImage image, KdTreeQueryStats stats) {
         Graphics2D g2d = (Graphics2D) image.getGraphics();
 
         // print FPS
@@ -78,18 +76,20 @@ public class CameraViewPanel extends JPanel {
         drawString(g2d, "rY=" + Double.toString(camera.getThetay()), 10, 30);
         drawString(g2d, "rZ=" + Double.toString(camera.getThetaz()), 10, 40);
 
-        // print spacial structure query stats
-        // node visits per ray
-        String avgNodeVisits = Double.toString(kdTreeNodeVisitsBuffer.getAvg());
-        drawString(g2d, "N_VST=" + avgNodeVisits, 10, 50);
+        long nodesPerRay = stats.getNodesVisited() / stats.getRaysCast();
+        long shapeVisitsPerRay = stats.getShapesVisited() / stats.getRaysCast();
+        String krays = Long.toString(stats.getRaysCast() / 1000);
+        drawString(g2d, "#KRAYS=" + krays, 10, 50);
 
-        // shape visits per ray
-        String avgShapeVisits = Double.toString(shapeVisitsBuffer.getAvg());
-        drawString(g2d, "S_VST=" + avgShapeVisits, 10, 60);
+        String shapeVisits = Long.toString(shapeVisitsPerRay);
+        drawString(g2d, "#SVST=" + shapeVisits, 10, 60);
+
+        String nodeVisits = Long.toString(nodesPerRay);
+        drawString(g2d, "#NVST=" + nodeVisits, 10, 70);
     }
 
     private void drawString(Graphics2D g2d, String s, int i, int j) {
-        if (s.length() > 11) {
+        if (s.length() > 12) {
             s = s.substring(0, 11);
         }
         char[] charA = s.toCharArray();
