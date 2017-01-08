@@ -12,7 +12,6 @@ import com.bradforj287.raytracer.engine.Tracer;
 import com.bradforj287.raytracer.geometry.Matrix3d;
 import com.bradforj287.raytracer.geometry.Ray3d;
 import com.bradforj287.raytracer.geometry.Vector3d;
-import com.bradforj287.raytracer.utils.VideoDataPointBuffer;
 
 public class Camera {
     private static int NUM_THREADS = Runtime.getRuntime().availableProcessors();
@@ -29,8 +28,6 @@ public class Camera {
     private double thetax = 0;
     private double thetay = 0;
     private double thetaz = 0;
-
-    private VideoDataPointBuffer fpsBuffer = new VideoDataPointBuffer();
 
     public Camera(Dimension screenResolution, Tracer tracer) {
         this.screenResolution = screenResolution;
@@ -89,7 +86,7 @@ public class Camera {
 
         ArrayList<Future> futures = new ArrayList<>();
 
-        // create the threads
+        // create the tasks
         for (int i = 0; i < NUM_THREADS; i++) {
             // calculate width and height for this thread
             int width = threadWidth;
@@ -111,7 +108,7 @@ public class Camera {
             futures.add(future);
         }
 
-        // make sure all threads have finished before we return!
+        // wait for all tasks to finish
         for (Future f : futures) {
             try {
                 f.get();
@@ -120,38 +117,7 @@ public class Camera {
             }
         }
 
-        fpsBuffer.addToBuffer(System.currentTimeMillis());
-
-        printStatsToImage(image);
         return image;
-    }
-
-    private void printStatsToImage(BufferedImage image) {
-        Graphics2D g2d = (Graphics2D) image.getGraphics();
-
-        // print FPS
-        String fpsString = Double.toString(fpsBuffer.getFramesPerSecond());
-        drawString(g2d, "FPS=" + fpsString, 10, 10);
-
-        // print rotation
-        drawString(g2d, "rX=" + Double.toString(thetax), 10, 20);
-        drawString(g2d, "rY=" + Double.toString(thetay), 10, 30);
-        drawString(g2d, "rZ=" + Double.toString(thetaz), 10, 40);
-
-        // print spacial structure query stats
-        //String avgNodeVisits = Double.toString(kdTreeNodeVisitsBuffer.getAvg());
-        //drawString(g2d, "N_VST=" + avgNodeVisits, 10, 50);
-
-        //String avgShapeVisits = Double.toString(shapeVisitsBuffer.getAvg());
-        //drawString(g2d, "S_VST=" + avgShapeVisits, 10, 60);
-    }
-
-    private void drawString(Graphics2D g2d, String s, int i, int j) {
-        if (s.length() > 11) {
-            s = s.substring(0, 11);
-        }
-        char[] charA = s.toCharArray();
-        g2d.drawChars(charA, 0, charA.length, i, j);
     }
 
     /**
@@ -237,13 +203,5 @@ public class Camera {
 
     public Tracer getTracer() {
         return tracer;
-    }
-
-    public VideoDataPointBuffer getFpsBuffer() {
-        return fpsBuffer;
-    }
-
-    public void setFpsBuffer(VideoDataPointBuffer fpsBuffer) {
-        this.fpsBuffer = fpsBuffer;
     }
 }

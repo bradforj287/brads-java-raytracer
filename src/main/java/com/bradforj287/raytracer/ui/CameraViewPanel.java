@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.*;
 import com.bradforj287.raytracer.model.Camera;
 import com.bradforj287.raytracer.utils.MathUtils;
+import com.bradforj287.raytracer.utils.VideoDataPointBuffer;
 
 /**
  * renders the ray tracing camera to a canvas
@@ -15,6 +16,8 @@ public class CameraViewPanel extends JPanel {
     final private Camera camera;
 
     private BufferedImage sceneFrame;
+
+    private VideoDataPointBuffer fpsBuffer = new VideoDataPointBuffer();
 
     public CameraViewPanel(Camera camera) {
         this.camera = camera;
@@ -26,6 +29,9 @@ public class CameraViewPanel extends JPanel {
         synchronized (paintLock) {
             sceneFrame = newImg;
         }
+        fpsBuffer.addToBuffer(System.currentTimeMillis());
+
+        printStatsToImage(newImg);
     }
 
     @Override
@@ -42,9 +48,9 @@ public class CameraViewPanel extends JPanel {
         Graphics2D g2d = (Graphics2D) g.create(paintRect.x, paintRect.y,
                 paintRect.width, paintRect.height);
 
-        double scalex = ((double) paintRect.getWidth())
+        double scalex = (paintRect.getWidth())
                 / ((double) sceneFrame.getWidth());
-        double scaley = ((double) paintRect.getHeight())
+        double scaley = (paintRect.getHeight())
                 / ((double) sceneFrame.getHeight());
 
         AffineTransform xform = AffineTransform
@@ -56,4 +62,33 @@ public class CameraViewPanel extends JPanel {
             g2d.drawImage(sceneFrame, xform, null);
         }
     }
+
+    private void printStatsToImage(BufferedImage image) {
+        Graphics2D g2d = (Graphics2D) image.getGraphics();
+
+        // print FPS
+        String fpsString = Double.toString(fpsBuffer.getFramesPerSecond());
+        drawString(g2d, "FPS=" + fpsString, 10, 10);
+
+        // print rotation
+        drawString(g2d, "rX=" + Double.toString(camera.getThetax()), 10, 20);
+        drawString(g2d, "rY=" + Double.toString(camera.getThetay()), 10, 30);
+        drawString(g2d, "rZ=" + Double.toString(camera.getThetaz()), 10, 40);
+
+        // print spacial structure query stats
+        //String avgNodeVisits = Double.toString(kdTreeNodeVisitsBuffer.getAvg());
+        //drawString(g2d, "N_VST=" + avgNodeVisits, 10, 50);
+
+        //String avgShapeVisits = Double.toString(shapeVisitsBuffer.getAvg());
+        //drawString(g2d, "S_VST=" + avgShapeVisits, 10, 60);
+    }
+
+    private void drawString(Graphics2D g2d, String s, int i, int j) {
+        if (s.length() > 11) {
+            s = s.substring(0, 11);
+        }
+        char[] charA = s.toCharArray();
+        g2d.drawChars(charA, 0, charA.length, i, j);
+    }
+
 }
