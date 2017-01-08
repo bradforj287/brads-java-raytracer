@@ -18,8 +18,8 @@ public class SceneModel {
         shapesTree = new KDTree(shapes);
     }
 
-    public SpacialStructureQueryStats visitPossibleIntersections(Ray3d ray, ShapeVisitor visitor) {
-        return shapesTree.visitPossibleIntersections(ray, visitor);
+    public void visitPossibleIntersections(Ray3d ray, ShapeVisitor visitor) {
+        shapesTree.visitPossibleIntersections(ray, visitor);
     }
 
     public AxisAlignedBoundingBox3d getBounds() {
