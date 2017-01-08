@@ -16,6 +16,13 @@ public class CameraControlPanel extends JPanel {
     private double velocity = 20;
     private Vector3d direction = new Vector3d(0, -1, 0);
 
+    private Timer moveForwardTimer;
+    private Timer moveBackwardTimer;
+    private Timer turnLeftTimer;
+    private Timer turnRightTimer;
+    private Timer lookUpTimer;
+    private Timer lookDownTimer;
+
     final double rotationRate = -1 * 5 * Math.PI / 180;
 
     public CameraControlPanel(Tracer rayTracer) {
@@ -28,7 +35,7 @@ public class CameraControlPanel extends JPanel {
 
         this.camera = new Camera(sceneRes, rayTracer);
         camera.setScreenPosition(ProgramArguments.DEFAULT_SCREEN_POSITION);
-        camera.setRotation(-1 * Math.PI/2, 0, 0);
+        camera.setRotation(-1 * Math.PI / 2, 0, 0);
 
         cameraViewPanel = new CameraViewPanel(camera);
         cameraViewPanel.renderFrame();
@@ -62,7 +69,15 @@ public class CameraControlPanel extends JPanel {
     }
 
     private void rotateLeft() {
-        rotateByDelta(0, 0, -1*rotationRate);
+        rotateByDelta(0, 0, -1 * rotationRate);
+    }
+
+    private void rotateUp() {
+        rotateByDelta(rotationRate, 0, 0);
+    }
+
+    private void rotateDown() {
+        rotateByDelta(-1 * rotationRate, 0, 0);
     }
 
     private void rotateRight() {
@@ -70,6 +85,14 @@ public class CameraControlPanel extends JPanel {
     }
 
     private void registerKbListeners() {
+        final int delay = 10;
+        this.moveForwardTimer = new Timer(delay, a -> movePositionForward(velocity));
+        this.moveBackwardTimer = new Timer(delay, a -> movePositionForward(-1 * velocity));
+        this.turnLeftTimer = new Timer(delay, a -> rotateLeft());
+        this.turnRightTimer = new Timer(delay, a -> rotateRight());
+        this.lookUpTimer = new Timer(delay, a -> rotateUp());
+        this.lookDownTimer = new Timer(delay, a -> rotateDown());
+
         this.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
@@ -79,20 +102,40 @@ public class CameraControlPanel extends JPanel {
             @Override
             public void keyPressed(KeyEvent e) {
                 char key = e.getKeyChar();
+                int keycode = e.getKeyCode();
                 if (key == 'w') {
-                    movePositionForward(velocity);
+                    moveForwardTimer.start();
                 } else if (key == 's') {
-                    movePositionForward(-1*velocity);
+                    moveBackwardTimer.start();
                 } else if (key == 'a') {
-                    rotateLeft();
-                } else if (key == 'd')  {
-                    rotateRight();
+                    turnLeftTimer.start();
+                } else if (key == 'd') {
+                    turnRightTimer.start();
+                } else if (keycode == KeyEvent.VK_UP) {
+                    lookUpTimer.start();
+                } else if (keycode == KeyEvent.VK_DOWN) {
+                    lookDownTimer.start();
                 }
             }
 
             @Override
             public void keyReleased(KeyEvent e) {
+                char key = e.getKeyChar();
+                int keycode = e.getKeyCode();
 
+                if (key == 'w') {
+                    moveForwardTimer.stop();
+                } else if (key == 's') {
+                    moveBackwardTimer.stop();
+                } else if (key == 'a') {
+                    turnLeftTimer.stop();
+                } else if (key == 'd') {
+                    turnRightTimer.stop();
+                } else if (keycode == KeyEvent.VK_UP) {
+                    lookUpTimer.stop();
+                } else if (keycode == KeyEvent.VK_DOWN) {
+                    lookDownTimer.stop();
+                }
             }
         });
     }
