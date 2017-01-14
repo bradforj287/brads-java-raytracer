@@ -7,13 +7,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 import javax.swing.*;
-import com.bradforj287.raytracer.engine.RayTracer;
-import com.bradforj287.raytracer.engine.Tracer;
 import com.bradforj287.raytracer.geometry.*;
-import com.bradforj287.raytracer.model.Camera;
 import com.bradforj287.raytracer.model.SceneModel;
 import com.bradforj287.raytracer.ui.CameraControlPanel;
-import com.bradforj287.raytracer.ui.CameraViewPanel;
 import com.bradforj287.raytracer.utils.Utils;
 
 public class MainEntry {

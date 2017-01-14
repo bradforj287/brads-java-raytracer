@@ -15,7 +15,7 @@ import com.bradforj287.raytracer.geometry.Vector3d;
 import com.bradforj287.raytracer.model.kdtree.KdTreeQueryStats;
 
 public class Camera {
-    private static int NUM_THREADS = Runtime.getRuntime().availableProcessors();
+    private static int PARALLEL_TASKS = Runtime.getRuntime().availableProcessors()*10;
 
     final private Dimension screenResolution;
     private Vector3d screenPosition;
@@ -78,18 +78,18 @@ public class Camera {
         final double yIncrement = ProgramArguments.SCREEN_HEIGHT / screenResolution.getHeight();
         final double xstart = -1 * ProgramArguments.SCREEN_WIDTH / 2;
         final double ystart = -1 * ProgramArguments.SCREEN_HEIGHT / 2;
-        final int threadWidth = screenResolution.width / NUM_THREADS;
+        final int threadWidth = screenResolution.width / PARALLEL_TASKS;
 
         ArrayList<Future<KdTreeQueryStats>> futures = new ArrayList<>();
 
         // create the tasks
-        for (int i = 0; i < NUM_THREADS; i++) {
+        for (int i = 0; i < PARALLEL_TASKS; i++) {
             // calculate width and height for this thread
             int width = threadWidth;
             int height = screenResolution.height;
 
-            if (i == NUM_THREADS - 1) {
-                width += screenResolution.width % NUM_THREADS;
+            if (i == PARALLEL_TASKS - 1) {
+                width += screenResolution.width % PARALLEL_TASKS;
             }
 
             // pass this to thread
