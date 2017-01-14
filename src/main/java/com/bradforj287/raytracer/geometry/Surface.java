@@ -2,6 +2,7 @@ package com.bradforj287.raytracer.geometry;
 
 public class Surface {
     private boolean isReflective;
+    private boolean isLightSource;
     private Double iof;
     private RgbColor color;
     public boolean isRefractive() {
@@ -9,6 +10,14 @@ public class Surface {
     }
 
     public Surface() {
+    }
+
+    public boolean isLightSource() {
+        return isLightSource;
+    }
+
+    public void setLightSource(boolean lightSource) {
+        isLightSource = lightSource;
     }
 
     public Surface(RgbColor color) {

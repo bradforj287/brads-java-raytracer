@@ -114,4 +114,13 @@ public class Vector3d {
             throw new RuntimeException(ex);
         }
     }
+
+    @Override
+    public String toString() {
+        return "Vector3d{" +
+                "x=" + x +
+                ", y=" + y +
+                ", z=" + z +
+                '}';
+    }
 }

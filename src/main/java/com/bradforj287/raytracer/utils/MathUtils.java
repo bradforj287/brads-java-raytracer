@@ -4,6 +4,14 @@ import java.awt.*;
 
 public class MathUtils {
 
+    public static double max(final double a, final double b, final double c) {
+        return Math.max(Math.max(a, b), c);
+    }
+
+    public static double max(final double a, final double b, final double c, final double d) {
+        return Math.max(MathUtils.max(a, b, c), d);
+    }
+
     /**
      * This function takes a Dimension object representing the width and height
      * of the video data to be displayed. This function returns the largest
