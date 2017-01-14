@@ -2,7 +2,6 @@ package com.bradforj287.raytracer.model.kdtree;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import com.bradforj287.raytracer.geometry.*;
 import com.bradforj287.raytracer.model.ShapeVisitor;
 import com.bradforj287.raytracer.utils.ShapeBoundsQueue;
@@ -44,96 +43,45 @@ public class KDTree {
         return node;
     }
 
-    private PotentialTreeSplit splitShapesByAxisPoint(final List<Shape3d> shapes, final Axis axis, double splitPoint) {
-        final String coord = axis.toCoordinateName();
-        List<Shape3d> left = new ArrayList<>();
-        List<Shape3d> right = new ArrayList<>();
-        List<Shape3d> equalShapes = new ArrayList<>();
-        for (Shape3d shape : shapes) {
-            Vector3d shapeMidpoint = shape.getCentroid();
-            double shapeCoord = shapeMidpoint.getCoordiateByName(coord);
-            if (shapeCoord == splitPoint) {
-                equalShapes.add(shape);
-            } else if (shapeCoord < splitPoint) {
-                left.add(shape);
-            } else {
-                right.add(shape);
-            }
-        }
-        // add equal shapes to the list that is smaller.
-        if (left.size() < right.size()) {
-            left.addAll(equalShapes);
-        } else {
-            right.addAll(equalShapes);
-        }
-        return new PotentialTreeSplit(left, right);
-    }
-
-    private PotentialTreeSplit getBestSplitOnAxisSahBruteForce(final List<Shape3d> shapes, Axis axis) {
-        List<Shape3d> sortedByAxis = shapes.stream().sorted((a, b) -> {
-            Double aa = a.getCentroid().getCoordiateByAxis(axis);
-            Double bb = b.getCentroid().getCoordiateByAxis(axis);
-            return aa.compareTo(bb);
-        }).collect(Collectors.toList());
-
-        return sortedByAxis.parallelStream()
-                .map(s -> {
-                    double splitPoint = s.getCentroid().getCoordiateByAxis(axis);
-                    return splitShapesByAxisPoint(shapes, axis, splitPoint);
-                })
-                .min((a, b) -> a.getSahHeuristic().compareTo(b.getSahHeuristic())).get();
-    }
-
     private PotentialTreeSplit getBestSplitSah(final List<PotentialTreeSplit> splits) {
         return splits.stream()
                 .min((a, b) -> a.getSahHeuristic().compareTo(b.getSahHeuristic()))
                 .get();
     }
 
-    private PotentialTreeSplit getBestSplitOnAxisStrategy(final List<Shape3d> shapes, Axis axis) {
+    private PotentialTreeSplit getBestSplitOnAxisSah(final List<Shape3d> shapes, Axis axis) {
         Preconditions.checkArgument(shapes.size() > 1);
-        if (shapes.size() <= 4) { // do brute force
-            return getBestSplitOnAxisSahBruteForce(shapes, axis);
-        } else {
-            List<Shape3d> sortedShapes = ShapeUtils.sortByAxis(shapes, axis);
-            ShapeBoundsQueue rhs = new ShapeBoundsQueue();
-            ShapeBoundsQueue lhs = new ShapeBoundsQueue();
-            rhs.addAll(sortedShapes);
 
-            double minSah = Double.MAX_VALUE;
-            int minSahLhsSize = 1;
+        List<Shape3d> sortedShapes = ShapeUtils.sortByAxis(shapes, axis);
+        ShapeBoundsQueue rhs = new ShapeBoundsQueue();
+        ShapeBoundsQueue lhs = new ShapeBoundsQueue();
+        rhs.addAll(sortedShapes);
 
-            while (rhs.size() > 1) {
-                lhs.add(rhs.remove());
+        double minSah = Double.MAX_VALUE;
+        int minSahLhsSize = 1;
 
-                double sah = lhs.getBoundingBox().getSurfaceArea() * lhs.size() + rhs.getBoundingBox().getSurfaceArea() * rhs.size();
-                if (sah < minSah) {
-                    minSah = sah;
-                    minSahLhsSize = lhs.size();
-                }
+        while (rhs.size() > 1) {
+            lhs.add(rhs.remove());
+
+            double sah = lhs.getBoundingBox().getSurfaceArea() * lhs.size() + rhs.getBoundingBox().getSurfaceArea() * rhs.size();
+            if (sah < minSah) {
+                minSah = sah;
+                minSahLhsSize = lhs.size();
             }
-
-            List<Shape3d> leftShapes = sortedShapes.subList(0, minSahLhsSize);
-            List<Shape3d> rightShapes = sortedShapes.subList(minSahLhsSize, sortedShapes.size());
-
-            return new PotentialTreeSplit(leftShapes, rightShapes);
         }
+
+        List<Shape3d> leftShapes = sortedShapes.subList(0, minSahLhsSize);
+        List<Shape3d> rightShapes = sortedShapes.subList(minSahLhsSize, sortedShapes.size());
+
+        return new PotentialTreeSplit(leftShapes, rightShapes);
     }
 
     private PotentialTreeSplit getBestSplitSahStrategy(final List<Shape3d> shapes) {
-        // split shapes on all axis
         List<PotentialTreeSplit> potentialTreeSplits = new ArrayList<>();
-        potentialTreeSplits.add(getBestSplitOnAxisStrategy(shapes, Axis.X));
-        potentialTreeSplits.add(getBestSplitOnAxisStrategy(shapes, Axis.Y));
-        potentialTreeSplits.add(getBestSplitOnAxisStrategy(shapes, Axis.Z));
-
+        potentialTreeSplits.add(getBestSplitOnAxisSah(shapes, Axis.X));
+        potentialTreeSplits.add(getBestSplitOnAxisSah(shapes, Axis.Y));
+        potentialTreeSplits.add(getBestSplitOnAxisSah(shapes, Axis.Z));
         return getBestSplitSah(potentialTreeSplits);
-    }
-
-    private PotentialTreeSplit splitShapesByAxisAvgLongestAxis(final List<Shape3d> shapes) {
-        Axis longestAxis = ShapeUtils.getBoundsForShapes(shapes).getLongestAxis();
-        double midpoint = ShapeUtils.getAverageCenterCoordiate(longestAxis.toCoordinateName(), shapes);
-        return splitShapesByAxisPoint(shapes, longestAxis, midpoint);
     }
 
     private void populateTree(KDNode node) {
