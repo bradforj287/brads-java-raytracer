@@ -1,7 +1,9 @@
 package com.bradforj287.raytracer.utils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import com.bradforj287.raytracer.geometry.Axis;
 import com.bradforj287.raytracer.geometry.AxisAlignedBoundingBox3d;
 import com.bradforj287.raytracer.geometry.Shape3d;
 import com.bradforj287.raytracer.geometry.Vector3d;
@@ -60,6 +62,14 @@ public class ShapeUtils {
             stats.addValue(shape3d.getCentroid().getCoordiateByName(coord));
         }
         return stats.getPercentile(50);
+    }
+
+    public static List<Shape3d> sortByAxis(List<Shape3d> shapes, Axis axis) {
+        return shapes.stream().sorted((a, b) -> {
+            Double aa = a.getCentroid().getCoordiateByAxis(axis);
+            Double bb = b.getCentroid().getCoordiateByAxis(axis);
+            return aa.compareTo(bb);
+        }).collect(Collectors.toList());
     }
 
     public static Vector3d getAveragePoint(List<Shape3d> shapes) {

@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import javax.swing.*;
 import com.bradforj287.raytracer.geometry.*;
 import com.bradforj287.raytracer.model.SceneModel;
+import com.bradforj287.raytracer.parser.ObjFileParser;
 import com.bradforj287.raytracer.ui.CameraControlPanel;
 import com.bradforj287.raytracer.utils.Utils;
 
@@ -18,8 +19,9 @@ public class MainEntry {
         JFrame frame = new JFrame("Brad's Ray Tracer");
 
         final File objFile = Utils.tryGetResourceFile("teapot.obj");
-        //final List<Shape3d> shapes = ObjFileParser.parseObjFile(objFile);
+        final List<Shape3d> teapot = ObjFileParser.parseObjFile(objFile);
         final List<Shape3d> shapes = new ArrayList<>();
+        shapes.addAll(teapot);
         final List<Triangle3d> boundingBoxTriangles = getBoundingBox();
 
         // test adding a sphere

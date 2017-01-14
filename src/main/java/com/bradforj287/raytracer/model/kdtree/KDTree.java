@@ -3,9 +3,9 @@ package com.bradforj287.raytracer.model.kdtree;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import com.bradforj287.raytracer.geometry.*;
 import com.bradforj287.raytracer.model.ShapeVisitor;
+import com.bradforj287.raytracer.utils.ShapeBoundsQueue;
 import com.bradforj287.raytracer.utils.ShapeUtils;
 import com.google.common.base.Preconditions;
 
@@ -92,30 +92,31 @@ public class KDTree {
 
     private PotentialTreeSplit getBestSplitOnAxisStrategy(final List<Shape3d> shapes, Axis axis) {
         Preconditions.checkArgument(shapes.size() > 1);
-        if (shapes.size() <= 25) { // do brute force
+        if (shapes.size() <= 4) { // do brute force
             return getBestSplitOnAxisSahBruteForce(shapes, axis);
-        } else { // do percentile splitting
-            DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics();
-            shapes.forEach(s -> descriptiveStatistics.addValue(s.getCentroid().getCoordiateByAxis(axis)));
+        } else {
+            List<Shape3d> sortedShapes = ShapeUtils.sortByAxis(shapes, axis);
+            ShapeBoundsQueue rhs = new ShapeBoundsQueue();
+            ShapeBoundsQueue lhs = new ShapeBoundsQueue();
+            rhs.addAll(sortedShapes);
 
-            double maxPercentile = 100;
-            double increment = 1;
-            double size = shapes.size();
+            double minSah = Double.MAX_VALUE;
+            int minSahLhsSize = 1;
 
-            if (size < maxPercentile) {
-                increment = 100 * (1/size);
+            while (rhs.size() > 1) {
+                lhs.add(rhs.remove());
+
+                double sah = lhs.getBoundingBox().getSurfaceArea() * lhs.size() + rhs.getBoundingBox().getSurfaceArea() * rhs.size();
+                if (sah < minSah) {
+                    minSah = sah;
+                    minSahLhsSize = lhs.size();
+                }
             }
 
-            List<Double> percentiles = new ArrayList<>();
-            for (double p = increment; p < maxPercentile; p+= increment) {
-                percentiles.add(p);
-            }
+            List<Shape3d> leftShapes = sortedShapes.subList(0, minSahLhsSize);
+            List<Shape3d> rightShapes = sortedShapes.subList(minSahLhsSize, sortedShapes.size());
 
-            return percentiles.parallelStream()
-                    .map(p -> {
-                        double splitPoint = descriptiveStatistics.getPercentile(p);
-                        return splitShapesByAxisPoint(shapes, axis, splitPoint);
-                    }).min((a, b) -> a.getSahHeuristic().compareTo(b.getSahHeuristic())).get();
+            return new PotentialTreeSplit(leftShapes, rightShapes);
         }
     }
 
@@ -146,7 +147,7 @@ public class KDTree {
         }
 
         // split shapes
-        PotentialTreeSplit optimal = splitShapesByAxisAvgLongestAxis(node.getShapes());
+        PotentialTreeSplit optimal = getBestSplitSahStrategy(node.getShapes());
 
         // base case #2 - if the split is empty we cant split */
         if (optimal.isEmptySplit()) {
@@ -179,7 +180,7 @@ public class KDTree {
     private void visitPossibleMatchesHelper(KDNode node, final Ray3d ray, final ShapeVisitor visitor, KdTreeQueryStats queryStats) {
         queryStats.nodesVisited++;
         if (node.isLeaf()) {
-            queryStats.shapesVisited+= node.getShapes().size();
+            queryStats.shapesVisited += node.getShapes().size();
             for (Shape3d shape : node.getShapes()) {
                 visitor.visit(shape);
             }
