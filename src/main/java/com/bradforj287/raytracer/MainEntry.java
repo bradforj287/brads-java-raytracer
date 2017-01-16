@@ -40,8 +40,11 @@ public class MainEntry {
 
         Vector3d theMin = new Vector3d(0, 0, 0);
         Vector3d theMax = new Vector3d(100, 100, 100);
+        System.out.println("building sponge");
         AxisAlignedBoundingBox3d bb = new AxisAlignedBoundingBox3d(theMin, theMax);
-        shapes.addAll(ShapeFactory.buildMengerSponge(bb, boxSurface, 1));
+        shapes.addAll(ShapeFactory.buildMengerSponge(bb, boxSurface, 2));
+        System.out.println("finished building sponge");
+
 
         double distance = 1000;
        /** shapes.add(new Sphere3d(new Vector3d(0, -1 * distance, 0), 40, new Surface(new RgbColor(Color.red.getRGB()))));

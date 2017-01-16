@@ -2,15 +2,21 @@ package com.bradforj287.raytracer.model.kdtree;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 import com.bradforj287.raytracer.geometry.*;
 import com.bradforj287.raytracer.model.ShapeVisitor;
 import com.bradforj287.raytracer.utils.ShapeBoundsQueue;
 import com.bradforj287.raytracer.utils.ShapeUtils;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Stopwatch;
 
 public class KDTree {
     private KDNode root;
     private List<Shape3d> shapes;
+
+    private int builtShapesCount;
 
     public KDTree(List<Shape3d> shapes) {
         this.shapes = shapes;
@@ -18,9 +24,23 @@ public class KDTree {
     }
 
     private void init() {
+        System.out.println("building kd tree of " + shapes.size() + " shapes");
+        Stopwatch sw = Stopwatch.createStarted();
         root = buildNode(shapes);
+
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                System.out.println(String.format("built %s/%s    %s", builtShapesCount, shapes.size(), ((double) builtShapesCount / (double) shapes.size())));
+            }
+        }, 0, 5000);
+
         populateTree(root);
         printKdTreeStats();
+        long elapsedSeconds = sw.elapsed(TimeUnit.SECONDS);
+        timer.cancel();
+        System.out.println("created tree in " + elapsedSeconds + " seconds");
     }
 
     private void printKdTreeStats() {
@@ -84,21 +104,54 @@ public class KDTree {
         return getBestSplitSah(potentialTreeSplits);
     }
 
+    private PotentialTreeSplit splitShapesByAxisPoint(final List<Shape3d> shapes, final Axis axis, double splitPoint) {
+        final String coord = axis.toCoordinateName();
+        List<Shape3d> left = new ArrayList<>();
+        List<Shape3d> right = new ArrayList<>();
+        List<Shape3d> equalShapes = new ArrayList<>();
+        for (Shape3d shape : shapes) {
+            Vector3d shapeMidpoint = shape.getCentroid();
+            double shapeCoord = shapeMidpoint.getCoordiateByName(coord);
+            if (shapeCoord == splitPoint) {
+                equalShapes.add(shape);
+            } else if (shapeCoord < splitPoint) {
+                left.add(shape);
+            } else {
+                right.add(shape);
+            }
+        }
+        // add equal shapes to the list that is smaller.
+        if (left.size() < right.size()) {
+            left.addAll(equalShapes);
+        } else {
+            right.addAll(equalShapes);
+        }
+        return new PotentialTreeSplit(left, right);
+    }
+
+    private PotentialTreeSplit splitShapesByAxisAvgLongestAxis(final List<Shape3d> shapes) {
+        Axis longestAxis = ShapeUtils.getBoundsForShapes(shapes).getLongestAxis();
+        double midpoint = ShapeUtils.getAverageCenterCoordiate(longestAxis.toCoordinateName(), shapes);
+        return splitShapesByAxisPoint(shapes, longestAxis, midpoint);
+    }
+
     private void populateTree(KDNode node) {
         Preconditions.checkNotNull(node);
         Preconditions.checkNotNull(node.getShapes());
         Preconditions.checkArgument(!node.getShapes().isEmpty());
 
         // base case #1 - min split
-        if (node.getShapes().size() <= 2) {
+        if (node.getShapes().size() <= 10) {
+            builtShapesCount += node.getShapes().size();
             return;
         }
 
         // split shapes
-        PotentialTreeSplit optimal = getBestSplitSahStrategy(node.getShapes());
+        PotentialTreeSplit optimal = splitShapesByAxisAvgLongestAxis(node.getShapes());
 
         // base case #2 - if the split is empty we cant split */
         if (optimal.isEmptySplit()) {
+            builtShapesCount += node.getShapes().size();
             return;
         }
 

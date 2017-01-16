@@ -68,8 +68,9 @@ public class ShapeFactory {
         Vector3d twiceZshift = zshiftv.multiply(2);
         Vector3d twiceYshift = yshiftv.multiply(2);
 
+        Vector3d deltav = new Vector3d(itr.boundingBox.xLength() / 3, itr.boundingBox.yLength() / 3, itr.boundingBox.zLength() / 3);
         //back
-        AxisAlignedBoundingBox3d b = new AxisAlignedBoundingBox3d(itr.boundingBox.getMin(), new Vector3d(itr.boundingBox.xLength() / 3, itr.boundingBox.yLength() / 3, itr.boundingBox.zLength() / 3));
+        AxisAlignedBoundingBox3d b = new AxisAlignedBoundingBox3d(itr.boundingBox.getMin(), itr.boundingBox.getMin().add(deltav));
         r.add(new MengerIteration(b, lvl));
         r.add(new MengerIteration(b.translate(yshiftv), lvl));
         r.add(new MengerIteration(b.translate(twiceYshift), lvl));
@@ -116,7 +117,9 @@ public class ShapeFactory {
             if (mi.level >= level) {
                 r.addAll(buildAxisAlignedTriangleBox(mi.boundingBox, surface));
             } else {
-                queue.addAll(mengerSplit(mi));
+                for (MengerIteration i : mengerSplit(mi)) {
+                    queue.add(i);
+                }
             }
         }
 

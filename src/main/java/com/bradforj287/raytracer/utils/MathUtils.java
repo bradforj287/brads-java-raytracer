@@ -12,6 +12,16 @@ public class MathUtils {
         return Math.max(MathUtils.max(a, b, c), d);
     }
 
+    public static boolean equals(final double a, final double b, double offset) {
+        double mina = a - offset;
+        double maxa = a + offset;
+        return b <= maxa && b >= mina;
+    }
+
+    public static boolean equals(final double a, final double b, final double c, double offset) {
+        return equals(a, b, offset) && equals(a, c, offset);
+    }
+
     /**
      * This function takes a Dimension object representing the width and height
      * of the video data to be displayed. This function returns the largest
