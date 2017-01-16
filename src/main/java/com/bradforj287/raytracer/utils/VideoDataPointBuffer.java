@@ -53,5 +53,4 @@ public class VideoDataPointBuffer {
         double frameRate = (double) buffer.size() / realDelta;
         return frameRate;
     }
-
 }

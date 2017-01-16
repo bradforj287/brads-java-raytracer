@@ -21,7 +21,7 @@ public class MainEntry {
         final File objFile = Utils.tryGetResourceFile("teapot.obj");
         final List<Shape3d> teapot = ObjFileParser.parseObjFile(objFile);
         final List<Shape3d> shapes = new ArrayList<>();
-        shapes.addAll(teapot);
+        //shapes.addAll(teapot);
         final List<Triangle3d> boundingBoxTriangles = getBoundingBox();
 
         // test adding a sphere
@@ -35,6 +35,13 @@ public class MainEntry {
         surface.setColor(RgbColor.fromInt(Color.blue.getRGB()));
         surface.setIof(1.5);
 
+
+        Surface boxSurface = new Surface(new RgbColor(Color.red.getRGB()));
+
+        Vector3d theMin = new Vector3d(0, 0, 0);
+        Vector3d theMax = new Vector3d(100, 100, 100);
+        AxisAlignedBoundingBox3d bb = new AxisAlignedBoundingBox3d(theMin, theMax);
+        shapes.addAll(ShapeFactory.buildMengerSponge(bb, boxSurface, 1));
 
         double distance = 1000;
        /** shapes.add(new Sphere3d(new Vector3d(0, -1 * distance, 0), 40, new Surface(new RgbColor(Color.red.getRGB()))));

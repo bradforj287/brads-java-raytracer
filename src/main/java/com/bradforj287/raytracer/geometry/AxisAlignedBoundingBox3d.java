@@ -42,6 +42,10 @@ public class AxisAlignedBoundingBox3d {
         return botAndTop + sides + frontBack;
     }
 
+    public AxisAlignedBoundingBox3d translate(Vector3d v) {
+        return new AxisAlignedBoundingBox3d(min.add(v), max.add(v));
+    }
+
     private class AxisLength {
         private Axis axis;
         private double length;
