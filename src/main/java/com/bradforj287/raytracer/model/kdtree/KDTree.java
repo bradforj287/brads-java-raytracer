@@ -196,7 +196,7 @@ public class KDTree {
         Preconditions.checkArgument(!node.getShapes().isEmpty());
 
         // base case #1 - min split
-        if (node.getShapes().size() <= 10) {
+        if (node.getShapes().size() <= 2) {
             builtShapesCount += node.getShapes().size();
             return;
         }
