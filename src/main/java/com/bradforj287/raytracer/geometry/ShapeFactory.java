@@ -54,13 +54,12 @@ public class ShapeFactory {
         }
     }
 
-    private static List<MengerIteration> mengerSplit(MengerIteration itr) {
-        List<MengerIteration> r = new ArrayList<>();
-        int lvl = itr.level + 1;
+    public static List<AxisAlignedBoundingBox3d> mengerSplit(AxisAlignedBoundingBox3d bbox) {
+        List<AxisAlignedBoundingBox3d> r = new ArrayList<>();
 
-        double xinc = itr.boundingBox.xLength() / 3;
-        double yinc = itr.boundingBox.yLength() / 3;
-        double zinc = itr.boundingBox.zLength() / 3;
+        double xinc = bbox.xLength() / 3;
+        double yinc = bbox.yLength() / 3;
+        double zinc = bbox.zLength() / 3;
 
         Vector3d xshiftv = new Vector3d(xinc, 0, 0);
         Vector3d yshiftv = new Vector3d(0, yinc, 0);
@@ -68,40 +67,40 @@ public class ShapeFactory {
         Vector3d twiceZshift = zshiftv.multiply(2);
         Vector3d twiceYshift = yshiftv.multiply(2);
 
-        Vector3d deltav = new Vector3d(itr.boundingBox.xLength() / 3, itr.boundingBox.yLength() / 3, itr.boundingBox.zLength() / 3);
+        Vector3d deltav = new Vector3d(bbox.xLength() / 3, bbox.yLength() / 3,bbox.zLength() / 3);
         //back
-        AxisAlignedBoundingBox3d b = new AxisAlignedBoundingBox3d(itr.boundingBox.getMin(), itr.boundingBox.getMin().add(deltav));
-        r.add(new MengerIteration(b, lvl));
-        r.add(new MengerIteration(b.translate(yshiftv), lvl));
-        r.add(new MengerIteration(b.translate(twiceYshift), lvl));
+        AxisAlignedBoundingBox3d b = new AxisAlignedBoundingBox3d(bbox.getMin(), bbox.getMin().add(deltav));
+        r.add(b);
+        r.add(b.translate(yshiftv));
+        r.add(b.translate(twiceYshift));
 
-        r.add(new MengerIteration(b.translate(zshiftv), lvl));
-        r.add(new MengerIteration(b.translate(zshiftv).translate(twiceYshift), lvl));
+        r.add(b.translate(zshiftv));
+        r.add(b.translate(zshiftv).translate(twiceYshift));
 
-        r.add(new MengerIteration(b.translate(twiceZshift), lvl));
-        r.add(new MengerIteration(b.translate(yshiftv).translate(twiceZshift), lvl));
-        r.add(new MengerIteration(b.translate(twiceYshift.add(twiceZshift)), lvl));
+        r.add(b.translate(twiceZshift));
+        r.add(b.translate(yshiftv).translate(twiceZshift));
+        r.add(b.translate(twiceYshift.add(twiceZshift)));
 
         // mid
         b = b.translate(xshiftv);
-        r.add(new MengerIteration(b,lvl));
-        r.add(new MengerIteration(b.translate(twiceYshift),lvl));
+        r.add(b);
+        r.add(b.translate(twiceYshift));
 
-        r.add(new MengerIteration(b.translate(twiceZshift),lvl));
-        r.add(new MengerIteration(b.translate(twiceYshift.add(twiceZshift)),lvl));
+        r.add(b.translate(twiceZshift));
+        r.add(b.translate(twiceYshift.add(twiceZshift)));
 
         // front
         b = b.translate(xshiftv);
-        r.add(new MengerIteration(b, lvl));
-        r.add(new MengerIteration(b.translate(yshiftv), lvl));
-        r.add(new MengerIteration(b.translate(twiceYshift), lvl));
+        r.add(b);
+        r.add(b.translate(yshiftv));
+        r.add(b.translate(twiceYshift));
 
-        r.add(new MengerIteration(b.translate(zshiftv), lvl));
-        r.add(new MengerIteration(b.translate(zshiftv).translate(twiceYshift), lvl));
+        r.add(b.translate(zshiftv));
+        r.add(b.translate(zshiftv).translate(twiceYshift));
 
-        r.add(new MengerIteration(b.translate(twiceZshift), lvl));
-        r.add(new MengerIteration(b.translate(yshiftv).translate(twiceZshift), lvl));
-        r.add(new MengerIteration(b.translate(twiceYshift.add(twiceZshift)), lvl));
+        r.add(b.translate(twiceZshift));
+        r.add(b.translate(yshiftv).translate(twiceZshift));
+        r.add(b.translate(twiceYshift.add(twiceZshift)));
 
         return r;
     }
@@ -117,8 +116,9 @@ public class ShapeFactory {
             if (mi.level >= level) {
                 r.addAll(buildAxisAlignedTriangleBox(mi.boundingBox, surface));
             } else {
-                for (MengerIteration i : mengerSplit(mi)) {
-                    queue.add(i);
+                for (AxisAlignedBoundingBox3d bbox : mengerSplit(mi.boundingBox)) {
+                    MengerIteration ni = new MengerIteration(bbox, mi.level + 1);
+                    queue.add(ni);
                 }
             }
         }

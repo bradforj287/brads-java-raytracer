@@ -35,18 +35,4 @@ public abstract class Shape3d {
     public double maxZ() {
         return getBoundingBox().getMax().getZ();
     }
-
-    public double getCosOfIntersectionAngle(Ray3d ray, Vector3d hitloc) {
-        Vector3d dir = ray.getDirection().toUnitVector().flippedInOtherDiretion();
-        Vector3d normal = this.normalAtSurfacePoint(hitloc);
-        return dir.dot(normal);
-    }
-
-    public boolean isRayEnteringShape(Ray3d ray, Vector3d hitLoc) {
-        return getCosOfIntersectionAngle(ray, hitLoc) > 0;
-    }
-
-    public boolean isRayExitingShape(Ray3d ray, Vector3d hitLoc) {
-        return getCosOfIntersectionAngle(ray, hitLoc) < 0;
-    }
 }
