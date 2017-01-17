@@ -34,10 +34,10 @@ public class CameraControlPanel extends JPanel {
         Dimension sceneRes = ProgramArguments.SIZE_OF_SCENE;
 
         this.camera = new Camera(sceneRes, sceneModel);
-        //camera.setScreenPosition(ProgramArguments.DEFAULT_SCREEN_POSITION);
-       // camera.setRotation(-1 * Math.PI / 2, 0, 0);
-          camera.setScreenPosition(new Vector3d(264.47257159,190.827145105804, 137.471873229963));
-         camera.setRotation(-1.22173, 0, -0.95993);
+        camera.setScreenPosition(ProgramArguments.DEFAULT_SCREEN_POSITION);
+        camera.setRotation(-1 * Math.PI / 2, 0, 0);
+        //camera.setScreenPosition(new Vector3d(264.47257159,190.827145105804, 137.471873229963));
+        //camera.setRotation(-1.22173, 0, -0.95993);
         cameraViewPanel = new CameraViewPanel(camera);
         cameraViewPanel.renderFrame();
 
@@ -54,7 +54,7 @@ public class CameraControlPanel extends JPanel {
     private void movePositionForward(double delta) {
         Vector3d dd = direction.multiply(delta);
         Vector3d newPos = camera.getScreenPosition().add(dd);
-        System.out.println(newPos.toString());
+        //System.out.println(newPos.toString());
         camera.setScreenPosition(newPos);
         rerender();
     }

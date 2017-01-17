@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import com.bradforj287.raytracer.Globals;
 import com.bradforj287.raytracer.geometry.*;
 import com.bradforj287.raytracer.model.ShapeVisitor;
 import com.bradforj287.raytracer.utils.ShapeBoundsQueue;
@@ -36,7 +38,26 @@ public class KDTree {
             }
         }, 0, 5000);
 
-        populateTree(root);
+        // first populate tree to a maximum depth.
+        populateTree(root, 3);
+
+        // now repopulate each leaf node on a separate task
+        List<Future> futures = new ArrayList<>();
+        visitLeafNodes(node -> {
+            Future future = Globals.executorService.submit(() -> {
+                populateTree(node);
+            });
+            futures.add(future);
+        });
+
+        futures.forEach(f -> {
+            try {
+                f.get();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+
         printKdTreeStats();
         long elapsedSeconds = sw.elapsed(TimeUnit.SECONDS);
         timer.cancel();
@@ -67,6 +88,29 @@ public class KDTree {
         return splits.stream()
                 .min((a, b) -> a.getSahHeuristic().compareTo(b.getSahHeuristic()))
                 .get();
+    }
+
+    private List<KDNode> getLeafNodes() {
+        final List<KDNode> r = new ArrayList<>();
+        visitLeafNodes(node -> {
+            r.add(node);
+        });
+        return r;
+    }
+
+    private void visitLeafNodes(KDNodeVisitor visitor) {
+        visitLeafNodesHelper(this.root, visitor);
+    }
+
+    private void visitLeafNodesHelper(KDNode node, KDNodeVisitor visitor) {
+        if (node == null) {
+            return;
+        } else if (node.isLeaf()) {
+            visitor.visit(node);
+        } else {
+            visitLeafNodesHelper(node.getLeft(), visitor);
+            visitLeafNodesHelper(node.getRight(), visitor);
+        }
     }
 
     private PotentialTreeSplit getBestSplitOnAxisSah(final List<Shape3d> shapes, Axis axis) {
@@ -136,6 +180,17 @@ public class KDTree {
     }
 
     private void populateTree(KDNode node) {
+        populateTreeHelper(node, 0, null);
+    }
+
+    private void populateTree(KDNode node, int maxDepth) {
+        populateTreeHelper(node, 0, maxDepth);
+    }
+
+    private void populateTreeHelper(KDNode node, int currentDepth, Integer maxDepth) {
+        if (maxDepth != null && currentDepth >= maxDepth) {
+            return;
+        }
         Preconditions.checkNotNull(node);
         Preconditions.checkNotNull(node.getShapes());
         Preconditions.checkArgument(!node.getShapes().isEmpty());
@@ -147,7 +202,7 @@ public class KDTree {
         }
 
         // split shapes
-        PotentialTreeSplit optimal = splitShapesByAxisAvgLongestAxis(node.getShapes());
+        PotentialTreeSplit optimal = getBestSplitSahStrategy(node.getShapes());
 
         // base case #2 - if the split is empty we cant split */
         if (optimal.isEmptySplit()) {
@@ -167,8 +222,8 @@ public class KDTree {
         node.setRight(rightNode);
 
         //recurse
-        populateTree(leftNode);
-        populateTree(rightNode);
+        populateTreeHelper(leftNode, currentDepth + 1, maxDepth);
+        populateTreeHelper(rightNode, currentDepth + 1, maxDepth);
     }
 
     public KdTreeQueryStats visitPossibleIntersections(final Ray3d ray, final ShapeVisitor visitor) {
