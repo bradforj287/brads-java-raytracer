@@ -29,7 +29,7 @@ public class Sphere3d extends Shape3d {
     }
 
     @Override
-    public boolean isHitByRay(Ray3d ray, double t1, RayCastArguments returnArgs) {
+    public ShapeHit isHitByRay(Ray3d ray, double t1) {
         Vector3d dir = ray.getDirection();
         Vector3d eye = ray.getPoint();
 
@@ -40,7 +40,7 @@ public class Sphere3d extends Shape3d {
         dis = dis - dir.dot(dir) * (eyeMinusCenter.dot(eyeMinusCenter) - radius * radius);
 
         if (dis < 0) {
-            return false;
+            return null;
         }
         dis = Math.sqrt(dis);
 
@@ -49,24 +49,26 @@ public class Sphere3d extends Shape3d {
 
         double time_1 = (shitTerm - dis) / bottomTerm;
         double time_2 = (shitTerm + dis) / bottomTerm;
+
+        double tToReturn;
         if (time_1 < 0 && time_2 < 0) {
-            return false;
+            return null;
         } else if (time_1 < 0) {
-            returnArgs.t = time_2;
+            tToReturn = time_2;
         } else if (time_2 < 0) {
-            returnArgs.t = time_1;
+            tToReturn = time_1;
         } else {
             if (time_1 < time_2) {
-                returnArgs.t = time_1;
+                tToReturn = time_1;
             } else {
-                returnArgs.t = time_2;
+                tToReturn = time_2;
             }
         }
-        if (returnArgs.t < 0 || returnArgs.t > t1) {
-            return false;
+        if (tToReturn < 0 || tToReturn > t1) {
+            return null;
         }
 
-        return true;
+        return new ShapeHit(tToReturn, this);
     }
 
     @Override

@@ -36,7 +36,7 @@ public class Triangle3d extends Shape3d {
     }
 
     @Override
-    public boolean isHitByRay(Ray3d ray, double t1, RayCastArguments returnArgs) {
+    public ShapeHit isHitByRay(Ray3d ray, double t1) {
 
         Vector3d eye = ray.getPoint();
         Vector3d dir = ray.getDirection();
@@ -68,7 +68,7 @@ public class Triangle3d extends Shape3d {
                 / M;
 
         if (t < 0 || t > t1) {
-            return false;
+            return null;
         }
 
         // compute gamma
@@ -77,7 +77,7 @@ public class Triangle3d extends Shape3d {
                 / M;
 
         if (gamma < 0 || gamma > 1) {
-            return false;
+            return null;
         }
         // compute beta
         double beta = (j * (e * i - h * f) + k * (g * f - d * i) + l
@@ -85,16 +85,11 @@ public class Triangle3d extends Shape3d {
                 / M;
 
         if (beta < 0 || beta > 1 - gamma) {
-            return false;
+            return null;
         }
 
         // set return arguments
-        if (returnArgs != null) {
-            returnArgs.t = t;
-            returnArgs.gamma = gamma;
-            returnArgs.beta = beta;
-        }
-        return true;
+        return new ShapeHit(t, this);
     }
 
     private Vector3d[] toVertexArray() {

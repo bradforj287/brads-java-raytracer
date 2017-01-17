@@ -178,14 +178,14 @@ public class RayTracer implements Tracer {
     private RayHitResult doesRayHitAnyShapeHelper(final Ray3d theRay, final double maxT) {
         final RayHitResult results = new RayHitResult();
         results.setT(maxT);
-        final RayCastArguments rayCastArgs = new RayCastArguments();
 
         KdTreeQueryStats stats = scene.visitPossibleIntersections(theRay, shape -> {
-            if (shape.isHitByRay(theRay, results.getT(),
-                    rayCastArgs)) {
-                if (rayCastArgs.t < results.getT()) {
-                    results.setT(rayCastArgs.t);
-                    results.setShape(shape);
+            ShapeHit shapeHit = shape.isHitByRay(theRay, results.getT());
+            if (shapeHit != null) {
+                if (shapeHit.getT() < results.getT()) {
+                    results.setT(shapeHit.getT());
+                    results.setShape(shapeHit.getHitShape());
+                    results.setShapeHit(shapeHit);
                 }
             }
         });

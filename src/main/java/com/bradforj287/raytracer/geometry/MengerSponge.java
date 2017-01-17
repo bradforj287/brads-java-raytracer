@@ -1,5 +1,7 @@
 package com.bradforj287.raytracer.geometry;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -8,9 +10,9 @@ import java.util.stream.Collectors;
  * recursively defined menger sponge
  */
 public class MengerSponge extends Shape3d {
-    final int level;
-    final Surface surface;
-    final AxisAlignedBoundingBox3d aabb;
+    final private int level;
+    final private Surface surface;
+    final private AxisAlignedBoundingBox3d aabb;
 
     public MengerSponge(AxisAlignedBoundingBox3d aabb, int level, Surface surface) {
         this.level = level;
@@ -29,16 +31,16 @@ public class MengerSponge extends Shape3d {
     }
 
     @Override
-    public Vector3d normalAtSurfacePoint(Vector3d intersectPoint) {
-        return null;
+    public Vector3d getCentroid() {
+        return aabb.getMin().add(aabb.getMax()).multiply(.5);
     }
 
     @Override
-    public Vector3d getCentroid() {
-        return null;
+    public Vector3d normalAtSurfacePoint(Vector3d intersectPoint) {
+        throw new NotImplementedException();
     }
 
-    private boolean mengerTriangleHit(Ray3d ray, double t1, List<AxisAlignedBoundingBox3d> boxes, RayCastArguments returnArgs) {
+    private ShapeHit mengerTriangleHit(Ray3d ray, double t1, List<AxisAlignedBoundingBox3d> boxes) {
         List<Triangle3d> triangles = new ArrayList<>();
         boxes.forEach(b -> triangles.addAll(ShapeFactory.buildAxisAlignedTriangleBox(b, this.surface)));
 
@@ -46,25 +48,24 @@ public class MengerSponge extends Shape3d {
         Triangle3d minHit = null;
 
         for (Triangle3d tri : triangles) {
-            RayCastArguments args = new RayCastArguments();
-            if (tri.isHitByRay(ray, t1, args)) {
-                if (minHit == null || args.t < minHitT) {
+            ShapeHit shapeHit = tri.isHitByRay(ray, t1);
+            if (shapeHit != null) {
+                if (minHit == null || shapeHit.getT() < minHitT) {
                     minHit = tri;
-                    minHitT = args.t;
+                    minHitT = shapeHit.getT();
                 }
             }
         }
 
         if (minHit == null) {
-            return false;
+            return null;
         } else {
-            returnArgs.t = minHitT;
-            return true;
+           return new ShapeHit(minHitT, minHit);
         }
     }
 
     @Override
-    public boolean isHitByRay(Ray3d ray, double t1, RayCastArguments returnArgs) {
+    public ShapeHit isHitByRay(Ray3d ray, double t1) {
         List<AxisAlignedBoundingBox3d> lookAt = new ArrayList<>();
         lookAt.add(aabb);
 
@@ -75,13 +76,13 @@ public class MengerSponge extends Shape3d {
                     .collect(Collectors.toList());
 
             if (filtered.isEmpty()) {
-                return false;
+                return null;
             }
 
             // if last iteration then check triangles
             boolean lastItr = (lvl == this.level);
             if (lastItr) {
-                return mengerTriangleHit(ray, t1, filtered, returnArgs);
+                return mengerTriangleHit(ray, t1, filtered);
             }
 
             // compute next iteration
@@ -91,6 +92,6 @@ public class MengerSponge extends Shape3d {
             }
         }
 
-        return false;
+        return null;
     }
 }

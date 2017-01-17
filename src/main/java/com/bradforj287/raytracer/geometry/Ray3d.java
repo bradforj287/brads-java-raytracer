@@ -22,6 +22,10 @@ public class Ray3d {
         return new Ray3d(newPoint, direction);
     }
 
+    public Vector3d getPointAtT(double t) {
+        return point.add(direction.multiply(t));
+    }
+
     public Vector3d getPoint() {
         return point;
     }
