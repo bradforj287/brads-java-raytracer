@@ -10,6 +10,7 @@ public class ShapeFactory {
 
     }
 
+    // with outward normals
     public static List<Triangle3d> buildAxisAlignedTriangleBox(AxisAlignedBoundingBox3d bb, Surface surface) {
         List<Triangle3d> r = new ArrayList<>();
 
@@ -24,27 +25,27 @@ public class ShapeFactory {
         Vector3d maxminmin = new Vector3d(max.x, min.y, min.z);
         //back
         r.add(new Triangle3d(min, minminmax, minmaxmax, surface));
-        r.add(new Triangle3d(min, minmaxmax, minmaxmin, surface));
+        r.add(new Triangle3d(min,minmaxmax, minmaxmin, surface));
 
         // front
-        r.add(new Triangle3d(maxminmin, maxminmax, max, surface));
-        r.add(new Triangle3d(maxminmin, max, maxmaxmin, surface));
+        r.add(new Triangle3d(maxminmin, max,maxminmax, surface));
+        r.add(new Triangle3d(maxminmin, maxmaxmin,max, surface));
 
         // top
-        r.add(new Triangle3d(minminmax, maxminmax, max, surface));
-        r.add(new Triangle3d(minminmax, minmaxmax, max, surface));
+        r.add(new Triangle3d(minminmax, maxminmax,max, surface));
+        r.add(new Triangle3d(minminmax, max,minmaxmax, surface));
 
         // bottom
-        r.add(new Triangle3d(min, maxminmin, maxmaxmin, surface));
+        r.add(new Triangle3d(min, maxmaxmin, maxminmin, surface));
         r.add(new Triangle3d(min, minmaxmin, maxmaxmin, surface));
 
         // rhs
-        r.add(new Triangle3d(minmaxmin, maxmaxmin, max, surface));
+        r.add(new Triangle3d(minmaxmin, max, maxmaxmin, surface));
         r.add(new Triangle3d(minmaxmin, minmaxmax, max, surface));
 
         // lhs
-        r.add(new Triangle3d(min, maxminmin, maxminmax, surface));
-        r.add(new Triangle3d(min, minminmax, maxminmax, surface));
+        r.add(new Triangle3d(min,  maxminmin, maxminmax, surface));
+        r.add(new Triangle3d(min, maxminmax, minminmax, surface));
 
         return r;
     }

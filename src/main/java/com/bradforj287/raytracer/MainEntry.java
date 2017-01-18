@@ -30,7 +30,7 @@ public class MainEntry {
        // shapes.addAll(genRandomSpheres(200, min, max, 20, 100));
 
         //test reflective sphere
-        Vector3d center = new Vector3d(300, 450, 350);
+        Vector3d center = new Vector3d(300, 400, 350);
         Surface surface = new Surface();
         surface.setColor(RgbColor.fromInt(Color.blue.getRGB()));
         surface.setIof(1.5);
@@ -43,8 +43,8 @@ public class MainEntry {
         Vector3d theMax = new Vector3d(800, 800, 800);
         System.out.println("building sponge");
         AxisAlignedBoundingBox3d bb = new AxisAlignedBoundingBox3d(theMin, theMax);
-        //shapes.addAll(ShapeFactory.buildMengerSponge(bb, boxSurface, 2));
-        shapes.add(new MengerSponge(bb, 6, boxSurface));
+        shapes.addAll(ShapeFactory.buildMengerSponge(bb, boxSurface, 1));
+       // shapes.add(new MengerSponge(bb, 6, boxSurface));
         System.out.println("finished building sponge");
 
 
@@ -67,7 +67,7 @@ public class MainEntry {
 
 
         //install bounding box
-      //  shapes.addAll(boundingBoxTriangles);
+        //shapes.addAll(boundingBoxTriangles);
 
         // build model
         SceneModel model = new SceneModel(shapes);
