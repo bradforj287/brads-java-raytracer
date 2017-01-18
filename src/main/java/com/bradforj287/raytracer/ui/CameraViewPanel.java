@@ -3,6 +3,8 @@ package com.bradforj287.raytracer.ui;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import com.bradforj287.raytracer.model.Camera;
 import com.bradforj287.raytracer.model.CameraTraceResult;
@@ -25,8 +27,25 @@ public class CameraViewPanel extends JPanel {
         this.setPreferredSize(camera.getScreenResolution());
     }
 
+    public BufferedImage getSceneFrame() {
+        return sceneFrame;
+    }
+
+    public void captureImageWriteToFile(File outputfile) {
+        CameraTraceResult result = camera.captureImage();
+        try {
+            ImageIO.write(result.getImage(), "png", outputfile);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+        synchronized (paintLock) {
+            sceneFrame = result.getImage();
+        }
+    }
+
     public void renderFrame() {
         CameraTraceResult result = camera.captureImage();
+
         synchronized (paintLock) {
             sceneFrame = result.getImage();
         }

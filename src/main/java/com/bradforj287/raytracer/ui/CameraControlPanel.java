@@ -3,6 +3,7 @@ package com.bradforj287.raytracer.ui;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
 import javax.swing.*;
 import com.bradforj287.raytracer.ProgramArguments;
 import com.bradforj287.raytracer.geometry.Matrix3d;
@@ -34,12 +35,13 @@ public class CameraControlPanel extends JPanel {
         Dimension sceneRes = ProgramArguments.SIZE_OF_SCENE;
 
         this.camera = new Camera(sceneRes, sceneModel);
-        camera.setScreenPosition(ProgramArguments.DEFAULT_SCREEN_POSITION);
-        camera.setRotation(-1 * Math.PI / 2, 0, 0);
-        //camera.setScreenPosition(new Vector3d(264.47257159,190.827145105804, 137.471873229963));
-        //camera.setRotation(-1.22173, 0, -0.95993);
+        //camera.setScreenPosition(ProgramArguments.DEFAULT_SCREEN_POSITION);
+       // camera.setRotation(-1 * Math.PI / 2, 0, 0);
+        camera.setScreenPosition(new Vector3d(459.599540818160,1011.1067346, 387.90691231098));
+        camera.setRotation(-1.48, 0, -.0872);
         cameraViewPanel = new CameraViewPanel(camera);
-        cameraViewPanel.renderFrame();
+
+        cameraViewPanel.captureImageWriteToFile(new File("image.png"));
 
         this.add(cameraViewPanel, BorderLayout.CENTER);
 
@@ -54,7 +56,7 @@ public class CameraControlPanel extends JPanel {
     private void movePositionForward(double delta) {
         Vector3d dd = direction.multiply(delta);
         Vector3d newPos = camera.getScreenPosition().add(dd);
-        //System.out.println(newPos.toString());
+        System.out.println(newPos.toString());
         camera.setScreenPosition(newPos);
         rerender();
     }

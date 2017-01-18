@@ -27,22 +27,24 @@ public class MainEntry {
         // test adding a sphere
         Vector3d min = new Vector3d(-1000, -1000, -1000);
         Vector3d max = new Vector3d(1000, 1000, 1000);
-        shapes.addAll(genRandomSpheres(200, min, max, 20, 100));
+       // shapes.addAll(genRandomSpheres(200, min, max, 20, 100));
 
         //test reflective sphere
-        Vector3d center = new Vector3d(0, 400, 0);
+        Vector3d center = new Vector3d(300, 450, 350);
         Surface surface = new Surface();
         surface.setColor(RgbColor.fromInt(Color.blue.getRGB()));
         surface.setIof(1.5);
+        surface.setReflective(true);
 
 
-        Surface boxSurface = new Surface(new RgbColor(Color.red.getRGB()));
+        Surface boxSurface = new Surface(new RgbColor(Color.blue.getRGB()));
 
         Vector3d theMin = new Vector3d(0, 0, 0);
-        Vector3d theMax = new Vector3d(100, 100, 100);
+        Vector3d theMax = new Vector3d(800, 800, 800);
         System.out.println("building sponge");
         AxisAlignedBoundingBox3d bb = new AxisAlignedBoundingBox3d(theMin, theMax);
-        shapes.addAll(ShapeFactory.buildMengerSponge(bb, boxSurface, 2));
+        //shapes.addAll(ShapeFactory.buildMengerSponge(bb, boxSurface, 2));
+        shapes.add(new MengerSponge(bb, 6, boxSurface));
         System.out.println("finished building sponge");
 
 
@@ -60,6 +62,7 @@ public class MainEntry {
         //surface.setIof(1.31);
 
         Sphere3d refractiveSphere = new Sphere3d(center, 40, surface);
+
         shapes.add(refractiveSphere);
 
 
