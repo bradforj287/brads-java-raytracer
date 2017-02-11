@@ -4,44 +4,50 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
-import java.util.stream.Collectors;
 
 public class ShapeFactory {
     private ShapeFactory() {
 
     }
 
+    // with outward normals
     public static List<Triangle3d> buildAxisAlignedTriangleBox(AxisAlignedBoundingBox3d bb, Surface surface) {
         List<Triangle3d> r = new ArrayList<>();
 
         Vector3d min = bb.getMin();
         Vector3d max = bb.getMax();
 
+        Vector3d minminmax = new Vector3d(min.x, min.y, max.z);
+        Vector3d minmaxmax = new Vector3d(min.x, max.y, max.z);
+        Vector3d minmaxmin = new Vector3d(min.x, max.y, min.z);
+        Vector3d maxminmax = new Vector3d(max.x, min.y, max.z);
+        Vector3d maxmaxmin = new Vector3d(max.x, max.y, min.z);
+        Vector3d maxminmin = new Vector3d(max.x, min.y, min.z);
         //back
-        r.add(new Triangle3d(min, new Vector3d(min.x, min.y, max.z), new Vector3d(min.x, max.y, max.z), surface));
-        r.add(new Triangle3d(min, new Vector3d(min.x, max.y, max.z), new Vector3d(min.x, max.y, min.z), surface));
+        r.add(new Triangle3d(min, minminmax, minmaxmax, surface));
+        r.add(new Triangle3d(min,minmaxmax, minmaxmin, surface));
 
         // front
-        r.add(new Triangle3d(new Vector3d(max.x, min.y, min.z), new Vector3d(max.x, min.y, max.z), new Vector3d(max.x, max.y, max.z), surface));
-        r.add(new Triangle3d(new Vector3d(max.x, min.y, min.z), new Vector3d(max.x, max.y, max.z), new Vector3d(max.x, max.y, min.z), surface));
+        r.add(new Triangle3d(maxminmin, max,maxminmax, surface));
+        r.add(new Triangle3d(maxminmin, maxmaxmin,max, surface));
 
         // top
-        r.add(new Triangle3d(new Vector3d(min.x, min.y, max.z), new Vector3d(max.x, min.y, max.z), max, surface));
-        r.add(new Triangle3d(new Vector3d(min.x, min.y, max.z), new Vector3d(min.x, max.y, max.z), max, surface));
+        r.add(new Triangle3d(minminmax, maxminmax,max, surface));
+        r.add(new Triangle3d(minminmax, max,minmaxmax, surface));
 
         // bottom
-        r.add(new Triangle3d(new Vector3d(min.x, min.y, min.z), new Vector3d(max.x, min.y, min.z), new Vector3d(max.x, max.y, min.z), surface));
-        r.add(new Triangle3d(new Vector3d(min.x, min.y, min.z), new Vector3d(min.x, max.y, min.z), new Vector3d(max.x, max.y, min.z), surface));
+        r.add(new Triangle3d(min, maxmaxmin, maxminmin, surface));
+        r.add(new Triangle3d(min, minmaxmin, maxmaxmin, surface));
 
         // rhs
-        r.add(new Triangle3d(new Vector3d(min.x, max.y, min.z), new Vector3d(max.x, max.y, min.z), max, surface));
-        r.add(new Triangle3d(new Vector3d(min.x, max.y, min.z), new Vector3d(min.x, max.y, max.z), max, surface));
+        r.add(new Triangle3d(minmaxmin, max, maxmaxmin, surface));
+        r.add(new Triangle3d(minmaxmin, minmaxmax, max, surface));
 
         // lhs
-        r.add(new Triangle3d(new Vector3d(min.x, min.y, min.z), new Vector3d(max.x, min.y, min.z), new Vector3d(max.x, min.y, max.z), surface));
-        r.add(new Triangle3d(new Vector3d(min.x, min.y, min.z), new Vector3d(min.x, min.y, max.z), new Vector3d(max.x, min.y, max.z), surface));
+        r.add(new Triangle3d(min,  maxminmin, maxminmax, surface));
+        r.add(new Triangle3d(min, maxminmax, minminmax, surface));
 
-        return r.parallelStream().map(tri -> correctNormal(tri)).collect(Collectors.toList());
+        return r;
     }
 
     private static class MengerIteration {
@@ -67,7 +73,7 @@ public class ShapeFactory {
         Vector3d twiceZshift = zshiftv.multiply(2);
         Vector3d twiceYshift = yshiftv.multiply(2);
 
-        Vector3d deltav = new Vector3d(bbox.xLength() / 3, bbox.yLength() / 3,bbox.zLength() / 3);
+        Vector3d deltav = new Vector3d(bbox.xLength() / 3, bbox.yLength() / 3, bbox.zLength() / 3);
         //back
         AxisAlignedBoundingBox3d b = new AxisAlignedBoundingBox3d(bbox.getMin(), bbox.getMin().add(deltav));
         r.add(b);
